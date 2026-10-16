@@ -12,7 +12,20 @@
           "package_name": "com.example.streetbite"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "286985391613-1uvveikc4cr5g2ia3n11m8u87dpgb3fp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.streetbite",
+            "certificate_hash": "7f40064574c7a7d511c5c58f64db6df1737c79b5"
+          }
+        },
+        {
+          "client_id": "286985391613-tineftu9vj3s379b55enedfc2243k2s7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyALdooOI5XUTFQPg9i58ob8Lrl47hSykEw"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "286985391613-tineftu9vj3s379b55enedfc2243k2s7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "286985391613-5fjv0f6d0r8t6g2q5hukj85gadtil98s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.streetbite"
+              }
+            }
+          ]
         }
       }
     }

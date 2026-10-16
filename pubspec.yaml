@@ -49,17 +49,25 @@ dependencies:
   intl: ^0.20.3
   dartz: ^0.10.1
   flutter_svg: ^2.3.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/images/applogo.svg"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/applogo.svg"
+    background_color: "#00C874"
+    theme_color: "#00C874"
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
