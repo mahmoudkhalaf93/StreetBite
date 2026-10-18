@@ -21,9 +21,7 @@ class MealDataSourceFactory {
     required this.localDataSource,
   });
 
-  // Example factory method: return local source if we specifically want cached data
   MealLocalDataSource getLocal() => localDataSource;
-  // Example factory method: return remote source for fresh data
   MealRemoteDataSource getRemote() => remoteDataSource;
 }
 
@@ -40,11 +38,11 @@ class MealRepositoryImpl implements MealRepository {
 
   @override
   Future<Either<Failure, List<Meal>>> searchMealsByFirstLetter(String letter) async {
-    // 1. Try returning cached meals first for INSTANT zero-wait loading!
+    // 1. Home Screen Default Feed: Try returning home cached meals first
     try {
       final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
       if (localMeals.isNotEmpty) {
-        // Refresh cache asynchronously in background
+        // Refresh home cache asynchronously in background
         dataSourceFactory.getRemote().searchMealsByFirstLetter(letter).then((remoteMeals) {
           if (remoteMeals.isNotEmpty) {
             dataSourceFactory.getLocal().cacheMeals(remoteMeals);
@@ -54,7 +52,7 @@ class MealRepositoryImpl implements MealRepository {
         return Right(localMeals);
       }
     } catch (_) {
-      // If no local cache exists, fall through to fetch from remote
+      // Fallback if no home cache exists
     }
 
     try {
@@ -68,12 +66,14 @@ class MealRepositoryImpl implements MealRepository {
 
   @override
   Future<Either<Failure, List<Meal>>> searchMealsByName(String query) async {
+    final cacheKey = 'SEARCH_$query';
+
     try {
-      final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
-      if (localMeals.isNotEmpty && query.isEmpty) {
+      final localMeals = await dataSourceFactory.getLocal().getCachedMealsByKey(cacheKey);
+      if (localMeals.isNotEmpty) {
         dataSourceFactory.getRemote().searchMealsByName(query).then((remoteMeals) {
           if (remoteMeals.isNotEmpty) {
-            dataSourceFactory.getLocal().cacheMeals(remoteMeals);
+            dataSourceFactory.getLocal().cacheMealsByKey(cacheKey, remoteMeals);
           }
         }).catchError((_) {});
 
@@ -83,11 +83,11 @@ class MealRepositoryImpl implements MealRepository {
 
     try {
       final remoteMeals = await dataSourceFactory.getRemote().searchMealsByName(query);
-      await dataSourceFactory.getLocal().cacheMeals(remoteMeals);
+      await dataSourceFactory.getLocal().cacheMealsByKey(cacheKey, remoteMeals);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       try {
-        final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
+        final localMeals = await dataSourceFactory.getLocal().getCachedMealsByKey(cacheKey);
         return Right(localMeals);
       } on CacheException {
         return Left(ServerFailure(message: e.message));
@@ -177,8 +177,24 @@ class MealRepositoryImpl implements MealRepository {
 
   @override
   Future<Either<Failure, List<Meal>>> filterByCategory(String category) async {
+    final cacheKey = 'CAT_$category';
+
+    try {
+      final localMeals = await dataSourceFactory.getLocal().getCachedMealsByKey(cacheKey);
+      if (localMeals.isNotEmpty) {
+        dataSourceFactory.getRemote().filterByCategory(category).then((remoteMeals) {
+          if (remoteMeals.isNotEmpty) {
+            dataSourceFactory.getLocal().cacheMealsByKey(cacheKey, remoteMeals);
+          }
+        }).catchError((_) {});
+
+        return Right(localMeals);
+      }
+    } catch (_) {}
+
     try {
       final remoteMeals = await dataSourceFactory.getRemote().filterByCategory(category);
+      await dataSourceFactory.getLocal().cacheMealsByKey(cacheKey, remoteMeals);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -187,8 +203,24 @@ class MealRepositoryImpl implements MealRepository {
 
   @override
   Future<Either<Failure, List<Meal>>> filterByArea(String area) async {
+    final cacheKey = 'AREA_$area';
+
+    try {
+      final localMeals = await dataSourceFactory.getLocal().getCachedMealsByKey(cacheKey);
+      if (localMeals.isNotEmpty) {
+        dataSourceFactory.getRemote().filterByArea(area).then((remoteMeals) {
+          if (remoteMeals.isNotEmpty) {
+            dataSourceFactory.getLocal().cacheMealsByKey(cacheKey, remoteMeals);
+          }
+        }).catchError((_) {});
+
+        return Right(localMeals);
+      }
+    } catch (_) {}
+
     try {
       final remoteMeals = await dataSourceFactory.getRemote().filterByArea(area);
+      await dataSourceFactory.getLocal().cacheMealsByKey(cacheKey, remoteMeals);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -215,4 +247,3 @@ class MealRepositoryImpl implements MealRepository {
     }
   }
 }
-
