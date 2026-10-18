@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +24,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late PageController _pageController;
+  late PageController _fastestController;
+  late PageController _hotOffersController;
+  Timer? _bannerTimer;
+  int _currentBannerIndex = 0;
 
   String _extractRegionName(String fullAddress) {
     final parts = fullAddress
@@ -46,18 +50,36 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Using viewportFraction 0.78 for the "Fastest" banner slider as requested
-    _pageController = PageController(viewportFraction: 0.78);
-    
+    _fastestController = PageController(viewportFraction: 0.78);
+    _hotOffersController = PageController(viewportFraction: 0.92);
+
+    _startAutoBannerScroll();
+
     // Fetch meals when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MealCubit>().fetchMeals();
     });
   }
 
+  void _startAutoBannerScroll() {
+    _bannerTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (_hotOffersController.hasClients) {
+        _currentBannerIndex++;
+        if (_currentBannerIndex >= 5) _currentBannerIndex = 0;
+        _hotOffersController.animateToPage(
+          _currentBannerIndex,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _pageController.dispose();
+    _bannerTimer?.cancel();
+    _fastestController.dispose();
+    _hotOffersController.dispose();
     super.dispose();
   }
 
@@ -270,9 +292,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-              // Content based on MealCubit State (Hot Offers, Fastest, Recommended)
+              // Content based on MealCubit State
               BlocBuilder<MealCubit, MealState>(
                 builder: (context, state) {
                   if (state is MealLoading || state is MealInitial) {
@@ -303,42 +325,64 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const Center(child: Text("No meals found."));
                     }
 
-                    // For presentation, slice the list into different categories
                     final hotOffersMeals = meals.take(5).toList();
                     final fastestMeals = meals.skip(5).take(5).toList();
-                    final recommendedMeals = meals; // Use all for grid
+                    final recommendedMeals = meals;
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 4. Hot Offers Section
+                        // 4. Hot Offers Section (Auto-Sliding Banners)
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                l10n.hotOffers,
-                                style: TextStyle(
-                                  fontFamily: 'SF Pro',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            l10n.hotOffers,
+                            style: TextStyle(
+                              fontFamily: 'SF Pro',
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         SizedBox(
-                          height: 210,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          height: 150,
+                          child: PageView.builder(
+                            controller: _hotOffersController,
+                            onPageChanged: (index) {
+                              setState(() => _currentBannerIndex = index);
+                            },
                             itemCount: hotOffersMeals.length,
                             itemBuilder: (context, index) {
-                              return _buildHotOfferCard(context, hotOffersMeals[index], l10n, isDark);
+                              return _buildHotOfferBannerCard(
+                                context,
+                                hotOffersMeals[index],
+                                l10n,
+                                isDark,
+                                index,
+                              );
                             },
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Page Indicator Dots for Banners
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            hotOffersMeals.length,
+                            (index) => AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              width: _currentBannerIndex == index ? 20 : 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: _currentBannerIndex == index
+                                    ? AppColors.primary
+                                    : Colors.grey.shade400,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -360,15 +404,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                           height: 240,
                           child: PageView.builder(
-                            controller: _pageController,
-                            padEnds: false, // Start aligning from the left edge
+                            controller: _fastestController,
+                            padEnds: false,
                             itemCount: fastestMeals.isNotEmpty ? fastestMeals.length : meals.length,
                             itemBuilder: (context, index) {
                               return _buildFastestCard(
-                                context, 
-                                fastestMeals.isNotEmpty ? fastestMeals[index] : meals[index], 
-                                l10n, 
-                                isDark
+                                context,
+                                fastestMeals.isNotEmpty ? fastestMeals[index] : meals[index],
+                                l10n,
+                                isDark,
                               );
                             },
                           ),
@@ -378,19 +422,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         // 6. Recommended Section (Two-column GridView)
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                l10n.recommended,
-                                style: TextStyle(
-                                  fontFamily: 'SF Pro',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            l10n.recommended,
+                            style: TextStyle(
+                              fontFamily: 'SF Pro',
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -400,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.60, // Adjusted to fit image, text, and button
+                            childAspectRatio: 0.60,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
                           ),
@@ -459,60 +498,115 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHotOfferCard(BuildContext context, Meal meal, AppLocalizations l10n, bool isDark) {
+  // Rectangular Auto-Sliding Banner for Hot Offers
+  Widget _buildHotOfferBannerCard(
+      BuildContext context, Meal meal, AppLocalizations l10n, bool isDark, int index) {
+    final discounts = ['20% OFF', '30% OFF', 'SPECIAL DEAL', 'BUY 1 GET 1', '25% OFF'];
+    final discountText = discounts[index % discounts.length];
+
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MealDetailsScreen(meal: meal))),
       child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 16.0),
+        margin: const EdgeInsets.only(right: 12.0),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF1F2937), const Color(0xFF111827)]
+                : [AppColors.primary, const Color(0xFF009B5A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppColors.primary.withValues(alpha: 0.25),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: meal.strMealThumb != null
-                  ? CachedNetworkImage(
-                      imageUrl: meal.strMealThumb!,
-                      height: 110,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        height: 110,
-                        color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
-                        child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 110,
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.fastfood, color: Colors.grey),
-                      ),
-                    )
-                  : Container(height: 110, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
-            ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
                 children: [
-                  Text(
-                    meal.strMeal,
-                    style: TextStyle(fontFamily: 'SF Pro', fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  // Text & Info Column
+                  Expanded(
+                    flex: 6,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            discountText,
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          meal.strMeal,
+                          style: const TextStyle(
+                            fontFamily: 'SF Pro',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Text(
+                              'Order Now',
+                              style: TextStyle(
+                                fontFamily: 'SF Compact',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white70),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  const Text('20% OFF', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold, fontSize: 12)),
+
+                  // Image Container
+                  Expanded(
+                    flex: 4,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: meal.strMealThumb != null
+                          ? CachedNetworkImage(
+                              imageUrl: meal.strMealThumb!,
+                              height: 110,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: Colors.black12,
+                                child: const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.black12,
+                                child: const Icon(Icons.fastfood, color: Colors.white),
+                              ),
+                            )
+                          : Container(color: Colors.black12, child: const Icon(Icons.fastfood, color: Colors.white)),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -526,7 +620,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MealDetailsScreen(meal: meal))),
       child: Container(
-        margin: const EdgeInsets.only(right: 16.0), // Margin gives the gap between PageView items
+        margin: const EdgeInsets.only(right: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -567,7 +661,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 Text(
-                  '4.8', // Mocked rating
+                  '4.8',
                   style: TextStyle(
                     fontFamily: 'SF Compact',
                     fontSize: 14,
@@ -579,7 +673,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SvgPicture.asset('assets/icons/Star.svg', width: 14, height: 14),
                 const SizedBox(width: 4),
                 const Text(
-                  '(120)', // Mocked review count
+                  '(120)',
                   style: TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
                 ),
                 const Padding(
@@ -587,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
                 ),
                 Text(
-                  '2.4 ${l10n.km}', // Formatted nice distance
+                  '2.4 ${l10n.km}',
                   style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
                 ),
                 const Padding(
@@ -595,7 +689,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
                 ),
                 Text(
-                  '20-25 ${l10n.min}', // Formatted nice time
+                  '20-25 ${l10n.min}',
                   style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
                 ),
               ],
