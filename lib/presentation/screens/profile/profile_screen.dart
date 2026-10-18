@@ -8,7 +8,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
-import 'package:local_auth/local_auth.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -33,8 +32,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isUploading = false;
   bool _isFetchingLocation = false;
-  bool _isAuthenticated = false;
-  final LocalAuthentication _localAuth = LocalAuthentication();
   String? _profilePicUrl;
   String _userName = "Vlad S.";
   String _deviceInfo = "Loading device details...";
@@ -42,7 +39,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _authenticateBiometrics();
     _loadUserData();
     _loadDeviceInfo();
   }
@@ -69,35 +65,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         setState(() => _deviceInfo = 'Device Info Unavailable');
       }
-    }
-  }
-
-  Future<bool> _authenticateForAction(String reason) async {
-    try {
-      final bool canCheck = await _localAuth.canCheckBiometrics;
-      final bool isSupported = canCheck || await _localAuth.isDeviceSupported();
-
-      if (isSupported) {
-        return await _localAuth.authenticate(
-          localizedReason: reason,
-          options: const AuthenticationOptions(
-            biometricOnly: false,
-            stickyAuth: true,
-            useErrorDialogs: true,
-          ),
-        );
-      }
-      return false;
-    } catch (e) {
-      debugPrint('Biometrics Error: $e');
-      return false;
-    }
-  }
-
-  Future<void> _authenticateBiometrics() async {
-    final didAuth = await _authenticateForAction('Please authenticate to access your profile');
-    if (mounted) {
-      setState(() => _isAuthenticated = didAuth);
     }
   }
 
@@ -369,50 +336,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final user = FirebaseAuth.instance.currentUser;
 
-    if (!_isAuthenticated) {
-      return Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.fingerprint_rounded, size: 80, color: AppColors.primary),
-                const SizedBox(height: 16),
-                Text(
-                  'Biometric Authentication',
-                  style: TextStyle(
-                    fontFamily: 'SF Pro',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.normal,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Please authenticate to securely access your profile',
-                  style: TextStyle(fontFamily: 'SF Compact', color: Colors.grey, fontStyle: FontStyle.normal),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  icon: const Icon(Icons.lock_open_rounded, color: Colors.white),
-                  label: const Text('Unlock Profile', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  onPressed: _authenticateBiometrics,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthInitial) {
@@ -612,22 +535,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 8),
 
-                      // Payment Information (Guarded with Biometrics)
+                      // Payment Information
                       _buildMenuItem(
                         iconData: Icons.credit_card_rounded,
                         title: l10n.paymentInfo,
                         isDark: isDark,
-                        onTap: () async {
-                          final authed = await _authenticateForAction('Authenticate to view payment information');
-                          if (!mounted || !context.mounted) return;
-                          if (authed) {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (_) => const PaymentInfoSheet(),
-                            );
-                          }
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => const PaymentInfoSheet(),
+                          );
                         },
                       ),
                       const SizedBox(height: 8),
@@ -723,14 +642,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              onTap: _isFetchingLocation
-                                  ? null
-                                  : () async {
-                                      final authed = await _authenticateForAction('Authenticate to add a new address');
-                                      if (authed && mounted) {
-                                        _addNewAddress();
-                                      }
-                                    },
+                              onTap: _isFetchingLocation ? null : _addNewAddress,
                             ),
                           ],
                         ),

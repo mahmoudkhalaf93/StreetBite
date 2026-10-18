@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,8 +7,32 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  Timer? _countdownTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Re-render every 10 seconds to update remaining delivery minutes live on screen
+    _countdownTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
 
   String _formatTimeAgo(DateTime? date) {
     if (date == null) return 'Recent';
@@ -92,7 +117,7 @@ class OrdersScreen extends StatelessWidget {
 
                   final now = DateTime.now();
 
-                  // Dynamic classification based on createdAt timestamp and delivery duration
+                  // Dynamic live classification based on createdAt timestamp
                   final List<Map<String, dynamic>> activeOrdersList = [];
                   final List<Map<String, dynamic>> pastOrdersList = [];
 
@@ -105,18 +130,18 @@ class OrdersScreen extends StatelessWidget {
                       final elapsedMinutes = now.difference(timestamp).inMinutes;
 
                       if (elapsedMinutes < deliveryMinutes) {
-                        // Order is still actively being prepared / delivered!
+                        // Order is still actively being prepared / delivered
                         final remainingMinutes = deliveryMinutes - elapsedMinutes;
                         activeOrdersList.add({
                           'data': data,
                           'remainingMinutes': remainingMinutes > 0 ? remainingMinutes : 1,
                         });
                       } else {
-                        // Estimated delivery time has passed -> Automatically moved to Past!
+                        // Estimated delivery time has passed -> Automatically moved to Past
                         pastOrdersList.add({'data': data, 'timestamp': timestamp});
                       }
                     } else {
-                      // Fallback if timestamp is not yet resolved by server
+                      // Fallback if timestamp is resolving
                       activeOrdersList.add({'data': data, 'remainingMinutes': deliveryMinutes});
                     }
                   }

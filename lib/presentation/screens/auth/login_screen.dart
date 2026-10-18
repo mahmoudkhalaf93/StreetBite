@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -24,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final LocalAuthentication _localAuth = LocalAuthentication();
 
   @override
   void dispose() {
@@ -38,6 +41,75 @@ class _LoginScreenState extends State<LoginScreen> {
             _emailController.text.trim(),
             _passwordController.text.trim(),
           );
+    }
+  }
+
+  Future<void> _onBiometricSignInPressed(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+    final authCubit = context.read<AuthCubit>();
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    try {
+      final bool canCheck = await _localAuth.canCheckBiometrics;
+      final bool isSupported = canCheck || await _localAuth.isDeviceSupported();
+
+      if (!isSupported) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              isArabic
+                  ? 'بصمة الأصبع غير مدعومة على هذا الجهاز'
+                  : 'Biometric authentication is not supported on this device',
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      final bool didAuth = await _localAuth.authenticate(
+        localizedReason: isArabic
+            ? 'يرجى تأكيد البصمة لتسجيل الدخول إلى StreetBite'
+            : 'Please authenticate to sign in to StreetBite',
+        options: const AuthenticationOptions(
+          biometricOnly: false,
+          stickyAuth: true,
+          useErrorDialogs: true,
+        ),
+      );
+
+      if (didAuth) {
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser != null) {
+          nav.pushReplacement(
+            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+          );
+        } else if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+          authCubit.login(
+            _emailController.text.trim(),
+            _passwordController.text.trim(),
+          );
+        } else {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                isArabic
+                    ? 'تمت المصادقة بنجاح! يرجى إدخال البريد الإلكتروني وكلمة المرور لتأكيد التفعيل'
+                    : 'Authenticated! Please enter your credentials once to complete sign in',
+              ),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Biometric Login Error: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -58,6 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return BlocProvider(
       create: (_) => sl<AuthCubit>(),
@@ -87,12 +160,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   // Header with Background and Logo
                   SizedBox(
-                    height: size.height * 0.24, // Reduced from 0.28 to fit small screens perfectly
+                    height: size.height * 0.24,
                     width: double.infinity,
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Background Photo
                         SizedBox(
                           width: double.infinity,
                           height: double.infinity,
@@ -101,13 +173,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        // Dark/Grey transparent overlay for better logo visibility
                         Container(
                           width: double.infinity,
                           height: double.infinity,
                           color: Colors.black.withValues(alpha: 0.3),
                         ),
-                        // White Logo Container
                         Container(
                           width: 80,
                           height: 80,
@@ -124,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           padding: const EdgeInsets.all(16),
                           child: SvgPicture.asset(
-                            'assets/images/applogofastfood.svg', 
+                            'assets/images/applogofastfood.svg',
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -133,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0), // Reduced vertical padding
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -144,24 +214,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             l10n.foodAndGroceries,
                             style: const TextStyle(
                               fontFamily: 'SF Pro',
-                              fontSize: 22, // Reduced from 24
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1E1E1E),
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 4), // Reduced from 6
+                          const SizedBox(height: 4),
                           // Subtitle
                           Text(
                             l10n.signInToGetMeal,
                             style: const TextStyle(
                               fontFamily: 'SF Compact',
-                              fontSize: 14, // Reduced from 16
+                              fontSize: 14,
                               color: Color(0xFF6B7280),
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 20), // Reduced from 24
+                          const SizedBox(height: 20),
 
                           // Email Field
                           CustomTextField(
@@ -180,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 12), // Reduced from 16
+                          const SizedBox(height: 12),
 
                           // Password Field
                           CustomTextField(
@@ -226,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16), // Reduced from 24
+                          const SizedBox(height: 16),
 
                           // Login Button
                           CustomButton(
@@ -234,7 +304,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             isLoading: isLoading,
                             onPressed: () => _onLoginPressed(context),
                           ),
-                          const SizedBox(height: 16), // Reduced from 24
+                          const SizedBox(height: 12),
+
+                          // Biometric Fingerprint Button
+                          CustomButton(
+                            text: isArabic ? 'تسجيل الدخول بالبصمة' : 'Sign In with Fingerprint',
+                            backgroundColor: Colors.white,
+                            textColor: AppColors.primary,
+                            border: const BorderSide(color: AppColors.primary),
+                            icon: const Icon(Icons.fingerprint_rounded, color: AppColors.primary, size: 24),
+                            onPressed: () => _onBiometricSignInPressed(context),
+                          ),
+                          const SizedBox(height: 16),
 
                           // OR Divider
                           Row(
@@ -250,7 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               const Expanded(child: Divider(color: Color(0xFFE5E7EB))),
                             ],
                           ),
-                          const SizedBox(height: 16), // Reduced from 24
+                          const SizedBox(height: 16),
 
                           // Google Button
                           CustomButton(
@@ -265,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             onPressed: () => _onGoogleSignInPressed(context),
                           ),
-                          const SizedBox(height: 12), // Reduced from 16
+                          const SizedBox(height: 12),
 
                           // Facebook Button
                           CustomButton(
@@ -280,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             onPressed: () => _onFacebookSignInPressed(context),
                           ),
-                          const SizedBox(height: 16), // Reduced from 32
+                          const SizedBox(height: 16),
 
                           // Sign Up Footer
                           Row(
@@ -324,4 +405,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
