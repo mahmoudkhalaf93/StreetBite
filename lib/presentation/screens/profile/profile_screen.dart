@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,12 +41,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _userName = "Vlad S.";
   String _deviceInfo = "Loading device details...";
 
+  StreamSubscription<DocumentSnapshot>? _userStreamSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadUserData();
     _loadDeviceInfo();
     _loadBiometricPreference();
+  }
+
+  @override
+  void dispose() {
+    _userStreamSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadBiometricPreference() async {
@@ -154,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _seedDefaultAddressIfEmpty(user);
 
       // Listen to User document changes live from Firestore
-      FirebaseFirestore.instance
+      _userStreamSubscription = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .snapshots()
