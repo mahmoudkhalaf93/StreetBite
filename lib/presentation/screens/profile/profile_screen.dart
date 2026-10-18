@@ -93,6 +93,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(userKey, true);
         await prefs.setString('LAST_BIOMETRIC_UID', user.uid);
+
+        final isGoogleUser = user.providerData.any((p) => p.providerId == 'google.com');
+        await prefs.setBool('IS_GOOGLE_USER_${user.uid}', isGoogleUser);
+
         if (user.email != null) {
           await prefs.setString('LAST_BIOMETRIC_EMAIL', user.email!);
         }

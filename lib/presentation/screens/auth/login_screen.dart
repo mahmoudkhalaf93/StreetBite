@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -52,22 +53,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _onBiometricSignInPressed(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     final authCubit = context.read<AuthCubit>();
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     final prefs = await SharedPreferences.getInstance();
     final lastUid = prefs.getString('LAST_BIOMETRIC_UID');
     final isBiometricEnabled = lastUid != null && (prefs.getBool('BIOMETRIC_ENABLED_$lastUid') ?? false);
+    final isGoogleUser = lastUid != null && (prefs.getBool('IS_GOOGLE_USER_$lastUid') ?? false);
     final savedEmail = prefs.getString('LAST_BIOMETRIC_EMAIL') ?? prefs.getString('SAVED_EMAIL');
     final savedPassword = prefs.getString('SAVED_PASSWORD');
 
-    if (!isBiometricEnabled || savedEmail == null || savedPassword == null) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (!isBiometricEnabled) {
       messenger.showSnackBar(
         SnackBar(
           content: Text(
             isArabic
-                ? 'يرجى تسجيل الدخول بالبريد وكلمة المرور أولاً وتفعيل "تسجيل الدخول بالبصمة" من الإعدادات'
-                : 'Please log in with email/password first and enable "Biometric Login" in Settings',
+                ? 'يرجى تسجيل الدخول أولاً وتفعيل "تسجيل الدخول بالبصمة" لهذا الحساب من الإعدادات'
+                : 'Please log in first and enable "Biometric Login" for this account in Settings',
           ),
           backgroundColor: Colors.orange,
           duration: const Duration(seconds: 3),
@@ -96,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final bool didAuth = await _localAuth.authenticate(
         localizedReason: isArabic
-            ? 'يرجى تأكيد البصمة لتسجيل الدخول إلى حسابك ($savedEmail)'
-            : 'Please authenticate to sign in to your account ($savedEmail)',
+            ? 'يرجى تأكيد البصمة لتسجيل الدخول إلى حسابك (${savedEmail ?? ''})'
+            : 'Please authenticate to sign in to your account (${savedEmail ?? ''})',
         options: const AuthenticationOptions(
           biometricOnly: false,
           stickyAuth: true,
@@ -106,7 +111,18 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (didAuth) {
-        authCubit.login(savedEmail, savedPassword);
+        if (currentUser != null) {
+          nav.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+            (route) => false,
+          );
+        } else if (isGoogleUser) {
+          authCubit.signInWithGoogle();
+        } else if (savedEmail != null && savedPassword != null) {
+          authCubit.login(savedEmail, savedPassword);
+        } else {
+          authCubit.signInWithGoogle();
+        }
       }
     } catch (e) {
       messenger.showSnackBar(
