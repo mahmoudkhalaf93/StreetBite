@@ -34,9 +34,34 @@ class MealCubit extends Cubit<MealState> {
 
   Future<void> fetchMeals() async {
     emit(MealLoading());
-    // Fetch some default meals (e.g. searching 'c' gives a good list like Chicken)
     final result = await repository.searchMealsByFirstLetter('c');
-    
+    result.fold(
+      (failure) => emit(MealError(failure.props.first as String)),
+      (meals) => emit(MealLoaded(meals)),
+    );
+  }
+
+  Future<void> filterByCategory(String category) async {
+    emit(MealLoading());
+    final result = await repository.filterByCategory(category);
+    result.fold(
+      (failure) => emit(MealError(failure.props.first as String)),
+      (meals) => emit(MealLoaded(meals)),
+    );
+  }
+
+  Future<void> filterByArea(String area) async {
+    emit(MealLoading());
+    final result = await repository.filterByArea(area);
+    result.fold(
+      (failure) => emit(MealError(failure.props.first as String)),
+      (meals) => emit(MealLoaded(meals)),
+    );
+  }
+
+  Future<void> searchMeals(String query) async {
+    emit(MealLoading());
+    final result = await repository.searchMealsByName(query);
     result.fold(
       (failure) => emit(MealError(failure.props.first as String)),
       (meals) => emit(MealLoaded(meals)),
