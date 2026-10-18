@@ -90,29 +90,35 @@ class OrdersScreen extends StatelessWidget {
                     );
                   }
 
-                  // Separate Active Orders from Past Orders
-                  final activeOrders = docs.where((doc) {
+                  final now = DateTime.now();
+
+                  // Dynamic classification based on createdAt timestamp and delivery duration
+                  final List<Map<String, dynamic>> activeOrdersList = [];
+                  final List<Map<String, dynamic>> pastOrdersList = [];
+
+                  for (var doc in docs) {
                     final data = doc.data() as Map<String, dynamic>;
-                    final status = data['status'] ?? 'Preparing';
-                    return status == 'Preparing' || status == 'On the way';
-                  }).toList();
+                    final timestamp = (data['createdAt'] as Timestamp?)?.toDate();
+                    final deliveryMinutes = (data['deliveryMinutes'] as num?)?.toInt() ?? 30;
 
-                  final pastOrders = docs.where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    final status = data['status'] ?? 'Preparing';
-                    return status != 'Preparing' && status != 'On the way';
-                  }).toList();
+                    if (timestamp != null) {
+                      final elapsedMinutes = now.difference(timestamp).inMinutes;
 
-                  // If no explicitly finished orders, treat all except the top 1 as past for design preview
-                  List<QueryDocumentSnapshot> displayActive = activeOrders;
-                  List<QueryDocumentSnapshot> displayPast = pastOrders;
-
-                  if (displayActive.isEmpty && docs.isNotEmpty) {
-                    displayActive = [docs.first];
-                    displayPast = docs.sublist(1);
-                  } else if (displayActive.isNotEmpty && displayPast.isEmpty && docs.length > 1) {
-                    displayPast = docs.sublist(1);
-                    displayActive = [docs.first];
+                      if (elapsedMinutes < deliveryMinutes) {
+                        // Order is still actively being prepared / delivered!
+                        final remainingMinutes = deliveryMinutes - elapsedMinutes;
+                        activeOrdersList.add({
+                          'data': data,
+                          'remainingMinutes': remainingMinutes > 0 ? remainingMinutes : 1,
+                        });
+                      } else {
+                        // Estimated delivery time has passed -> Automatically moved to Past!
+                        pastOrdersList.add({'data': data, 'timestamp': timestamp});
+                      }
+                    } else {
+                      // Fallback if timestamp is not yet resolved by server
+                      activeOrdersList.add({'data': data, 'remainingMinutes': deliveryMinutes});
+                    }
                   }
 
                   return SingleChildScrollView(
@@ -134,9 +140,10 @@ class OrdersScreen extends StatelessWidget {
                         const SizedBox(height: 20),
 
                         // 2. Active Orders Section
-                        if (displayActive.isNotEmpty) ...[
-                          ...displayActive.map((doc) {
-                            final data = doc.data() as Map<String, dynamic>;
+                        if (activeOrdersList.isNotEmpty) ...[
+                          ...activeOrdersList.map((item) {
+                            final data = item['data'] as Map<String, dynamic>;
+                            final remainingMinutes = item['remainingMinutes'] as int;
                             final items = (data['items'] as List?) ?? [];
                             final firstItem = items.isNotEmpty ? items.first : {};
                             final title = firstItem['strMeal'] ?? 'StreetBite Special';
@@ -173,9 +180,9 @@ class OrdersScreen extends StatelessWidget {
                                               ),
                                             ),
                                             const SizedBox(width: 6),
-                                            const Text(
-                                              'Arrives in 25-30 min',
-                                              style: TextStyle(
+                                            Text(
+                                              'Arrives in $remainingMinutes min',
+                                              style: const TextStyle(
                                                 fontFamily: 'SF Pro',
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
@@ -206,7 +213,7 @@ class OrdersScreen extends StatelessWidget {
                         ],
 
                         // 3. Past Orders Section Header
-                        if (displayPast.isNotEmpty) ...[
+                        if (pastOrdersList.isNotEmpty) ...[
                           Text(
                             'Past',
                             style: TextStyle(
@@ -219,14 +226,14 @@ class OrdersScreen extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           // Past Orders List
-                          ...displayPast.map((doc) {
-                            final data = doc.data() as Map<String, dynamic>;
+                          ...pastOrdersList.map((item) {
+                            final data = item['data'] as Map<String, dynamic>;
+                            final timestamp = item['timestamp'] as DateTime?;
                             final items = (data['items'] as List?) ?? [];
                             final firstItem = items.isNotEmpty ? items.first : {};
                             final title = firstItem['strMeal'] ?? 'StreetBite Meal';
                             final thumb = firstItem['strMealThumb'];
                             final itemCount = (data['itemCount'] as num?)?.toInt() ?? items.length;
-                            final timestamp = (data['createdAt'] as Timestamp?)?.toDate();
                             final timeAgo = _formatTimeAgo(timestamp);
 
                             return Padding(

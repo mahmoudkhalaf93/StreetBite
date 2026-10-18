@@ -31,76 +31,105 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _bannerTimer;
   int _currentBannerIndex = 0;
 
+  // Exact 14 API Categories matching https://www.themealdb.com/api/json/v1/1/categories.php
   final List<Map<String, dynamic>> _homeCategories = [
     {
-      'labelEn': 'Ramen',
-      'labelAr': 'رامن',
-      'icon': 'assets/icons/ramen.svg',
-      'query': 'Seafood',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Pizza',
-      'labelAr': 'بيتزا',
-      'icon': 'assets/icons/pizza.svg',
-      'query': 'Miscellaneous',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Fast Food',
-      'labelAr': 'وجبات سريعة',
-      'icon': 'assets/icons/fast_food.svg',
+      'labelEn': 'Beef',
+      'labelAr': 'لحوم بقر',
+      'icon': 'assets/icons/meat.svg',
       'query': 'Beef',
       'isArea': false,
     },
     {
-      'labelEn': 'Healthy',
-      'labelAr': 'أكل صحي',
-      'icon': 'assets/icons/healthy.svg',
-      'query': 'Vegetarian',
+      'labelEn': 'Chicken',
+      'labelAr': 'دجاج',
+      'icon': 'assets/icons/fast_food.svg',
+      'query': 'Chicken',
       'isArea': false,
     },
     {
-      'labelEn': 'Salads',
-      'labelAr': 'سلاطات',
-      'icon': 'assets/icons/salads.svg',
-      'query': 'Side',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Desserts',
+      'labelEn': 'Dessert',
       'labelAr': 'حلويات',
       'icon': 'assets/icons/icecream.svg',
       'query': 'Dessert',
       'isArea': false,
     },
     {
-      'labelEn': 'Meat',
-      'labelAr': 'لحوم',
+      'labelEn': 'Lamb',
+      'labelAr': 'لحم ضأن',
       'icon': 'assets/icons/meat.svg',
       'query': 'Lamb',
       'isArea': false,
     },
     {
-      'labelEn': 'Asian',
-      'labelAr': 'آسيوي',
-      'icon': 'assets/icons/asian.svg',
-      'query': 'Japanese',
-      'isArea': true,
+      'labelEn': 'Miscellaneous',
+      'labelAr': 'أطباق متنوعة',
+      'icon': 'assets/icons/acclaimed.svg',
+      'query': 'Miscellaneous',
+      'isArea': false,
     },
     {
-      'labelEn': 'Bakery',
-      'labelAr': 'مخبوزات',
+      'labelEn': 'Pasta',
+      'labelAr': 'باستا',
+      'icon': 'assets/icons/ramen.svg',
+      'query': 'Pasta',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Pork',
+      'labelAr': 'لحم خنزير',
+      'icon': 'assets/icons/meat.svg',
+      'query': 'Pork',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Seafood',
+      'labelAr': 'مأكولات بحرية',
+      'icon': 'assets/icons/asian.svg',
+      'query': 'Seafood',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Side',
+      'labelAr': 'أطباق جانبية',
+      'icon': 'assets/icons/salads.svg',
+      'query': 'Side',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Starter',
+      'labelAr': 'مقبلات',
+      'icon': 'assets/icons/pizza.svg',
+      'query': 'Starter',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Vegan',
+      'labelAr': 'نباتي صرف',
+      'icon': 'assets/icons/healthy.svg',
+      'query': 'Vegan',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Vegetarian',
+      'labelAr': 'نباتي',
+      'icon': 'assets/icons/healthy.svg',
+      'query': 'Vegetarian',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Breakfast',
+      'labelAr': 'إفطار',
       'icon': 'assets/icons/bakery.svg',
       'query': 'Breakfast',
       'isArea': false,
     },
     {
-      'labelEn': 'Italian',
-      'labelAr': 'إيطالي',
-      'icon': 'assets/icons/italian.svg',
-      'query': 'Italian',
-      'isArea': true,
+      'labelEn': 'Goat',
+      'labelAr': 'لحم ماعز',
+      'icon': 'assets/icons/meat.svg',
+      'query': 'Goat',
+      'isArea': false,
     },
   ];
 
@@ -378,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 3. Categories (Horizontal Scroll matching Browse categories)
+              // 3. Categories (Horizontal Scroll matching categories.php API)
               SizedBox(
                 height: 95,
                 child: ListView.builder(
@@ -693,9 +722,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 6),
-                        Row(
+                        const Row(
                           children: [
-                            const Text(
+                            Text(
                               'Order Now',
                               style: TextStyle(
                                 fontFamily: 'SF Compact',
@@ -704,8 +733,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.white70,
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white70),
+                            SizedBox(width: 4),
+                            Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white70),
                           ],
                         ),
                       ],
