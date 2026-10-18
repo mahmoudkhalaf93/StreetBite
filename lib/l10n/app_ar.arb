@@ -68,5 +68,11 @@
   "fetchingLocation": "جاري تحديد موقعك...",
   "locationSaved": "تم حفظ العنوان بنجاح",
   "uploadingImage": "جاري رفع الصورة...",
-  "imageUpdated": "تم تحديث صورة الملف الشخصي"
+  "imageUpdated": "تم تحديث صورة الملف الشخصي",
+  "changeDefaultAddressTitle": "تغيير العنوان الافتراضي",
+  "changeDefaultAddressConfirm": "هل توافق على تغيير العنوان الافتراضي إلى هذا العنوان؟",
+  "changeDefaultPaymentTitle": "تغيير طريقة الدفع الأساسية",
+  "changeDefaultPaymentConfirm": "هل توافق على تعيين هذه البطاقة كطريقة الدفع الأساسية؟",
+  "agree": "موافق",
+  "cancel": "إلغاء"
 }

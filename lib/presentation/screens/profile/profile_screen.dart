@@ -79,6 +79,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _setDefaultAddress(String selectedDocId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final addressesRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('addresses');
+
+    final snapshot = await addressesRef.get();
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (var doc in snapshot.docs) {
+      batch.update(doc.reference, {'isDefault': doc.id == selectedDocId});
+    }
+
+    await batch.commit();
+  }
+
+  void _confirmSetDefaultAddress(String docId) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          l10n.changeDefaultAddressTitle,
+          style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          l10n.changeDefaultAddressConfirm,
+          style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _setDefaultAddress(docId);
+            },
+            child: Text(l10n.agree, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _pickAndUploadImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
@@ -445,6 +496,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     final lng = (data['longitude'] as num?)?.toStringAsFixed(4) ?? '';
 
                                     return ListTile(
+                                      onTap: isDefault ? null : () => _confirmSetDefaultAddress(doc.id),
                                       contentPadding: const EdgeInsets.only(left: 36, right: 8),
                                       title: Text(
                                         title,
@@ -460,7 +512,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           : Text('$lat, $lng', style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11)),
                                       trailing: isDefault
                                           ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
-                                          : null,
+                                          : const Icon(Icons.circle_outlined, color: Colors.grey, size: 18),
                                     );
                                   }).toList(),
                                 );

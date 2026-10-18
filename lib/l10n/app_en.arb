@@ -75,5 +75,11 @@
   "fetchingLocation": "Fetching location...",
   "locationSaved": "Location saved successfully",
   "uploadingImage": "Uploading photo...",
-  "imageUpdated": "Profile photo updated"
+  "imageUpdated": "Profile photo updated",
+  "changeDefaultAddressTitle": "Change Default Address",
+  "changeDefaultAddressConfirm": "Are you sure you want to set this as your default delivery address?",
+  "changeDefaultPaymentTitle": "Change Primary Payment Method",
+  "changeDefaultPaymentConfirm": "Are you sure you want to set this as your primary payment card?",
+  "agree": "Agree",
+  "cancel": "Cancel"
 }

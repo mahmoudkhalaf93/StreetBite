@@ -220,4 +220,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get imageUpdated => 'تم تحديث صورة الملف الشخصي';
+
+  @override
+  String get changeDefaultAddressTitle => 'تغيير العنوان الافتراضي';
+
+  @override
+  String get changeDefaultAddressConfirm =>
+      'هل توافق على تغيير العنوان الافتراضي إلى هذا العنوان؟';
+
+  @override
+  String get changeDefaultPaymentTitle => 'تغيير طريقة الدفع الأساسية';
+
+  @override
+  String get changeDefaultPaymentConfirm =>
+      'هل توافق على تعيين هذه البطاقة كطريقة الدفع الأساسية؟';
+
+  @override
+  String get agree => 'موافق';
+
+  @override
+  String get cancel => 'إلغاء';
 }

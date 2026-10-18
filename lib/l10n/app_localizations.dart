@@ -511,6 +511,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile photo updated'**
   String get imageUpdated;
+
+  /// No description provided for @changeDefaultAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Default Address'**
+  String get changeDefaultAddressTitle;
+
+  /// No description provided for @changeDefaultAddressConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to set this as your default delivery address?'**
+  String get changeDefaultAddressConfirm;
+
+  /// No description provided for @changeDefaultPaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Primary Payment Method'**
+  String get changeDefaultPaymentTitle;
+
+  /// No description provided for @changeDefaultPaymentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to set this as your primary payment card?'**
+  String get changeDefaultPaymentConfirm;
+
+  /// No description provided for @agree.
+  ///
+  /// In en, this message translates to:
+  /// **'Agree'**
+  String get agree;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -64,17 +66,58 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        l10n.parkWay,
-                        style: const TextStyle(
-                          fontFamily: 'SF Pro',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontStyle: FontStyle.normal,
-                          color: AppColors.primary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: Builder(
+                        builder: (context) {
+                          final user = FirebaseAuth.instance.currentUser;
+                          final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+                          if (user == null) {
+                            return Text(
+                              l10n.parkWay,
+                              style: const TextStyle(
+                                fontFamily: 'SF Pro',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.primary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            );
+                          }
+
+                          return StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user.uid)
+                                .collection('addresses')
+                                .where('isDefault', isEqualTo: true)
+                                .limit(1)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              String addressTitle = l10n.parkWay;
+                              if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                                final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
+                                addressTitle = isArabic
+                                    ? (data['addressAr'] ?? data['addressEn'] ?? l10n.parkWay)
+                                    : (data['addressEn'] ?? l10n.parkWay);
+                              }
+
+                              return Text(
+                                addressTitle,
+                                style: const TextStyle(
+                                  fontFamily: 'SF Pro',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.primary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
                     // Language Toggle

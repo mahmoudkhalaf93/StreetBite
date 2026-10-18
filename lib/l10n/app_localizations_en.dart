@@ -221,4 +221,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageUpdated => 'Profile photo updated';
+
+  @override
+  String get changeDefaultAddressTitle => 'Change Default Address';
+
+  @override
+  String get changeDefaultAddressConfirm =>
+      'Are you sure you want to set this as your default delivery address?';
+
+  @override
+  String get changeDefaultPaymentTitle => 'Change Primary Payment Method';
+
+  @override
+  String get changeDefaultPaymentConfirm =>
+      'Are you sure you want to set this as your primary payment card?';
+
+  @override
+  String get agree => 'Agree';
+
+  @override
+  String get cancel => 'Cancel';
 }
