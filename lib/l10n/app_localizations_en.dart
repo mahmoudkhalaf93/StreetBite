@@ -155,4 +155,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hotOffers => 'Hot Offers';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get contactUs => 'Contact us';
+
+  @override
+  String get helpCenter => 'Help center';
+
+  @override
+  String get paymentInfo => 'Payment information';
+
+  @override
+  String get addresses => 'Addresses';
+
+  @override
+  String get addAddress => 'Add new address';
+
+  @override
+  String get defaultAddress => 'Default address';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get logout => 'Logout';
 }

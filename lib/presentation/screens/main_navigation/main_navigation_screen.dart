@@ -4,6 +4,7 @@ import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../home/home_screen.dart';
+import '../profile/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -25,7 +26,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const HomeScreen(),
       Center(child: Text(l10n.navBrowse)),
       Center(child: Text(l10n.navOrders)),
-      Center(child: Text(l10n.navProfile)),
+      const ProfileScreen(),
     ];
 
     return Scaffold(

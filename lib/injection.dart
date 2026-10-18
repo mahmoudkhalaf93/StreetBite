@@ -42,6 +42,7 @@ Future<void> init() async {
       loginUseCase: sl(),
       signUpUseCase: sl(),
       googleSignInUseCase: sl(),
+      signOutUseCase: sl(),
     ),
   );
 

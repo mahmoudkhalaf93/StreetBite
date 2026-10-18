@@ -46,5 +46,15 @@
   "retry": "إعادة المحاولة",
   "addToCart": "أضف للسلة",
   "addedToCart": "تم إضافة {mealName} إلى السلة",
-  "hotOffers": "عروض مميزة"
+  "hotOffers": "عروض مميزة",
+  "settings": "الإعدادات",
+  "contactUs": "تواصل معنا",
+  "helpCenter": "مركز المساعدة",
+  "paymentInfo": "معلومات الدفع",
+  "addresses": "العناوين",
+  "addAddress": "إضافة عنوان جديد",
+  "defaultAddress": "العنوان الافتراضي",
+  "language": "اللغة",
+  "theme": "المظهر",
+  "logout": "تسجيل الخروج"
 }

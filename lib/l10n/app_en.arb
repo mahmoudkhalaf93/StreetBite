@@ -53,5 +53,15 @@
       }
     }
   },
-  "hotOffers": "Hot Offers"
+  "hotOffers": "Hot Offers",
+  "settings": "Settings",
+  "contactUs": "Contact us",
+  "helpCenter": "Help center",
+  "paymentInfo": "Payment information",
+  "addresses": "Addresses",
+  "addAddress": "Add new address",
+  "defaultAddress": "Default address",
+  "language": "Language",
+  "theme": "Theme",
+  "logout": "Logout"
 }

@@ -154,4 +154,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hotOffers => 'عروض مميزة';
+
+  @override
+  String get settings => 'الإعدادات';
+
+  @override
+  String get contactUs => 'تواصل معنا';
+
+  @override
+  String get helpCenter => 'مركز المساعدة';
+
+  @override
+  String get paymentInfo => 'معلومات الدفع';
+
+  @override
+  String get addresses => 'العناوين';
+
+  @override
+  String get addAddress => 'إضافة عنوان جديد';
+
+  @override
+  String get defaultAddress => 'العنوان الافتراضي';
+
+  @override
+  String get language => 'اللغة';
+
+  @override
+  String get theme => 'المظهر';
+
+  @override
+  String get logout => 'تسجيل الخروج';
 }
