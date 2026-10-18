@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -50,6 +51,25 @@ class _LoginScreenState extends State<LoginScreen> {
     final authCubit = context.read<AuthCubit>();
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
+    final prefs = await SharedPreferences.getInstance();
+    final isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED') ?? false;
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (!isBiometricEnabled && currentUser == null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'يرجى تسجيل الدخول أولاً وتفعيل "تسجيل الدخول بالبصمة" من صفحة الإعدادات/البروفايل'
+                : 'Please log in first and enable "Biometric Login" in Settings/Profile',
+          ),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     try {
       final bool canCheck = await _localAuth.canCheckBiometrics;
       final bool isSupported = canCheck || await _localAuth.isDeviceSupported();
@@ -80,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (didAuth) {
-        final currentUser = FirebaseAuth.instance.currentUser;
         if (currentUser != null) {
           nav.pushReplacement(
             MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
@@ -91,15 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
             _passwordController.text.trim(),
           );
         } else {
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                isArabic
-                    ? 'تمت المصادقة بنجاح! يرجى إدخال البريد الإلكتروني وكلمة المرور لتأكيد التفعيل'
-                    : 'Authenticated! Please enter your credentials once to complete sign in',
-              ),
-              backgroundColor: AppColors.primary,
-            ),
+          nav.pushReplacement(
+            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
           );
         }
       }

@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
@@ -32,6 +34,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isUploading = false;
   bool _isFetchingLocation = false;
+  bool _isBiometricEnabled = false;
+  final LocalAuthentication _localAuth = LocalAuthentication();
   String? _profilePicUrl;
   String _userName = "Vlad S.";
   String _deviceInfo = "Loading device details...";
@@ -41,6 +45,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _loadUserData();
     _loadDeviceInfo();
+    _loadBiometricPreference();
+  }
+
+  Future<void> _loadBiometricPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED') ?? false;
+      });
+    }
+  }
+
+  Future<bool> _authenticateForAction(String reason) async {
+    try {
+      final bool canCheck = await _localAuth.canCheckBiometrics;
+      final bool isSupported = canCheck || await _localAuth.isDeviceSupported();
+
+      if (isSupported) {
+        return await _localAuth.authenticate(
+          localizedReason: reason,
+          options: const AuthenticationOptions(
+            biometricOnly: false,
+            stickyAuth: true,
+            useErrorDialogs: true,
+          ),
+        );
+      }
+      return true;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Future<void> _toggleBiometricLogin(bool value) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    if (value) {
+      final authed = await _authenticateForAction('Authenticate to enable biometric login');
+      if (authed) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('BIOMETRIC_ENABLED', true);
+        if (user.email != null) {
+          await prefs.setString('SAVED_BIOMETRIC_EMAIL', user.email!);
+        }
+        if (mounted) {
+          setState(() => _isBiometricEnabled = true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                Localizations.localeOf(context).languageCode == 'ar'
+                    ? 'تم تفعيل تسجيل الدخول بالبصمة بنجاح! 🔒'
+                    : 'Biometric login enabled successfully! 🔒',
+              ),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+      }
+    } else {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('BIOMETRIC_ENABLED', false);
+      if (mounted) {
+        setState(() => _isBiometricEnabled = false);
+      }
+    }
   }
 
   Future<void> _loadDeviceInfo() async {
@@ -467,6 +537,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           children: [
+                            ListTile(
+                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                              title: Text(
+                                isArabic ? 'تسجيل الدخول بالبصمة' : 'Biometric Login',
+                                style: const TextStyle(fontSize: 13, fontStyle: FontStyle.normal),
+                              ),
+                              trailing: Switch(
+                                activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+                                activeThumbColor: AppColors.primary,
+                                value: _isBiometricEnabled,
+                                onChanged: _toggleBiometricLogin,
+                              ),
+                            ),
                             ListTile(
                               contentPadding: const EdgeInsets.only(left: 36, right: 8),
                               title: Text(l10n.language, style: TextStyle(fontSize: 13, fontStyle: FontStyle.normal, color: isDark ? Colors.white70 : Colors.black87)),
