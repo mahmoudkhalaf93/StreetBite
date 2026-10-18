@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:local_auth/local_auth.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
@@ -17,6 +18,7 @@ import '../../blocs/auth/auth_state.dart';
 import '../../blocs/locale/locale_cubit.dart';
 import '../../blocs/theme/theme_cubit.dart';
 import '../auth/login_screen.dart';
+import '../favourites/favourites_screen.dart';
 import 'widgets/contact_us_sheet.dart';
 import 'widgets/help_center_sheet.dart';
 import 'widgets/payment_info_sheet.dart';
@@ -35,12 +37,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final LocalAuthentication _localAuth = LocalAuthentication();
   String? _profilePicUrl;
   String _userName = "Vlad S.";
+  String _deviceInfo = "Loading device details...";
 
   @override
   void initState() {
     super.initState();
     _authenticateBiometrics();
     _loadUserData();
+    _loadDeviceInfo();
+  }
+
+  Future<void> _loadDeviceInfo() async {
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        if (mounted) {
+          setState(() {
+            _deviceInfo = '${androidInfo.manufacturer.toUpperCase()} ${androidInfo.model} (Android ${androidInfo.version.release})';
+          });
+        }
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        if (mounted) {
+          setState(() {
+            _deviceInfo = '${iosInfo.name} (${iosInfo.systemName} ${iosInfo.systemVersion})';
+          });
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _deviceInfo = 'Device Info Unavailable');
+      }
+    }
   }
 
   Future<void> _authenticateBiometrics() async {
@@ -424,6 +453,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // 3. Compact & Elegant Menu Items
                   Column(
                     children: [
+                      // Favourites Menu Option
+                      _buildMenuItem(
+                        iconData: Icons.favorite_rounded,
+                        title: isArabic ? 'الوجبات المفضلة ❤️' : 'My Favourites ❤️',
+                        isDark: isDark,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const FavouritesScreen()),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+
                       // Settings (Language & Theme)
                       Theme(
                         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -625,6 +668,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Device Details Option (device_info_plus)
+                      _buildMenuItem(
+                        iconData: Icons.phone_android_rounded,
+                        title: _deviceInfo,
+                        isDark: isDark,
+                        onTap: () {},
                       ),
                     ],
                   ),

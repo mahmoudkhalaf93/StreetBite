@@ -17,6 +17,7 @@ import '../meal/meal_details_screen.dart';
 import '../cart/cart_screen.dart';
 import '../vendor_map/vendor_map_screen.dart';
 import '../browse/category_meals_screen.dart';
+import '../../widgets/favourite_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -877,22 +878,33 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: meal.strMealThumb != null
-                    ? CachedNetworkImage(
-                        imageUrl: meal.strMealThumb!,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
-                          child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey.shade300,
-                          child: const Icon(Icons.fastfood, color: Colors.grey),
-                        ),
-                      )
-                    : Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: meal.strMealThumb != null
+                          ? CachedNetworkImage(
+                              imageUrl: meal.strMealThumb!,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                                child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey.shade300,
+                                child: const Icon(Icons.fastfood, color: Colors.grey),
+                              ),
+                            )
+                          : Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
+                    ),
+                  ),
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: FavouriteButton(meal: meal, size: 20),
+                  ),
+                ],
               ),
             ),
             Padding(

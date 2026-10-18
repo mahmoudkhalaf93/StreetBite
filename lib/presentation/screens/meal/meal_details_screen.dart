@@ -5,6 +5,7 @@ import '../../../domain/entities/meal.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../blocs/cart/cart_cubit.dart';
+import '../../widgets/favourite_button.dart';
 
 class MealDetailsScreen extends StatelessWidget {
   final Meal meal;
@@ -24,6 +25,10 @@ class MealDetailsScreen extends StatelessWidget {
           style: const TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
         ),
         elevation: 0,
+        actions: [
+          FavouriteButton(meal: meal, size: 24),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
