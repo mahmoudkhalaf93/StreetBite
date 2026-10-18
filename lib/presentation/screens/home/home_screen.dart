@@ -15,6 +15,7 @@ import '../../blocs/meal/meal_cubit.dart';
 import '../../blocs/theme/theme_cubit.dart';
 import '../meal/meal_details_screen.dart';
 import '../cart/cart_screen.dart';
+import '../vendor_map/vendor_map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -100,68 +101,80 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                 child: Row(
                   children: [
-                    SvgPicture.asset(
-                      'assets/icons/location_in_bar.svg',
-                      width: 24,
-                      height: 24,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Builder(
-                        builder: (context) {
-                          final user = FirebaseAuth.instance.currentUser;
-                          final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const VendorMapScreen()),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/location_in_bar.svg',
+                            width: 24,
+                            height: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Builder(
+                            builder: (context) {
+                              final user = FirebaseAuth.instance.currentUser;
+                              final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
-                          if (user == null) {
-                            return Text(
-                              l10n.parkWay,
-                              style: const TextStyle(
-                                fontFamily: 'SF Pro',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontStyle: FontStyle.normal,
-                                color: AppColors.primary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            );
-                          }
-
-                          return StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(user.uid)
-                                .collection('addresses')
-                                .where('isDefault', isEqualTo: true)
-                                .limit(1)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              String addressTitle = l10n.parkWay;
-                              if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                                final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
-                                final rawAddress = isArabic
-                                    ? (data['addressAr'] ?? data['addressEn'] ?? l10n.parkWay)
-                                    : (data['addressEn'] ?? l10n.parkWay);
-                                addressTitle = _extractRegionName(rawAddress);
+                              if (user == null) {
+                                return Text(
+                                  l10n.parkWay,
+                                  style: const TextStyle(
+                                    fontFamily: 'SF Pro',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.normal,
+                                    color: AppColors.primary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                );
                               }
 
-                              return Text(
-                                addressTitle,
-                                style: const TextStyle(
-                                  fontFamily: 'SF Pro',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  fontStyle: FontStyle.normal,
-                                  color: AppColors.primary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              return StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('addresses')
+                                    .where('isDefault', isEqualTo: true)
+                                    .limit(1)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  String addressTitle = l10n.parkWay;
+                                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                                    final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
+                                    final rawAddress = isArabic
+                                        ? (data['addressAr'] ?? data['addressEn'] ?? l10n.parkWay)
+                                        : (data['addressEn'] ?? l10n.parkWay);
+                                    addressTitle = _extractRegionName(rawAddress);
+                                  }
+
+                                  return Text(
+                                    addressTitle,
+                                    style: const TextStyle(
+                                      fontFamily: 'SF Pro',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FontStyle.normal,
+                                      color: AppColors.primary,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
+                          ),
+                        ],
                       ),
                     ),
+                    const Spacer(),
                     // Language Toggle
                     AnimatedClickButton(
                       onPressed: () => context.read<LocaleCubit>().toggleLocale(),
