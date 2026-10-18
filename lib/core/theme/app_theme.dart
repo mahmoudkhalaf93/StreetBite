@@ -6,6 +6,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      fontFamily: 'SF Pro', // Default font family
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.primaryDark,
@@ -25,6 +26,7 @@ class AppTheme {
           color: AppColors.textPrimaryLight,
           fontSize: 20,
           fontWeight: FontWeight.bold,
+          fontFamily: 'SF Pro',
         ),
       ),
     );
@@ -34,6 +36,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: 'SF Pro', // Default font family
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.primaryDark,
@@ -53,8 +56,10 @@ class AppTheme {
           color: AppColors.textPrimaryDark,
           fontSize: 20,
           fontWeight: FontWeight.bold,
+          fontFamily: 'SF Pro',
         ),
       ),
     );
   }
 }
+

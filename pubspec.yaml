@@ -50,6 +50,7 @@ dependencies:
   dartz: ^0.10.1
   flutter_svg: ^2.3.0
   google_sign_in: 6.2.1
+  google_fonts: ^9.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -85,6 +86,29 @@ flutter:
     - assets/animations/
     - assets/map_styles/
     - assets/data/
+
+  fonts:
+    - family: SF Pro
+      fonts:
+        - asset: assets/fonts/SFProDisplay-LightItalic.otf
+          style: italic
+          weight: 300
+        - asset: assets/fonts/SFProDisplay-Regular.otf
+          weight: 400
+        - asset: assets/fonts/SFProDisplay-Medium.otf
+          weight: 500
+        - asset: assets/fonts/SFProDisplay-SemiBoldItalic.otf
+          style: italic
+          weight: 600
+        - asset: assets/fonts/SFProDisplay-Bold.otf
+          weight: 700
+
+    - family: SF Compact
+      fonts:
+        - asset: assets/fonts/SFCompactDisplay-Thin.otf
+          weight: 100
+        - asset: assets/fonts/SFCompactDisplay-Medium.otf
+          weight: 500
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
