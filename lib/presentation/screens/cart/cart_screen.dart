@@ -4,8 +4,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart' as geo;
+
 import '../../../core/theme/app_colors.dart';
 import '../../../data/services/payment_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../blocs/cart/cart_cubit.dart';
 
 class CartScreen extends StatefulWidget {
@@ -16,10 +20,162 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  bool _isFetchingLocation = false;
+
+  Future<void> _addNewAddressFromCart() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _isFetchingLocation = true);
+
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() => _isFetchingLocation = false);
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+
+      final geocodingAr = geo.Geocoding(locale: const Locale('ar'));
+      final geocodingEn = geo.Geocoding(locale: const Locale('en'));
+
+      List<geo.Placemark> placemarksAr = await geocodingAr.placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      List<geo.Placemark> placemarksEn = await geocodingEn.placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      String addressEn = placemarksEn.isNotEmpty
+          ? '${placemarksEn.first.street}, ${placemarksEn.first.locality}'
+          : 'Location (${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)})';
+
+      String addressAr = placemarksAr.isNotEmpty
+          ? '${placemarksAr.first.street}, ${placemarksAr.first.locality}'
+          : addressEn;
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('addresses')
+          .add({
+        'addressEn': addressEn,
+        'addressAr': addressAr,
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'isDefault': true,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (mounted) {
+        setState(() => _isFetchingLocation = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.locationSaved),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isFetchingLocation = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error getting location: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  Future<void> _checkAndProceedCheckout(
+    BuildContext context,
+    PaymentStrategy strategy,
+    String selectedAddress,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final nav = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final cartCubit = context.read<CartCubit>();
+
+    // Check if user has active order in progress
+    final ordersSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('orders')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    final now = DateTime.now();
+    bool hasActiveOrder = false;
+
+    for (var doc in ordersSnapshot.docs) {
+      final data = doc.data();
+      final timestamp = (data['createdAt'] as Timestamp?)?.toDate();
+      final deliveryMinutes = (data['deliveryMinutes'] as num?)?.toInt() ?? 30;
+
+      if (timestamp != null && now.difference(timestamp).inMinutes < deliveryMinutes) {
+        hasActiveOrder = true;
+        break;
+      }
+    }
+
+    if (!mounted || !context.mounted) return;
+
+    if (hasActiveOrder) {
+      final shouldProceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Active Order in Progress'),
+          content: const Text(
+            'You already have an order currently being prepared! Would you like to place an additional order?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('View Current Order'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Place Additional Order', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldProceed != true) {
+        nav.pop(); // Close cart and return
+        return;
+      }
+    }
+
+    final success = await cartCubit.placeOrder(strategy);
+    if (success) {
+      nav.pop(); // Return after successful order
+    } else {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Failed to place order. Please try again.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
   void _showCheckoutModal(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     bool isCash = true;
-    String selectedAddress = 'Park Way 145';
+    String? selectedAddress;
     String selectedCard = 'VISA •••• 4242';
 
     showModalBottomSheet(
@@ -32,7 +188,7 @@ class _CartScreenState extends State<CartScreen> {
 
           return Container(
             padding: const EdgeInsets.all(24),
-            height: MediaQuery.of(context).size.height * 0.75,
+            height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -60,41 +216,86 @@ class _CartScreenState extends State<CartScreen> {
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 const Divider(),
 
                 Expanded(
                   child: ListView(
                     children: [
                       // 1. Select Delivery Address from Firestore
-                      Text(
-                        'Delivery Address',
-                        style: TextStyle(
-                          fontFamily: 'SF Pro',
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Delivery Address',
+                            style: TextStyle(
+                              fontFamily: 'SF Pro',
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                            ),
+                          ),
+                          TextButton.icon(
+                            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                            icon: _isFetchingLocation
+                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
+                                : const Icon(Icons.add_location_alt_rounded, size: 16, color: AppColors.primary),
+                            label: Text(
+                              _isFetchingLocation ? 'Fetching...' : '+ Add New',
+                              style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: _isFetchingLocation
+                                ? null
+                                : () async {
+                                    await _addNewAddressFromCart();
+                                    setSheetState(() {});
+                                  },
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
+
                       if (user != null)
                         StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance
                               .collection('users')
                               .doc(user.uid)
                               .collection('addresses')
+                              .orderBy('createdAt', descending: false)
                               .snapshots(),
                           builder: (context, snapshot) {
                             final docs = snapshot.data?.docs ?? [];
                             if (docs.isEmpty) {
                               return Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade100,
+                                  color: Colors.amber.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.amber),
                                 ),
-                                child: Text(selectedAddress, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 20),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'No address found. Please add a location above!',
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amber),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               );
+                            }
+
+                            // Initialize default selection if not set
+                            if (selectedAddress == null) {
+                              final defaultDoc = docs.firstWhere(
+                                (d) => (d.data() as Map<String, dynamic>)['isDefault'] == true,
+                                orElse: () => docs.first,
+                              );
+                              final data = defaultDoc.data() as Map<String, dynamic>;
+                              selectedAddress = data['addressEn'] ?? data['addressAr'] ?? 'Location';
                             }
 
                             return Column(
@@ -159,9 +360,10 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       const SizedBox(height: 8),
 
-                      // Cash Option
+                      // Cash Option (Default)
                       InkWell(
                         onTap: () => setSheetState(() => isCash = true),
+                        borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           margin: const EdgeInsets.only(bottom: 8),
@@ -188,7 +390,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
 
-                      // Card Option (Stream Cards from Firestore)
+                      // Card Options from Firestore
                       if (user != null)
                         StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance
@@ -211,6 +413,7 @@ class _CartScreenState extends State<CartScreen> {
                                     isCash = false;
                                     selectedCard = cardInfo;
                                   }),
+                                  borderRadius: BorderRadius.circular(12),
                                   child: Container(
                                     padding: const EdgeInsets.all(12),
                                     margin: const EdgeInsets.only(bottom: 8),
@@ -255,16 +458,23 @@ class _CartScreenState extends State<CartScreen> {
                       elevation: 0,
                     ),
                     onPressed: () async {
+                      if (selectedAddress == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please add or select a delivery address first!'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                        return;
+                      }
+
                       Navigator.pop(ctx);
 
                       final PaymentStrategy strategy = isCash
                           ? CashPaymentService()
                           : CardPaymentService(cardNumber: selectedCard);
 
-                      final success = await context.read<CartCubit>().placeOrder(strategy);
-                      if (success && context.mounted) {
-                        Navigator.pop(context); // Close Cart screen and return to Orders
-                      }
+                      await _checkAndProceedCheckout(context, strategy, selectedAddress!);
                     },
                     child: const Text(
                       'Checkout',
