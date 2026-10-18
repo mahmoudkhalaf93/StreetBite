@@ -3,6 +3,8 @@ import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/meal.dart';
+import '../../domain/entities/area.dart';
+import '../../domain/entities/ingredient.dart';
 import '../../domain/repositories/meal_repository.dart';
 import '../datasources/meal_local_data_source.dart';
 import '../datasources/meal_remote_data_source.dart';
@@ -90,10 +92,60 @@ class MealRepositoryImpl implements MealRepository {
   }
 
   @override
+  Future<Either<Failure, List<Meal>>> getRandomSelection() async {
+    try {
+      final remoteMeals = await dataSourceFactory.getRemote().getRandomSelection();
+      return Right(remoteMeals);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Meal>>> getLatestMeals() async {
+    try {
+      final remoteMeals = await dataSourceFactory.getRemote().getLatestMeals();
+      return Right(remoteMeals);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<Category>>> getCategories() async {
     try {
       final remoteCategories = await dataSourceFactory.getRemote().getCategories();
       return Right(remoteCategories);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Category>>> getCategoriesList() async {
+    try {
+      final remoteCategories = await dataSourceFactory.getRemote().getCategoriesList();
+      return Right(remoteCategories);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Area>>> getAreasList() async {
+    try {
+      final remoteAreas = await dataSourceFactory.getRemote().getAreasList();
+      return Right(remoteAreas);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Ingredient>>> getIngredientsList() async {
+    try {
+      final remoteIngredients = await dataSourceFactory.getRemote().getIngredientsList();
+      return Right(remoteIngredients);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }
@@ -123,6 +175,16 @@ class MealRepositoryImpl implements MealRepository {
   Future<Either<Failure, List<Meal>>> filterByIngredient(String ingredient) async {
     try {
       final remoteMeals = await dataSourceFactory.getRemote().filterByIngredient(ingredient);
+      return Right(remoteMeals);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Meal>>> filterByMultiIngredient(String ingredients) async {
+    try {
+      final remoteMeals = await dataSourceFactory.getRemote().filterByMultiIngredient(ingredients);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
