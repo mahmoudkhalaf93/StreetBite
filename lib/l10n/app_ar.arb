@@ -56,5 +56,17 @@
   "defaultAddress": "العنوان الافتراضي",
   "language": "اللغة",
   "theme": "المظهر",
-  "logout": "تسجيل الخروج"
+  "logout": "تسجيل الخروج",
+  "supportPhone": "خط الدعم الفني",
+  "sendMessage": "إرسال رسالة",
+  "typeMessage": "اكتب رسالتك...",
+  "faqTitle": "الأسئلة الشائعة",
+  "cardHolder": "حامل البطاقة",
+  "expires": "تاريخ الانتهاء",
+  "addNewCard": "إضافة بطاقة جديدة",
+  "cardNumber": "رقم البطاقة",
+  "fetchingLocation": "جاري تحديد موقعك...",
+  "locationSaved": "تم حفظ العنوان بنجاح",
+  "uploadingImage": "جاري رفع الصورة...",
+  "imageUpdated": "تم تحديث صورة الملف الشخصي"
 }

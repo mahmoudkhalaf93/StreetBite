@@ -185,4 +185,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logout => 'Logout';
+
+  @override
+  String get supportPhone => 'Support Hotline';
+
+  @override
+  String get sendMessage => 'Send Message';
+
+  @override
+  String get typeMessage => 'Type a message...';
+
+  @override
+  String get faqTitle => 'Frequently Asked Questions';
+
+  @override
+  String get cardHolder => 'Card Holder';
+
+  @override
+  String get expires => 'Expires';
+
+  @override
+  String get addNewCard => 'Add New Card';
+
+  @override
+  String get cardNumber => 'Card Number';
+
+  @override
+  String get fetchingLocation => 'Fetching location...';
+
+  @override
+  String get locationSaved => 'Location saved successfully';
+
+  @override
+  String get uploadingImage => 'Uploading photo...';
+
+  @override
+  String get imageUpdated => 'Profile photo updated';
 }

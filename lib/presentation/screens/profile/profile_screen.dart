@@ -1,16 +1,198 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../blocs/auth/auth_cubit.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../blocs/locale/locale_cubit.dart';
 import '../../blocs/theme/theme_cubit.dart';
+import 'widgets/contact_us_sheet.dart';
+import 'widgets/help_center_sheet.dart';
+import 'widgets/payment_info_sheet.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isUploading = false;
+  bool _isFetchingLocation = false;
+  String? _profilePicUrl;
+  String _userName = "Vlad S.";
+
+  final List<Map<String, dynamic>> _addresses = [
+    {
+      'title': 'Park Way 145',
+      'subTitle': 'Default Address',
+      'isDefault': true,
+      'lat': 30.0444,
+      'lng': 31.2357,
+    }
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (doc.exists && mounted) {
+        final data = doc.data();
+        setState(() {
+          _userName = data?['name'] ?? user.displayName ?? "Vlad S.";
+          _profilePicUrl = data?['profilePicUrl'] ?? user.photoURL;
+        });
+      }
+    }
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+
+    if (pickedFile == null) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _isUploading = true);
+
+    try {
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_photos')
+          .child('${user.uid}.jpg');
+
+      await storageRef.putFile(File(pickedFile.path));
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'profilePicUrl': downloadUrl});
+
+      if (mounted) {
+        setState(() {
+          _profilePicUrl = downloadUrl;
+          _isUploading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.imageUpdated),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isUploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload failed: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  Future<void> _addNewAddress() async {
+    setState(() => _isFetchingLocation = true);
+
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() => _isFetchingLocation = false);
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+
+      final geocodingAr = geo.Geocoding(locale: const Locale('ar'));
+      final geocodingEn = geo.Geocoding(locale: const Locale('en'));
+
+      List<geo.Placemark> placemarksAr = await geocodingAr.placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      List<geo.Placemark> placemarksEn = await geocodingEn.placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      String addressEn = placemarksEn.isNotEmpty
+          ? '${placemarksEn.first.street}, ${placemarksEn.first.locality}'
+          : 'Current Location (${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)})';
+      
+      String addressAr = placemarksAr.isNotEmpty
+          ? '${placemarksAr.first.street}, ${placemarksAr.first.locality}'
+          : addressEn;
+
+      if (!mounted) return;
+      final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+      final formattedAddress = isArabic ? addressAr : addressEn;
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('addresses')
+            .add({
+          'addressEn': addressEn,
+          'addressAr': addressAr,
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      if (mounted) {
+        setState(() {
+          _addresses.add({
+            'title': formattedAddress,
+            'subTitle': '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
+            'isDefault': false,
+            'lat': position.latitude,
+            'lng': position.longitude,
+          });
+          _isFetchingLocation = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.locationSaved),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isFetchingLocation = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error getting location: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,194 +204,271 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 1. Profile Header
-                BlocBuilder<AuthCubit, AuthState>(
-                  builder: (context, state) {
-                    String name = "Vlad S."; // Default for design
-                    if (state is AuthSuccess) {
-                      name = state.user.name.isNotEmpty ? state.user.name : name;
-                    }
-                    return Row(
+                const SizedBox(height: 12),
+
+                // 1. Profile Photo (Centered + Tap to Upload)
+                Center(
+                  child: GestureDetector(
+                    onTap: _pickAndUploadImage,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: Colors.grey.shade300,
-                          // For now, hardcode a placeholder or use network image if user has one
-                          backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=11'),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontFamily: 'SF Pro',
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.primary, width: 2),
+                          ),
+                          child: CircleAvatar(
+                            radius: 42,
+                            backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                            backgroundImage: _profilePicUrl != null
+                                ? NetworkImage(_profilePicUrl!)
+                                : const NetworkImage('https://i.pravatar.cc/150?img=11') as ImageProvider,
                           ),
                         ),
+                        if (_isUploading)
+                          Container(
+                            width: 84,
+                            height: 84,
+                            decoration: const BoxDecoration(
+                              color: Colors.black45,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+                            ),
+                          )
+                        else
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
+                            ),
+                          ),
                       ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // 2. User Name (Centered Below Photo)
+                BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, state) {
+                    if (state is AuthSuccess) {
+                      _userName = state.user.name.isNotEmpty ? state.user.name : _userName;
+                    }
+                    return Text(
+                      _userName,
+                      style: TextStyle(
+                        fontFamily: 'SF Pro',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                      ),
                     );
                   },
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 28),
 
-                // 2. Settings (Expandable to show Language and Theme)
-                Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    leading: SvgPicture.asset(
-                      'assets/icons/settings.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
-                    ),
-                    title: Text(
-                      l10n.settings,
-                      style: TextStyle(
-                        fontFamily: 'SF Pro',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                      ),
-                    ),
-                    children: [
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 40, right: 16),
-                        title: Text(l10n.language, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-                        trailing: DropdownButton<String>(
-                          value: Localizations.localeOf(context).languageCode,
-                          underline: const SizedBox(),
-                          dropdownColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                          style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                          items: const [
-                            DropdownMenuItem(value: 'en', child: Text('English')),
-                            DropdownMenuItem(value: 'ar', child: Text('العربية')),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              context.read<LocaleCubit>().toggleLocale();
-                            }
-                          },
+                // 3. Compact & Elegant Menu Items
+                Column(
+                  children: [
+                    // Settings (Language & Theme)
+                    Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        tilePadding: EdgeInsets.zero,
+                        leading: SvgPicture.asset(
+                          'assets/icons/settings.svg',
+                          width: 20,
+                          height: 20,
+                          colorFilter: ColorFilter.mode(isDark ? Colors.white70 : const Color(0xFF333333), BlendMode.srcIn),
                         ),
-                      ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 40, right: 16),
-                        title: Text(l10n.theme, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-                        trailing: Switch(
-                          activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
-                          activeThumbColor: AppColors.primary,
-                          value: isDark,
-                          onChanged: (value) {
-                            context.read<ThemeCubit>().toggleTheme();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 3. Contact Us
-                _buildMenuItem(
-                  iconPath: 'assets/icons/contact_us.svg',
-                  title: l10n.contactUs,
-                  isDark: isDark,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 16),
-
-                // 4. Help Center
-                _buildMenuItem(
-                  iconPath: 'assets/icons/help_center.svg',
-                  title: l10n.helpCenter,
-                  isDark: isDark,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 16),
-
-                // 5. Payment Information
-                _buildMenuItem(
-                  iconData: Icons.payment_outlined, // Fallback icon since no SVG provided
-                  title: l10n.paymentInfo,
-                  isDark: isDark,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 16),
-
-                // 6. Addresses (Expandable to show Default and Add Option)
-                Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.location_on_outlined,
-                      size: 24,
-                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                    ),
-                    title: Text(
-                      l10n.addresses,
-                      style: TextStyle(
-                        fontFamily: 'SF Pro',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                      ),
-                    ),
-                    children: [
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 40, right: 16),
                         title: Text(
-                          'Park Way 145',
+                          l10n.settings,
                           style: TextStyle(
-                            fontFamily: 'SF Compact',
-                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SF Pro',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                             color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                           ),
                         ),
-                        subtitle: Text(l10n.defaultAddress, style: const TextStyle(color: AppColors.primary, fontSize: 12)),
-                        trailing: const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                        children: [
+                          ListTile(
+                            contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                            title: Text(l10n.language, style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
+                            trailing: DropdownButton<String>(
+                              value: Localizations.localeOf(context).languageCode,
+                              underline: const SizedBox(),
+                              dropdownColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                              style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black),
+                              items: const [
+                                DropdownMenuItem(value: 'en', child: Text('English')),
+                                DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  context.read<LocaleCubit>().toggleLocale();
+                                }
+                              },
+                            ),
+                          ),
+                          ListTile(
+                            contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                            title: Text(l10n.theme, style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
+                            trailing: Switch(
+                              activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+                              activeThumbColor: AppColors.primary,
+                              value: isDark,
+                              onChanged: (value) {
+                                context.read<ThemeCubit>().toggleTheme();
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 40, right: 16),
-                        leading: const Icon(Icons.add, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Contact Us
+                    _buildMenuItem(
+                      iconPath: 'assets/icons/contact_us.svg',
+                      title: l10n.contactUs,
+                      isDark: isDark,
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const ContactUsSheet(),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Help Center
+                    _buildMenuItem(
+                      iconPath: 'assets/icons/help_center.svg',
+                      title: l10n.helpCenter,
+                      isDark: isDark,
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const HelpCenterSheet(),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Payment Information
+                    _buildMenuItem(
+                      iconData: Icons.credit_card_rounded,
+                      title: l10n.paymentInfo,
+                      isDark: isDark,
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const PaymentInfoSheet(),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Addresses (Expandable with Geolocator Add Address)
+                    Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        tilePadding: EdgeInsets.zero,
+                        leading: Icon(
+                          Icons.location_on_outlined,
+                          size: 20,
+                          color: isDark ? Colors.white70 : const Color(0xFF333333),
+                        ),
                         title: Text(
-                          l10n.addAddress,
-                          style: const TextStyle(
-                            fontFamily: 'SF Compact',
+                          l10n.addresses,
+                          style: TextStyle(
+                            fontFamily: 'SF Pro',
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                           ),
                         ),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.underConstruction)),
-                          );
-                        },
+                        children: [
+                          ..._addresses.map(
+                            (addr) => ListTile(
+                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                              title: Text(
+                                addr['title'],
+                                style: TextStyle(
+                                  fontFamily: 'SF Compact',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                ),
+                              ),
+                              subtitle: addr['isDefault'] == true
+                                  ? Text(l10n.defaultAddress, style: const TextStyle(color: AppColors.primary, fontSize: 11))
+                                  : Text(addr['subTitle'], style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11)),
+                              trailing: addr['isDefault'] == true
+                                  ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
+                                  : null,
+                            ),
+                          ),
+                          ListTile(
+                            contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                            leading: _isFetchingLocation
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                                  )
+                                : const Icon(Icons.my_location_rounded, color: AppColors.primary, size: 18),
+                            title: Text(
+                              _isFetchingLocation ? l10n.fetchingLocation : l10n.addAddress,
+                              style: const TextStyle(
+                                fontFamily: 'SF Compact',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            onTap: _isFetchingLocation ? null : _addNewAddress,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
-                // 7. Logout Button
+                // 4. Logout Button
                 SizedBox(
                   width: double.infinity,
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.error,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    icon: const Icon(Icons.logout),
+                    icon: const Icon(Icons.logout, size: 18),
                     label: Text(
                       l10n.logout,
                       style: const TextStyle(
                         fontFamily: 'SF Pro',
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -234,30 +493,31 @@ class ProfileScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return InkWell(
+      borderRadius: BorderRadius.circular(10),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Row(
           children: [
             if (iconPath != null)
               SvgPicture.asset(
                 iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(isDark ? Colors.white70 : const Color(0xFF333333), BlendMode.srcIn),
               )
             else if (iconData != null)
               Icon(
                 iconData,
-                size: 24,
-                color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                size: 20,
+                color: isDark ? Colors.white70 : const Color(0xFF333333),
               ),
             const SizedBox(width: 16),
             Text(
               title,
               style: TextStyle(
                 fontFamily: 'SF Pro',
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : const Color(0xFF1E1E1E),
               ),

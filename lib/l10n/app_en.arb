@@ -63,5 +63,17 @@
   "defaultAddress": "Default address",
   "language": "Language",
   "theme": "Theme",
-  "logout": "Logout"
+  "logout": "Logout",
+  "supportPhone": "Support Hotline",
+  "sendMessage": "Send Message",
+  "typeMessage": "Type a message...",
+  "faqTitle": "Frequently Asked Questions",
+  "cardHolder": "Card Holder",
+  "expires": "Expires",
+  "addNewCard": "Add New Card",
+  "cardNumber": "Card Number",
+  "fetchingLocation": "Fetching location...",
+  "locationSaved": "Location saved successfully",
+  "uploadingImage": "Uploading photo...",
+  "imageUpdated": "Profile photo updated"
 }

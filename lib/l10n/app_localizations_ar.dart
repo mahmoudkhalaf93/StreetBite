@@ -184,4 +184,40 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logout => 'تسجيل الخروج';
+
+  @override
+  String get supportPhone => 'خط الدعم الفني';
+
+  @override
+  String get sendMessage => 'إرسال رسالة';
+
+  @override
+  String get typeMessage => 'اكتب رسالتك...';
+
+  @override
+  String get faqTitle => 'الأسئلة الشائعة';
+
+  @override
+  String get cardHolder => 'حامل البطاقة';
+
+  @override
+  String get expires => 'تاريخ الانتهاء';
+
+  @override
+  String get addNewCard => 'إضافة بطاقة جديدة';
+
+  @override
+  String get cardNumber => 'رقم البطاقة';
+
+  @override
+  String get fetchingLocation => 'جاري تحديد موقعك...';
+
+  @override
+  String get locationSaved => 'تم حفظ العنوان بنجاح';
+
+  @override
+  String get uploadingImage => 'جاري رفع الصورة...';
+
+  @override
+  String get imageUpdated => 'تم تحديث صورة الملف الشخصي';
 }
