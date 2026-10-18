@@ -25,9 +25,8 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     SvgPicture.asset(
                       'assets/icons/location_in_bar.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                      width: 24,
+                      height: 24,
                     ),
                     const SizedBox(width: 8),
                     Expanded(

@@ -103,6 +103,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'StreetBite'**
   String get appTitle;
+
+  /// No description provided for @foodAndGroceries.
+  ///
+  /// In en, this message translates to:
+  /// **'Food and groceries delivered to you'**
+  String get foodAndGroceries;
+
+  /// No description provided for @signInToGetMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to get your favorite meal ready'**
+  String get signInToGetMeal;
+
+  /// No description provided for @signUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account'**
+  String get signUpTitle;
+
+  /// No description provided for @signUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up to start discovering street food'**
+  String get signUpSubtitle;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
+  /// No description provided for @emailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailAddress;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get or;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @continueWithFacebook.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Facebook'**
+  String get continueWithFacebook;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name is required'**
+  String get nameRequired;
+
+  /// No description provided for @nameMustStartWithCapital.
+  ///
+  /// In en, this message translates to:
+  /// **'Name must start with a capital letter'**
+  String get nameMustStartWithCapital;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// No description provided for @emailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get emailInvalid;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get passwordRequired;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordTooShort;
+
+  /// No description provided for @confirmPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get confirmPasswordRequired;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @underConstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is currently in the development phase'**
+  String get underConstruction;
+
+  /// No description provided for @parkWay.
+  ///
+  /// In en, this message translates to:
+  /// **'Park Way 145'**
+  String get parkWay;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Food, groceries, etc.'**
+  String get searchHint;
+
+  /// No description provided for @acclaimed.
+  ///
+  /// In en, this message translates to:
+  /// **'Acclaimed'**
+  String get acclaimed;
+
+  /// No description provided for @healthy.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get healthy;
+
+  /// No description provided for @pizza.
+  ///
+  /// In en, this message translates to:
+  /// **'Pizza'**
+  String get pizza;
+
+  /// No description provided for @ramen.
+  ///
+  /// In en, this message translates to:
+  /// **'Ramen'**
+  String get ramen;
+
+  /// No description provided for @burger.
+  ///
+  /// In en, this message translates to:
+  /// **'Burger'**
+  String get burger;
+
+  /// No description provided for @fastest.
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest'**
+  String get fastest;
+
+  /// No description provided for @recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get recommended;
+
+  /// No description provided for @min.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get min;
+
+  /// No description provided for @km.
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get km;
+
+  /// No description provided for @deliveryFeeText.
+  ///
+  /// In en, this message translates to:
+  /// **'\${fee} delivery fee over \${amount}'**
+  String deliveryFeeText(Object amount, Object fee);
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navBrowse.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse'**
+  String get navBrowse;
+
+  /// No description provided for @navOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get navOrders;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'unknown'**
+  String get unknown;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @addToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Cart'**
+  String get addToCart;
+
+  /// No description provided for @addedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'{mealName} added to cart'**
+  String addedToCart(String mealName);
+
+  /// No description provided for @hotOffers.
+  ///
+  /// In en, this message translates to:
+  /// **'Hot Offers'**
+  String get hotOffers;
 }
 
 class _AppLocalizationsDelegate

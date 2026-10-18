@@ -22,7 +22,7 @@ class MealDetailsScreen extends StatelessWidget {
                 meal.strMealThumb!,
                 height: 250,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (context, error, stackTrace) => Container(
                   height: 250,
                   color: Colors.grey.shade200,
                   child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),

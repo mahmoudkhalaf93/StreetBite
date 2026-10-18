@@ -32,9 +32,9 @@ Future<void> init() async {
 
   //! Core
   // App-wide Cubits
-  sl.registerFactory(() => ThemeCubit());
-  sl.registerFactory(() => LocaleCubit());
-  sl.registerFactory(() => CartCubit());
+  sl.registerLazySingleton(() => ThemeCubit());
+  sl.registerLazySingleton(() => LocaleCubit());
+  sl.registerLazySingleton(() => CartCubit());
 
   //! Features - Auth
   sl.registerFactory(
@@ -64,7 +64,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
 
   //! Features - Meals
-  sl.registerFactory(() => MealCubit(repository: sl()));
+  sl.registerLazySingleton(() => MealCubit(repository: sl()));
 
   sl.registerLazySingleton<MealRemoteDataSource>(
     () => MealRemoteDataSourceImpl(dio: sl()),
