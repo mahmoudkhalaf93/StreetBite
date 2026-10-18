@@ -143,8 +143,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => CategoryMealsScreen(
-                                  categoryName: query,
-                                  apiQuery: query,
+                                  categoryName: 'Search: ${query.trim()}',
+                                  apiQuery: query.trim(),
+                                  isSearchMode: true,
                                 ),
                               ),
                             );

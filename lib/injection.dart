@@ -65,7 +65,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
 
   //! Features - Meals
-  sl.registerLazySingleton(() => MealCubit(repository: sl()));
+  sl.registerFactory(() => MealCubit(repository: sl()));
 
   sl.registerLazySingleton<MealRemoteDataSource>(
     () => MealRemoteDataSourceImpl(dio: sl()),

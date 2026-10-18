@@ -16,6 +16,7 @@ import '../../blocs/theme/theme_cubit.dart';
 import '../meal/meal_details_screen.dart';
 import '../cart/cart_screen.dart';
 import '../vendor_map/vendor_map_screen.dart';
+import '../browse/category_meals_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -272,6 +273,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextField(
+                          onSubmitted: (query) {
+                            if (query.trim().isNotEmpty) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CategoryMealsScreen(
+                                    categoryName: 'Search: ${query.trim()}',
+                                    apiQuery: query.trim(),
+                                    isSearchMode: true,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                           decoration: InputDecoration(
                             hintText: l10n.searchHint,
                             hintStyle: const TextStyle(

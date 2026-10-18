@@ -4,15 +4,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/meal.dart';
+import '../../../injection.dart' as di;
 import '../../../l10n/app_localizations.dart';
 import '../../blocs/cart/cart_cubit.dart';
 import '../../blocs/meal/meal_cubit.dart';
 import '../meal/meal_details_screen.dart';
 
-class CategoryMealsScreen extends StatefulWidget {
+class CategoryMealsScreen extends StatelessWidget {
   final String categoryName;
   final String apiQuery;
   final bool isAreaFilter;
+  final bool isSearchMode;
   final String? iconPath;
 
   const CategoryMealsScreen({
@@ -20,19 +22,52 @@ class CategoryMealsScreen extends StatefulWidget {
     required this.categoryName,
     required this.apiQuery,
     this.isAreaFilter = false,
+    this.isSearchMode = false,
     this.iconPath,
   });
 
   @override
-  State<CategoryMealsScreen> createState() => _CategoryMealsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => di.sl<MealCubit>(),
+      child: _CategoryMealsView(
+        categoryName: categoryName,
+        apiQuery: apiQuery,
+        isAreaFilter: isAreaFilter,
+        isSearchMode: isSearchMode,
+        iconPath: iconPath,
+      ),
+    );
+  }
 }
 
-class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
+class _CategoryMealsView extends StatefulWidget {
+  final String categoryName;
+  final String apiQuery;
+  final bool isAreaFilter;
+  final bool isSearchMode;
+  final String? iconPath;
+
+  const _CategoryMealsView({
+    required this.categoryName,
+    required this.apiQuery,
+    required this.isAreaFilter,
+    required this.isSearchMode,
+    this.iconPath,
+  });
+
+  @override
+  State<_CategoryMealsView> createState() => _CategoryMealsViewState();
+}
+
+class _CategoryMealsViewState extends State<_CategoryMealsView> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.isAreaFilter) {
+      if (widget.isSearchMode) {
+        context.read<MealCubit>().searchMeals(widget.apiQuery);
+      } else if (widget.isAreaFilter) {
         context.read<MealCubit>().filterByArea(widget.apiQuery);
       } else {
         context.read<MealCubit>().filterByCategory(widget.apiQuery);
@@ -81,7 +116,9 @@ class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
                     onPressed: () {
-                      if (widget.isAreaFilter) {
+                      if (widget.isSearchMode) {
+                        context.read<MealCubit>().searchMeals(widget.apiQuery);
+                      } else if (widget.isAreaFilter) {
                         context.read<MealCubit>().filterByArea(widget.apiQuery);
                       } else {
                         context.read<MealCubit>().filterByCategory(widget.apiQuery);
@@ -95,7 +132,7 @@ class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
           } else if (state is MealLoaded) {
             final meals = state.meals;
             if (meals.isEmpty) {
-              return const Center(child: Text("No meals found in this category."));
+              return const Center(child: Text("No meals found."));
             }
 
             return GridView.builder(
@@ -173,7 +210,7 @@ class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    widget.categoryName,
+                    meal.strCategory ?? widget.categoryName,
                     style: const TextStyle(fontFamily: 'SF Compact', fontSize: 12, color: Color(0xFF9CA3AF)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
