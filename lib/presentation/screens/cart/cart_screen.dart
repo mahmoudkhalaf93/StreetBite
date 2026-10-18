@@ -290,10 +290,13 @@ class _CartScreenState extends State<CartScreen> {
 
                             // Initialize default selection if not set
                             if (selectedAddress == null) {
-                              final defaultDoc = docs.firstWhere(
+                              final defaultMatchingDocs = docs.where(
                                 (d) => (d.data() as Map<String, dynamic>)['isDefault'] == true,
-                                orElse: () => docs.first,
                               );
+                              final defaultDoc = defaultMatchingDocs.isNotEmpty
+                                  ? defaultMatchingDocs.first
+                                  : docs.first;
+
                               final data = defaultDoc.data() as Map<String, dynamic>;
                               selectedAddress = data['addressEn'] ?? data['addressAr'] ?? 'Location';
                             }
