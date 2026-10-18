@@ -14,7 +14,7 @@ class CartItem extends Equatable {
   const CartItem({
     required this.meal,
     this.quantity = 1,
-    this.pricePerItem = 15.0,
+    this.pricePerItem = 14.99,
   });
 
   double get totalPrice => quantity * pricePerItem;
@@ -49,7 +49,7 @@ class CartItem extends Equatable {
         strArea: json['strArea'],
       ),
       quantity: json['quantity'] ?? 1,
-      pricePerItem: (json['pricePerItem'] as num?)?.toDouble() ?? 15.0,
+      pricePerItem: (json['pricePerItem'] as num?)?.toDouble() ?? 14.99,
     );
   }
 
@@ -59,29 +59,43 @@ class CartItem extends Equatable {
 
 class CartState extends Equatable {
   final List<CartItem> items;
+  final bool isDelivery;
   final bool isPlacingOrder;
   final String? orderSuccessMessage;
 
   const CartState({
     this.items = const [],
+    this.isDelivery = true,
     this.isPlacingOrder = false,
     this.orderSuccessMessage,
   });
 
-  double get totalPrice => items.fold(0.0, (acc, item) => acc + item.totalPrice);
+  double get itemsSubtotal => items.fold(0.0, (acc, item) => acc + item.totalPrice);
+  double get deliveryFee => (items.isNotEmpty && isDelivery) ? 3.99 : 0.00;
+  double get taxes => items.isNotEmpty ? 2.45 : 0.00;
+  double get discount => items.isNotEmpty ? 4.56 : 0.00;
+
+  double get finalTotal {
+    if (items.isEmpty) return 0.0;
+    final total = itemsSubtotal + deliveryFee + taxes - discount;
+    return total < 0 ? 0.0 : total;
+  }
+
   int get totalItemCount => items.fold(0, (acc, item) => acc + item.quantity);
   List<Meal> get cartItems => items.map((i) => i.meal).toList();
 
   @override
-  List<Object?> get props => [items, isPlacingOrder, orderSuccessMessage];
+  List<Object?> get props => [items, isDelivery, isPlacingOrder, orderSuccessMessage];
 
   CartState copyWith({
     List<CartItem>? items,
+    bool? isDelivery,
     bool? isPlacingOrder,
     String? orderSuccessMessage,
   }) {
     return CartState(
       items: items ?? this.items,
+      isDelivery: isDelivery ?? this.isDelivery,
       isPlacingOrder: isPlacingOrder ?? this.isPlacingOrder,
       orderSuccessMessage: orderSuccessMessage,
     );
@@ -102,12 +116,10 @@ class CartCubit extends Cubit<CartState> {
       if (doc.exists && doc.data()?['cart'] != null) {
         final List rawCart = doc.data()!['cart'];
         final loadedItems = rawCart.map((item) => CartItem.fromJson(Map<String, dynamic>.from(item))).toList();
-        emit(state.copyWith(items: loadedLoadedItems(loadedItems)));
+        emit(state.copyWith(items: loadedItems));
       }
     } catch (_) {}
   }
-
-  List<CartItem> loadedLoadedItems(List<CartItem> items) => items;
 
   Future<void> _syncCartToFirestore(List<CartItem> items) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -119,6 +131,10 @@ class CartCubit extends Cubit<CartState> {
         'cart': cartJson,
       }, SetOptions(merge: true));
     } catch (_) {}
+  }
+
+  void setOrderType({required bool isDelivery}) {
+    emit(state.copyWith(isDelivery: isDelivery));
   }
 
   void addToCart(Meal meal) {
@@ -170,7 +186,7 @@ class CartCubit extends Cubit<CartState> {
     emit(state.copyWith(isPlacingOrder: true, orderSuccessMessage: null));
 
     try {
-      final success = await paymentStrategy.processPayment(state.totalPrice);
+      final success = await paymentStrategy.processPayment(state.finalTotal);
       if (!success) {
         emit(state.copyWith(isPlacingOrder: false));
         return false;
@@ -187,21 +203,26 @@ class CartCubit extends Cubit<CartState> {
             'pricePerItem': item.pricePerItem,
             'totalPrice': item.totalPrice,
           }).toList(),
-          'totalAmount': state.totalPrice,
+          'subtotal': state.itemsSubtotal,
+          'deliveryFee': state.deliveryFee,
+          'taxes': state.taxes,
+          'discount': state.discount,
+          'totalAmount': state.finalTotal,
           'itemCount': state.totalItemCount,
+          'orderType': state.isDelivery ? 'Delivery' : 'Pickup',
           'paymentMethod': paymentStrategy.paymentMethodName,
           'status': 'Preparing',
           'createdAt': FieldValue.serverTimestamp(),
         };
 
-        // 1. Save order to user's orders collection
+        // 1. Save order to user's orders collection in Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .collection('orders')
             .add(orderData);
 
-        // 2. Clear cart in Firestore
+        // 2. Clear active cart in Firestore
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'cart': [],
         }, SetOptions(merge: true));
