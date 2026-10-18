@@ -1,18 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/meal.dart';
+import '../../blocs/cart/cart_cubit.dart';
+import '../../blocs/locale/locale_cubit.dart';
+import '../../blocs/meal/meal_cubit.dart';
+import '../../blocs/theme/theme_cubit.dart';
+import '../meal/meal_details_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Using viewportFraction 0.78 for the "Fastest" banner slider as requested
+    _pageController = PageController(viewportFraction: 0.78);
+    
+    // Fetch meals when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MealCubit>().fetchMeals();
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -36,19 +69,68 @@ class HomeScreen extends StatelessWidget {
                           fontFamily: 'SF Pro',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.normal,
                           color: AppColors.primary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    IconButton(
-                      icon: SvgPicture.asset('assets/icons/Bell_notification.svg'),
-                      onPressed: () {},
+                    // Language Toggle stays in the Top Bar for UX
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onPressed: () => context.read<LocaleCubit>().toggleLocale(),
+                      child: Text(
+                        Localizations.localeOf(context).languageCode.toUpperCase(),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                      ),
                     ),
                     IconButton(
-                      icon: SvgPicture.asset('assets/icons/cart.svg'),
+                      icon: SvgPicture.asset(
+                        'assets/icons/Bell_notification.svg',
+                        colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
+                      ),
                       onPressed: () {},
+                    ),
+                    // Cart Icon with Badge
+                    BlocBuilder<CartCubit, CartState>(
+                      builder: (context, cartState) {
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            IconButton(
+                              icon: SvgPicture.asset(
+                                'assets/icons/cart.svg',
+                                colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
+                              ),
+                              onPressed: () {},
+                            ),
+                            if (cartState.cartItems.isNotEmpty)
+                              Positioned(
+                                right: 6,
+                                top: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.error,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '${cartState.cartItems.length}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -60,7 +142,7 @@ class HomeScreen extends StatelessWidget {
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF9FAFB),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -98,101 +180,169 @@ class HomeScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   children: [
-                    _buildCategoryItem(icon: 'acclaimed.svg', label: l10n.acclaimed),
-                    _buildCategoryItem(icon: 'healthy.svg', label: l10n.healthy),
-                    _buildCategoryItem(icon: 'pizza.svg', label: l10n.pizza),
-                    _buildCategoryItem(icon: 'ramen.svg', label: l10n.ramen),
-                    _buildCategoryItem(icon: 'burger.svg', label: l10n.burger),
+                    _buildCategoryItem(icon: 'acclaimed.svg', label: l10n.acclaimed, isDark: isDark),
+                    _buildCategoryItem(icon: 'healthy.svg', label: l10n.healthy, isDark: isDark),
+                    _buildCategoryItem(icon: 'pizza.svg', label: l10n.pizza, isDark: isDark),
+                    _buildCategoryItem(icon: 'ramen.svg', label: l10n.ramen, isDark: isDark),
+                    _buildCategoryItem(icon: 'burger.svg', label: l10n.burger, isDark: isDark),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
 
-              // 4. Fastest Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  l10n.fastest,
-                  style: const TextStyle(
-                    fontFamily: 'SF Pro',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E1E1E),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 240,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  children: [
-                    _buildFastestCard(
-                      imagePath: 'unknown',
-                      name: 'Morning Delights Café',
-                      rating: '4.9',
-                      reviewsCount: '103',
-                      distance: '2.3',
-                      time: '25',
-                      l10n: l10n,
-                    ),
-                    _buildFastestCard(
-                      imagePath: 'unknown',
-                      name: 'Sunrise Eats',
-                      rating: '4.8',
-                      reviewsCount: '561',
-                      distance: '2.3', // Unknown from crop, estimating
-                      time: 'unknown',
-                      l10n: l10n,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
+              // Content based on MealCubit State (Hot Offers, Fastest, Recommended)
+              BlocBuilder<MealCubit, MealState>(
+                builder: (context, state) {
+                  if (state is MealLoading || state is MealInitial) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 40.0),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                    );
+                  } else if (state is MealError) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 40.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Text(state.message, style: const TextStyle(color: AppColors.error)),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                              onPressed: () => context.read<MealCubit>().fetchMeals(),
+                              child: Text(l10n.retry, style: const TextStyle(color: Colors.white)),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  } else if (state is MealLoaded) {
+                    final meals = state.meals;
+                    if (meals.isEmpty) {
+                      return const Center(child: Text("No meals found."));
+                    }
 
-              // 5. Recommended Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  l10n.recommended,
-                  style: const TextStyle(
-                    fontFamily: 'SF Pro',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E1E1E),
-                  ),
-                ),
+                    // For presentation, slice the list into different categories
+                    final hotOffersMeals = meals.take(5).toList();
+                    final fastestMeals = meals.skip(5).take(5).toList();
+                    final recommendedMeals = meals; // Use all for grid
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 4. Hot Offers Section + THEME TOGGLE
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                l10n.hotOffers,
+                                style: TextStyle(
+                                  fontFamily: 'SF Pro',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                ),
+                              ),
+                              // Theme Toggle is placed here as per project guidelines
+                              IconButton(
+                                icon: Icon(
+                                  isDark ? Icons.light_mode : Icons.dark_mode,
+                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                  size: 24,
+                                ),
+                                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 210,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            itemCount: hotOffersMeals.length,
+                            itemBuilder: (context, index) {
+                              return _buildHotOfferCard(context, hotOffersMeals[index], l10n, isDark);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // 5. Fastest Section (PageView Banner)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
+                            l10n.fastest,
+                            style: TextStyle(
+                              fontFamily: 'SF Pro',
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 240,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            padEnds: false, // Start aligning from the left edge
+                            itemCount: fastestMeals.isNotEmpty ? fastestMeals.length : meals.length,
+                            itemBuilder: (context, index) {
+                              return _buildFastestCard(
+                                context, 
+                                fastestMeals.isNotEmpty ? fastestMeals[index] : meals[index], 
+                                l10n, 
+                                isDark
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // 6. Recommended Section (Two-column GridView)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                l10n.recommended,
+                                style: TextStyle(
+                                  fontFamily: 'SF Pro',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.60, // Adjusted to fit image, text, and button
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                          ),
+                          itemCount: recommendedMeals.length,
+                          itemBuilder: (context, index) {
+                            return _buildGridMealCard(context, recommendedMeals[index], l10n, isDark);
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    );
+                  }
+                  return const SizedBox();
+                },
               ),
-              const SizedBox(height: 16),
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                children: [
-                  _buildRecommendedCard(
-                    imagePath: 'unknown',
-                    name: 'Sabor Mexicano Grill',
-                    rating: '4.7',
-                    reviewsCount: '59',
-                    distance: '1.5',
-                    time: '20',
-                    deliveryFeeText: l10n.deliveryFeeText('0', '30'),
-                    l10n: l10n,
-                  ),
-                  _buildRecommendedCard(
-                    imagePath: 'unknown',
-                    name: 'Burger Haven',
-                    rating: '4.9',
-                    reviewsCount: '1940',
-                    distance: '4',
-                    time: '35',
-                    deliveryFeeText: 'unknown', // not visible in crop
-                    l10n: l10n,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -200,7 +350,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryItem({required String icon, required String label}) {
+  Widget _buildCategoryItem({required String icon, required String label, required bool isDark}) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: Column(
@@ -209,7 +359,7 @@ class HomeScreen extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F8F0), // Light green
+              color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE8F8F0),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -224,11 +374,11 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'SF Compact',
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E1E1E),
+              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
             ),
           ),
         ],
@@ -236,192 +386,224 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFastestCard({
-    required String imagePath,
-    required String name,
-    required String rating,
-    required String reviewsCount,
-    required String distance,
-    required String time,
-    required AppLocalizations l10n,
-  }) {
-    // We use a fixed width taking ~75% of screen
-    return Container(
-      width: 260,
-      margin: const EdgeInsets.only(right: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: 160,
-              width: double.infinity,
-              color: Colors.grey.shade300, // Placeholder
-              child: const Icon(Icons.image, color: Colors.grey, size: 48), // Placeholder image
+  Widget _buildHotOfferCard(BuildContext context, Meal meal, AppLocalizations l10n, bool isDark) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MealDetailsScreen(meal: meal))),
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 16.0),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: meal.strMealThumb != null
+                  ? Image.network(
+                      meal.strMealThumb!, 
+                      height: 110, 
+                      width: double.infinity, 
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(height: 110, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
+                    )
+                  : Container(height: 110, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            name,
-            style: const TextStyle(
-              fontFamily: 'SF Pro',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E1E1E),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    meal.strMeal,
+                    style: TextStyle(fontFamily: 'SF Pro', fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('20% OFF', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold, fontSize: 12)),
+                ],
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                rating,
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E1E1E),
-                ),
-              ),
-              const SizedBox(width: 4),
-              SvgPicture.asset('assets/icons/Star.svg', width: 14, height: 14),
-              const SizedBox(width: 4),
-              Text(
-                '($reviewsCount)',
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
-              ),
-              Text(
-                '$distance${l10n.km}',
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
-              ),
-              Text(
-                time == 'unknown' ? l10n.unknown : '$time ${l10n.min}',
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildRecommendedCard({
-    required String imagePath,
-    required String name,
-    required String rating,
-    required String reviewsCount,
-    required String distance,
-    required String time,
-    required String deliveryFeeText,
-    required AppLocalizations l10n,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: 180,
-              width: double.infinity,
-              color: Colors.grey.shade300, // Placeholder
-              child: const Icon(Icons.image, color: Colors.grey, size: 48), // Placeholder image
+  Widget _buildFastestCard(BuildContext context, Meal meal, AppLocalizations l10n, bool isDark) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MealDetailsScreen(meal: meal))),
+      child: Container(
+        margin: const EdgeInsets.only(right: 16.0), // Margin gives the gap between PageView items
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: meal.strMealThumb != null
+                  ? Image.network(
+                      meal.strMealThumb!, 
+                      height: 160, 
+                      width: double.infinity, 
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(height: 160, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, size: 48, color: Colors.grey)),
+                    )
+                  : Container(height: 160, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, size: 48, color: Colors.grey)),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            name,
-            style: const TextStyle(
-              fontFamily: 'SF Pro',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E1E1E),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                rating,
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E1E1E),
-                ),
-              ),
-              const SizedBox(width: 4),
-              SvgPicture.asset('assets/icons/Star.svg', width: 14, height: 14),
-              const SizedBox(width: 4),
-              Text(
-                '($reviewsCount)',
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
-              ),
-              Text(
-                '$distance${l10n.km}',
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
-              ),
-              Text(
-                time == 'unknown' ? l10n.unknown : '$time ${l10n.min}',
-                style: const TextStyle(
-                  fontFamily: 'SF Compact',
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-            ],
-          ),
-          if (deliveryFeeText != 'unknown') ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 12),
             Text(
-              deliveryFeeText,
-              style: const TextStyle(
-                fontFamily: 'SF Compact',
-                fontSize: 14,
-                color: Color(0xFF9CA3AF),
+              meal.strMeal,
+              style: TextStyle(
+                fontFamily: 'SF Pro',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  '4.8', // Mocked rating
+                  style: TextStyle(
+                    fontFamily: 'SF Compact',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                SvgPicture.asset('assets/icons/Star.svg', width: 14, height: 14),
+                const SizedBox(width: 4),
+                const Text(
+                  '(120)', // Mocked review count
+                  style: TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
+                ),
+                Text(
+                  '2.4 ${l10n.km}', // Formatted nice distance
+                  style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
+                ),
+                Text(
+                  '20-25 ${l10n.min}', // Formatted nice time
+                  style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGridMealCard(BuildContext context, Meal meal, AppLocalizations l10n, bool isDark) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MealDetailsScreen(meal: meal))),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: meal.strMealThumb != null
+                    ? Image.network(
+                        meal.strMealThumb!, 
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
+                      )
+                    : Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
               ),
             ),
-          ]
-        ],
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    meal.strMeal,
+                    style: TextStyle(fontFamily: 'SF Pro', fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    meal.strCategory ?? 'Food',
+                    style: const TextStyle(fontFamily: 'SF Compact', fontSize: 12, color: Color(0xFF9CA3AF)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 14),
+                      const SizedBox(width: 4),
+                      Text('4.9', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E))),
+                      const Spacer(),
+                      Text('20 ${l10n.min}', style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 36,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () {
+                        context.read<CartCubit>().addToCart(meal);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.addedToCart(meal.strMeal)),
+                            backgroundColor: AppColors.primary,
+                            duration: const Duration(seconds: 1),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                      child: Text(l10n.addToCart, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
