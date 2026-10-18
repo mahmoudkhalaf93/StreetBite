@@ -1,0 +1,5 @@
+Test Case ID,Description,Preconditions,Steps,Expected Result,Actual Result,Status,Severity,Priority
+TC_LOGIN_001,Verify Login with Valid Credentials,App is installed and opened,1. Enter valid email. 2. Enter valid password. 3. Tap Login.,User is navigated to Home Screen.,User navigated to Home Screen,PASS,High,High
+TC_LOGIN_002,Verify Login with Invalid Credentials,App is installed and opened,1. Enter unregistered email. 2. Enter random password. 3. Tap Login.,Firebase error SnackBar appears.,Error SnackBar displayed,PASS,High,High
+TC_LOGIN_003,Verify Login with Empty Fields,App is installed and opened,1. Leave email empty. 2. Leave password empty. 3. Tap Login.,Validation errors shown under text fields.,Validation errors shown,PASS,Medium,High
+TC_LOGIN_004,Verify Biometric Login,User has logged in before and enabled biometrics in Profile,1. Tap 'Sign in with Fingerprint'. 2. Authenticate fingerprint.,User is instantly navigated to Home Screen.,Navigated successfully,PASS,High,Medium

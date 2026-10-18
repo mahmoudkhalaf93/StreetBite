@@ -1,0 +1,6 @@
+Test Case ID,Description,Preconditions,Steps,Expected Result,Actual Result,Status,Severity,Priority
+TC_HOME_001,Verify Meal API Fetching,User is logged in and on Home Screen,1. Observe Hot Offers and Fastest lists.,Meals are displayed correctly with images and titles.,Meals loaded successfully,PASS,High,High
+TC_HOME_002,Verify Add to Cart from Home,Meals are loaded,1. Tap 'Add to Cart' on a Recommended meal.,SnackBar shows 'Added to cart' and Cart badge increments.,Badge updated and SnackBar shown,PASS,High,High
+TC_HOME_003,Verify Caching (Offline Mode),Meals were previously loaded,1. Turn off WiFi/Data. 2. Restart App.,Meals load instantly from local cache.,Cached meals displayed,PASS,High,Medium
+TC_HOME_004,Verify Theme Switching,User is on Home Screen,1. Tap the Theme toggle icon in the Top Bar.,App switches to Dark/Light mode instantly.,Theme switched seamlessly,PASS,Medium,Low
+TC_HOME_005,Verify Language Switching (EN/AR),User is on Home Screen,1. Tap the Language toggle icon in the Top Bar.,App translates to Arabic and flips to RTL layout.,Language and direction updated,PASS,High,Medium
