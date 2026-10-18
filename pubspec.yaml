@@ -94,23 +94,23 @@ flutter:
   fonts:
     - family: SF Pro
       fonts:
-        - asset: assets/fonts/SFProDisplay-LightItalic.otf
-          style: italic
+        - asset: assets/fonts/SFProDisplay-Regular.otf
           weight: 300
         - asset: assets/fonts/SFProDisplay-Regular.otf
           weight: 400
         - asset: assets/fonts/SFProDisplay-Medium.otf
           weight: 500
-        - asset: assets/fonts/SFProDisplay-SemiBoldItalic.otf
-          style: italic
+        - asset: assets/fonts/SFProDisplay-Medium.otf
           weight: 600
         - asset: assets/fonts/SFProDisplay-Bold.otf
           weight: 700
 
     - family: SF Compact
       fonts:
-        - asset: assets/fonts/SFCompactDisplay-Thin.otf
+        - asset: assets/fonts/SFCompactDisplay-Medium.otf
           weight: 100
+        - asset: assets/fonts/SFCompactDisplay-Medium.otf
+          weight: 400
         - asset: assets/fonts/SFCompactDisplay-Medium.otf
           weight: 500
   #   - images/a_dot_ham.jpeg
