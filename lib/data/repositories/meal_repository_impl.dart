@@ -7,24 +7,44 @@ import '../../domain/repositories/meal_repository.dart';
 import '../datasources/meal_local_data_source.dart';
 import '../datasources/meal_remote_data_source.dart';
 
-class MealRepositoryImpl implements MealRepository {
+/// FACTORY PATTERN IMPLEMENTATION
+/// This factory class decides whether to return a Remote or Local data source 
+/// based on the context (e.g., fetching mode or network availability).
+class MealDataSourceFactory {
   final MealRemoteDataSource remoteDataSource;
   final MealLocalDataSource localDataSource;
 
-  MealRepositoryImpl({
+  MealDataSourceFactory({
     required this.remoteDataSource,
     required this.localDataSource,
   });
 
+  // Example factory method: return local source if we specifically want cached data
+  MealLocalDataSource getLocal() => localDataSource;
+  // Example factory method: return remote source for fresh data
+  MealRemoteDataSource getRemote() => remoteDataSource;
+}
+
+class MealRepositoryImpl implements MealRepository {
+  final MealDataSourceFactory dataSourceFactory;
+
+  MealRepositoryImpl({
+    required MealRemoteDataSource remoteDataSource,
+    required MealLocalDataSource localDataSource,
+  }) : dataSourceFactory = MealDataSourceFactory(
+          remoteDataSource: remoteDataSource,
+          localDataSource: localDataSource,
+        );
+
   @override
   Future<Either<Failure, List<Meal>>> searchMealsByName(String query) async {
     try {
-      final remoteMeals = await remoteDataSource.searchMealsByName(query);
-      await localDataSource.cacheMeals(remoteMeals);
+      final remoteMeals = await dataSourceFactory.getRemote().searchMealsByName(query);
+      await dataSourceFactory.getLocal().cacheMeals(remoteMeals);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       try {
-        final localMeals = await localDataSource.getLastCachedMeals();
+        final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
         return Right(localMeals);
       } on CacheException {
         return Left(ServerFailure(message: e.message));
@@ -35,17 +55,24 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<Either<Failure, List<Meal>>> searchMealsByFirstLetter(String letter) async {
     try {
-      final remoteMeals = await remoteDataSource.searchMealsByFirstLetter(letter);
+      final remoteMeals = await dataSourceFactory.getRemote().searchMealsByFirstLetter(letter);
+      await dataSourceFactory.getLocal().cacheMeals(remoteMeals); // Cache successfully fetched items
       return Right(remoteMeals);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      try {
+        // Factory fallback to local cache
+        final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
+        return Right(localMeals);
+      } on CacheException {
+        return Left(ServerFailure(message: e.message));
+      }
     }
   }
 
   @override
   Future<Either<Failure, Meal>> getMealDetails(String id) async {
     try {
-      final remoteMeal = await remoteDataSource.getMealDetails(id);
+      final remoteMeal = await dataSourceFactory.getRemote().getMealDetails(id);
       return Right(remoteMeal);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -55,7 +82,7 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<Either<Failure, Meal>> getRandomMeal() async {
     try {
-      final remoteMeal = await remoteDataSource.getRandomMeal();
+      final remoteMeal = await dataSourceFactory.getRemote().getRandomMeal();
       return Right(remoteMeal);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -65,7 +92,7 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<Either<Failure, List<Category>>> getCategories() async {
     try {
-      final remoteCategories = await remoteDataSource.getCategories();
+      final remoteCategories = await dataSourceFactory.getRemote().getCategories();
       return Right(remoteCategories);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -75,7 +102,7 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<Either<Failure, List<Meal>>> filterByCategory(String category) async {
     try {
-      final remoteMeals = await remoteDataSource.filterByCategory(category);
+      final remoteMeals = await dataSourceFactory.getRemote().filterByCategory(category);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -85,7 +112,7 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<Either<Failure, List<Meal>>> filterByArea(String area) async {
     try {
-      final remoteMeals = await remoteDataSource.filterByArea(area);
+      final remoteMeals = await dataSourceFactory.getRemote().filterByArea(area);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -95,10 +122,11 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<Either<Failure, List<Meal>>> filterByIngredient(String ingredient) async {
     try {
-      final remoteMeals = await remoteDataSource.filterByIngredient(ingredient);
+      final remoteMeals = await dataSourceFactory.getRemote().filterByIngredient(ingredient);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }
   }
 }
+

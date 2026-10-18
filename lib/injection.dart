@@ -6,9 +6,18 @@ import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'data/datasources/auth_remote_data_source.dart';
+import 'data/datasources/meal_local_data_source.dart';
+import 'data/datasources/meal_remote_data_source.dart';
 import 'data/repositories/auth_repository_impl.dart';
+import 'data/repositories/meal_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
+import 'domain/repositories/meal_repository.dart';
 import 'domain/usecases/auth_usecases.dart';
+import 'presentation/blocs/auth/auth_cubit.dart';
+import 'presentation/blocs/cart/cart_cubit.dart';
+import 'presentation/blocs/locale/locale_cubit.dart';
+import 'presentation/blocs/meal/meal_cubit.dart';
+import 'presentation/blocs/theme/theme_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -22,9 +31,20 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GoogleSignIn());
 
   //! Core
+  // App-wide Cubits
+  sl.registerFactory(() => ThemeCubit());
+  sl.registerFactory(() => LocaleCubit());
+  sl.registerFactory(() => CartCubit());
 
   //! Features - Auth
-  // Data Sources
+  sl.registerFactory(
+    () => AuthCubit(
+      loginUseCase: sl(),
+      signUpUseCase: sl(),
+      googleSignInUseCase: sl(),
+    ),
+  );
+
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(
       firebaseAuth: sl(),
@@ -33,12 +53,10 @@ Future<void> init() async {
     ),
   );
 
-  // Repositories
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
   );
 
-  // UseCases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
   sl.registerLazySingleton(() => GoogleSignInUseCase(sl()));
@@ -46,4 +64,20 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
 
   //! Features - Meals
+  sl.registerFactory(() => MealCubit(repository: sl()));
+
+  sl.registerLazySingleton<MealRemoteDataSource>(
+    () => MealRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<MealLocalDataSource>(
+    () => MealLocalDataSourceImpl(sharedPreferences: sl()),
+  );
+
+  sl.registerLazySingleton<MealRepository>(
+    () => MealRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
 }
+

@@ -1,4 +1,57 @@
 {
   "@@locale": "en",
-  "appTitle": "StreetBite"
+  "appTitle": "StreetBite",
+  "foodAndGroceries": "Food and groceries delivered to you",
+  "signInToGetMeal": "Sign in to get your favorite meal ready",
+  "signUpTitle": "Create an account",
+  "signUpSubtitle": "Sign up to start discovering street food",
+  "fullName": "Full Name",
+  "emailAddress": "Email Address",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "forgotPassword": "Forgot password?",
+  "login": "Login",
+  "or": "OR",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithFacebook": "Continue with Facebook",
+  "dontHaveAccount": "Don't have an account?",
+  "alreadyHaveAccount": "Already have an account?",
+  "signUp": "Sign Up",
+  "nameRequired": "Full Name is required",
+  "nameMustStartWithCapital": "Name must start with a capital letter",
+  "emailRequired": "Email is required",
+  "emailInvalid": "Please enter a valid email",
+  "passwordRequired": "Password is required",
+  "passwordTooShort": "Password must be at least 6 characters",
+  "confirmPasswordRequired": "Please confirm your password",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "underConstruction": "This feature is currently in the development phase",
+  "parkWay": "Park Way 145",
+  "searchHint": "Food, groceries, etc.",
+  "acclaimed": "Acclaimed",
+  "healthy": "Healthy",
+  "pizza": "Pizza",
+  "ramen": "Ramen",
+  "burger": "Burger",
+  "fastest": "Fastest",
+  "recommended": "Recommended",
+  "min": "min",
+  "km": "km",
+  "deliveryFeeText": "${fee} delivery fee over ${amount}",
+  "navHome": "Home",
+  "navBrowse": "Browse",
+  "navOrders": "Orders",
+  "navProfile": "Profile",
+  "unknown": "unknown",
+  "retry": "Retry",
+  "addToCart": "Add to Cart",
+  "addedToCart": "{mealName} added to cart",
+  "@addedToCart": {
+    "placeholders": {
+      "mealName": {
+        "type": "String"
+      }
+    }
+  },
+  "hotOffers": "Hot Offers"
 }
