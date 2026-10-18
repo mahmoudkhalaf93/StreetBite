@@ -222,6 +222,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get imageUpdated => 'تم تحديث صورة الملف الشخصي';
 
   @override
+  String get resetPasswordTitle => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get resetPasswordSubtitle =>
+      'أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.';
+
+  @override
+  String get sendResetLink => 'إرسال رابط التعيين';
+
+  @override
+  String get resetEmailSent =>
+      'تم إرسال رابط التعيين! يرجى التحقق من صندوق الوارد في بريدك الإلكتروني.';
+
+  @override
+  String get backToLogin => 'العودة لتسجيل الدخول';
+
+  @override
   String get changeDefaultAddressTitle => 'تغيير العنوان الافتراضي';
 
   @override

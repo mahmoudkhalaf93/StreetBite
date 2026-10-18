@@ -223,6 +223,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageUpdated => 'Profile photo updated';
 
   @override
+  String get resetPasswordTitle => 'Reset Password';
+
+  @override
+  String get resetPasswordSubtitle =>
+      'Enter your email address and we\'ll send you a link to reset your password.';
+
+  @override
+  String get sendResetLink => 'Send Reset Link';
+
+  @override
+  String get resetEmailSent =>
+      'Password reset link sent! Check your email inbox.';
+
+  @override
+  String get backToLogin => 'Back to Login';
+
+  @override
   String get changeDefaultAddressTitle => 'Change Default Address';
 
   @override

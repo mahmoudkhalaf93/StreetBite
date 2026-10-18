@@ -249,6 +249,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Proximity duplicate check (150 meters = ~85-90% location proximity)
+        final existingDocs = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('addresses')
+            .get();
+
+        bool isDuplicate = false;
+        for (var doc in existingDocs.docs) {
+          final data = doc.data();
+          final existingLat = (data['latitude'] as num?)?.toDouble();
+          final existingLng = (data['longitude'] as num?)?.toDouble();
+
+          if (existingLat != null && existingLng != null) {
+            final distanceInMeters = Geolocator.distanceBetween(
+              position.latitude,
+              position.longitude,
+              existingLat,
+              existingLng,
+            );
+
+            if (distanceInMeters < 150) {
+              isDuplicate = true;
+              break;
+            }
+          }
+        }
+
+        if (isDuplicate) {
+          if (mounted) {
+            setState(() => _isFetchingLocation = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'هذا العنوان مسجل بالفعل بالقرب منك!'
+                      : 'This address is already registered nearby!',
+                ),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+          return;
+        }
+      }
+
       final geocodingAr = geo.Geocoding(locale: const Locale('ar'));
       final geocodingEn = geo.Geocoding(locale: const Locale('en'));
 
@@ -269,7 +317,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? '${placemarksAr.first.street}, ${placemarksAr.first.locality}'
           : addressEn;
 
-      final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await FirebaseFirestore.instance
             .collection('users')
