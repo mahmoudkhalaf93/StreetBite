@@ -10,6 +10,7 @@ import 'presentation/blocs/theme/theme_cubit.dart';
 import 'presentation/blocs/locale/locale_cubit.dart';
 import 'presentation/blocs/cart/cart_cubit.dart';
 import 'presentation/blocs/meal/meal_cubit.dart';
+import 'presentation/blocs/auth/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<LocaleCubit>()),
         BlocProvider(create: (_) => di.sl<CartCubit>()),
         BlocProvider(create: (_) => di.sl<MealCubit>()),
+        BlocProvider(create: (_) => di.sl<AuthCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
