@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -10,14 +12,32 @@ class PaymentInfoSheet extends StatefulWidget {
 }
 
 class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
-  final List<Map<String, String>> _cards = [
-    {
-      'holder': 'Vlad S.',
-      'number': '•••• •••• •••• 4242',
-      'expiry': '12/26',
-      'type': 'VISA',
-    },
-  ];
+  final user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _seedDefaultCardIfEmpty();
+  }
+
+  Future<void> _seedDefaultCardIfEmpty() async {
+    if (user == null) return;
+    final cardsRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('cards');
+
+    final snapshot = await cardsRef.get();
+    if (snapshot.docs.isEmpty) {
+      await cardsRef.add({
+        'holder': user!.displayName?.isNotEmpty == true ? user!.displayName : 'Vlad S.',
+        'number': '•••• •••• •••• 4242',
+        'expiry': '12/26',
+        'type': 'VISA',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
 
   void _showAddCardDialog() {
     final numberController = TextEditingController();
@@ -69,17 +89,25 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            onPressed: () {
-              if (numberController.text.isNotEmpty && holderController.text.isNotEmpty) {
-                setState(() {
-                  _cards.add({
-                    'holder': holderController.text,
-                    'number': '•••• •••• •••• ${numberController.text.length >= 4 ? numberController.text.substring(numberController.text.length - 4) : '0000'}',
-                    'expiry': expiryController.text.isNotEmpty ? expiryController.text : '12/28',
-                    'type': 'Mastercard',
-                  });
+            onPressed: () async {
+              if (numberController.text.isNotEmpty && holderController.text.isNotEmpty && user != null) {
+                final last4 = numberController.text.length >= 4
+                    ? numberController.text.substring(numberController.text.length - 4)
+                    : '0000';
+
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user!.uid)
+                    .collection('cards')
+                    .add({
+                  'holder': holderController.text,
+                  'number': '•••• •••• •••• $last4',
+                  'expiry': expiryController.text.isNotEmpty ? expiryController.text : '12/28',
+                  'type': 'Mastercard',
+                  'createdAt': FieldValue.serverTimestamp(),
                 });
-                Navigator.pop(ctx);
+
+                if (mounted && ctx.mounted) Navigator.pop(ctx);
               }
             },
             child: const Text('Save Card', style: TextStyle(color: Colors.white)),
@@ -135,96 +163,122 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
           ),
           const Divider(),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: _cards.length,
-              itemBuilder: (context, index) {
-                final card = _cards[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(20),
-                  height: 180,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      colors: index % 2 == 0
-                          ? [const Color(0xFF1E1E1E), const Color(0xFF3A3A3A)]
-                          : [AppColors.primary, const Color(0xFF009657)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            card['type']!,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic,
+            child: user == null
+                ? const Center(child: Text("Please sign in to view cards"))
+                : StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user!.uid)
+                        .collection('cards')
+                        .orderBy('createdAt', descending: false)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                      }
+
+                      final docs = snapshot.data?.docs ?? [];
+                      if (docs.isEmpty) {
+                        return const Center(child: Text("No cards found"));
+                      }
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(20),
+                        itemCount: docs.length,
+                        itemBuilder: (context, index) {
+                          final data = docs[index].data() as Map<String, dynamic>;
+                          final holder = data['holder'] ?? 'Vlad S.';
+                          final number = data['number'] ?? '•••• •••• •••• 4242';
+                          final expiry = data['expiry'] ?? '12/26';
+                          final type = data['type'] ?? 'VISA';
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(20),
+                            height: 180,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: LinearGradient(
+                                colors: index % 2 == 0
+                                    ? [const Color(0xFF1E1E1E), const Color(0xFF3A3A3A)]
+                                    : [AppColors.primary, const Color(0xFF009657)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ),
-                          const Icon(Icons.credit_card, color: Colors.white70),
-                        ],
-                      ),
-                      Text(
-                        card['number']!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          letterSpacing: 2,
-                          fontFamily: 'SF Pro',
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.cardHolder.toUpperCase(),
-                                style: const TextStyle(color: Colors.white60, fontSize: 10),
-                              ),
-                              Text(
-                                card['holder']!,
-                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.expires.toUpperCase(),
-                                style: const TextStyle(color: Colors.white60, fontSize: 10),
-                              ),
-                              Text(
-                                card['expiry']!,
-                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      type,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    const Icon(Icons.credit_card, color: Colors.white70),
+                                  ],
+                                ),
+                                Text(
+                                  number,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    letterSpacing: 2,
+                                    fontFamily: 'SF Pro',
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          l10n.cardHolder.toUpperCase(),
+                                          style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                        ),
+                                        Text(
+                                          holder,
+                                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          l10n.expires.toUpperCase(),
+                                          style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                        ),
+                                        Text(
+                                          expiry,
+                                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),

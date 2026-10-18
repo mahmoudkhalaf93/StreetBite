@@ -32,16 +32,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _profilePicUrl;
   String _userName = "Vlad S.";
 
-  final List<Map<String, dynamic>> _addresses = [
-    {
-      'title': 'Park Way 145',
-      'subTitle': 'Default Address',
-      'isDefault': true,
-      'lat': 30.0444,
-      'lng': 31.2357,
-    }
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -51,14 +41,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (doc.exists && mounted) {
-        final data = doc.data();
-        setState(() {
-          _userName = data?['name'] ?? user.displayName ?? "Vlad S.";
-          _profilePicUrl = data?['profilePicUrl'] ?? user.photoURL;
-        });
-      }
+      _seedDefaultAddressIfEmpty(user);
+
+      // Listen to User document changes live from Firestore
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .snapshots()
+          .listen((doc) {
+        if (doc.exists && mounted) {
+          final data = doc.data();
+          setState(() {
+            _userName = data?['name'] ?? user.displayName ?? "Vlad S.";
+            _profilePicUrl = data?['profilePicUrl'] ?? user.photoURL;
+          });
+        }
+      });
+    }
+  }
+
+  Future<void> _seedDefaultAddressIfEmpty(User user) async {
+    final addressesRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('addresses');
+
+    final snapshot = await addressesRef.get();
+    if (snapshot.docs.isEmpty) {
+      await addressesRef.add({
+        'addressEn': 'Park Way 145',
+        'addressAr': 'بارك واي 145',
+        'latitude': 30.0444,
+        'longitude': 31.2357,
+        'isDefault': true,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
     }
   }
 
@@ -146,10 +163,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? '${placemarksAr.first.street}, ${placemarksAr.first.locality}'
           : addressEn;
 
-      if (!mounted) return;
-      final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-      final formattedAddress = isArabic ? addressAr : addressEn;
-
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await FirebaseFirestore.instance
@@ -161,19 +174,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'addressAr': addressAr,
           'latitude': position.latitude,
           'longitude': position.longitude,
+          'isDefault': false,
           'createdAt': FieldValue.serverTimestamp(),
         });
       }
 
       if (mounted) {
         setState(() {
-          _addresses.add({
-            'title': formattedAddress,
-            'subTitle': '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
-            'isDefault': false,
-            'lat': position.latitude,
-            'lng': position.longitude,
-          });
           _isFetchingLocation = false;
         });
 
@@ -198,6 +205,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -388,7 +397,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 8),
 
-                    // Addresses (Expandable with Geolocator Add Address)
+                    // Addresses (Expandable with Geolocator Add Address synced with Firestore)
                     Theme(
                       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
@@ -408,26 +417,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         children: [
-                          ..._addresses.map(
-                            (addr) => ListTile(
-                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
-                              title: Text(
-                                addr['title'],
-                                style: TextStyle(
-                                  fontFamily: 'SF Compact',
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                                ),
-                              ),
-                              subtitle: addr['isDefault'] == true
-                                  ? Text(l10n.defaultAddress, style: const TextStyle(color: AppColors.primary, fontSize: 11))
-                                  : Text(addr['subTitle'], style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11)),
-                              trailing: addr['isDefault'] == true
-                                  ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
-                                  : null,
+                          if (user != null)
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user.uid)
+                                  .collection('addresses')
+                                  .orderBy('createdAt', descending: false)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(12.0),
+                                    child: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                                  );
+                                }
+
+                                final docs = snapshot.data?.docs ?? [];
+                                return Column(
+                                  children: docs.map((doc) {
+                                    final data = doc.data() as Map<String, dynamic>;
+                                    final title = isArabic
+                                        ? (data['addressAr'] ?? data['addressEn'] ?? 'Address')
+                                        : (data['addressEn'] ?? 'Address');
+                                    final isDefault = data['isDefault'] == true;
+                                    final lat = (data['latitude'] as num?)?.toStringAsFixed(4) ?? '';
+                                    final lng = (data['longitude'] as num?)?.toStringAsFixed(4) ?? '';
+
+                                    return ListTile(
+                                      contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                                      title: Text(
+                                        title,
+                                        style: TextStyle(
+                                          fontFamily: 'SF Compact',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                        ),
+                                      ),
+                                      subtitle: isDefault
+                                          ? Text(l10n.defaultAddress, style: const TextStyle(color: AppColors.primary, fontSize: 11))
+                                          : Text('$lat, $lng', style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11)),
+                                      trailing: isDefault
+                                          ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
+                                          : null,
+                                    );
+                                  }).toList(),
+                                );
+                              },
                             ),
-                          ),
                           ListTile(
                             contentPadding: const EdgeInsets.only(left: 36, right: 8),
                             leading: _isFetchingLocation
