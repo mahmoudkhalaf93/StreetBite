@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/meal.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -8,11 +9,7 @@ class FavouriteButton extends StatelessWidget {
   final Meal meal;
   final double size;
 
-  const FavouriteButton({
-    super.key,
-    required this.meal,
-    this.size = 22.0,
-  });
+  const FavouriteButton({super.key, required this.meal, this.size = 22.0});
 
   Future<void> _toggleFavourite(BuildContext context, bool isFav) async {
     final user = FirebaseAuth.instance.currentUser;

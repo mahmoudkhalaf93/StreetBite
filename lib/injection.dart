@@ -75,10 +75,6 @@ Future<void> init() async {
   );
 
   sl.registerLazySingleton<MealRepository>(
-    () => MealRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-    ),
+    () => MealRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
 }
-

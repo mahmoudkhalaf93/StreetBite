@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -13,7 +14,8 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> _messages = [
     {
-      'text': 'Hello! Welcome to StreetBite Support. How can we help you today?',
+      'text':
+          'Hello! Welcome to StreetBite Support. How can we help you today?',
       'isUser': false,
       'time': '12:00 PM',
     },
@@ -27,7 +29,8 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
       _messages.add({
         'text': text,
         'isUser': true,
-        'time': '${TimeOfDay.now().hour}:${TimeOfDay.now().minute.toString().padLeft(2, '0')}',
+        'time':
+            '${TimeOfDay.now().hour}:${TimeOfDay.now().minute.toString().padLeft(2, '0')}',
       });
       _controller.clear();
     });
@@ -39,7 +42,8 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
           _messages.add({
             'text': 'Thank you for reaching out! Our team is reviewing your message and will get back to you shortly.',
             'isUser': false,
-            'time': '${TimeOfDay.now().hour}:${TimeOfDay.now().minute.toString().padLeft(2, '0')}',
+            'time':
+                '${TimeOfDay.now().hour}:${TimeOfDay.now().minute.toString().padLeft(2, '0')}',
           });
         });
       }
@@ -87,7 +91,7 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: () => Navigator.pop(context),
-                )
+                ),
               ],
             ),
           ),
@@ -103,7 +107,11 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.headset_mic_rounded, color: AppColors.primary, size: 20),
+                const Icon(
+                  Icons.headset_mic_rounded,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,17 +149,24 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
                 final isUser = msg['isUser'] as bool;
 
                 return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.7,
+                    ),
                     decoration: BoxDecoration(
                       color: isUser
                           ? AppColors.primary
                           : isDark
-                              ? const Color(0xFF2A2A2A)
-                              : Colors.grey.shade100,
+                          ? const Color(0xFF2A2A2A)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(16),
                         topRight: const Radius.circular(16),
@@ -164,7 +179,9 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
                       style: TextStyle(
                         fontFamily: 'SF Compact',
                         fontSize: 13,
-                        color: isUser ? Colors.white : (isDark ? Colors.white : Colors.black87),
+                        color: isUser
+                            ? Colors.white
+                            : (isDark ? Colors.white : Colors.black87),
                       ),
                     ),
                   ),
@@ -187,14 +204,19 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade100,
+                      color: isDark
+                          ? const Color(0xFF2A2A2A)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: TextField(
                       controller: _controller,
                       decoration: InputDecoration(
                         hintText: l10n.typeMessage,
-                        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
+                        hintStyle: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF9CA3AF),
+                        ),
                         border: InputBorder.none,
                       ),
                     ),
@@ -205,7 +227,11 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
                   backgroundColor: AppColors.primary,
                   radius: 20,
                   child: IconButton(
-                    icon: const Icon(Icons.send_rounded, size: 18, color: Colors.white),
+                    icon: const Icon(
+                      Icons.send_rounded,
+                      size: 18,
+                      color: Colors.white,
+                    ),
                     onPressed: _sendMessage,
                   ),
                 ),

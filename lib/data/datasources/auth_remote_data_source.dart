@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import '../../core/errors/exceptions.dart';
 import '../models/user_model.dart';
 
@@ -24,7 +25,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   });
 
   @override
-  Future<UserModel> signUpWithEmail(String name, String email, String password) async {
+  Future<UserModel> signUpWithEmail(
+    String name,
+    String email,
+    String password,
+  ) async {
     UserCredential? credential;
     try {
       // 1. Create user in Firebase Auth
@@ -102,15 +107,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) throw AuthException(message: 'Google sign in aborted.');
+      if (googleUser == null) {
+        throw AuthException(message: 'Google sign in aborted.');
+      }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await firebaseAuth.signInWithCredential(credential);
+      final userCredential = await firebaseAuth.signInWithCredential(
+        credential,
+      );
       final user = userCredential.user;
       if (user == null) throw AuthException(message: 'Google sign in failed.');
 
@@ -126,7 +136,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             .setProfilePicUrl(user.photoURL)
             .build();
 
-        await firestore.collection('users').doc(user.uid).set(newUserModel.toJson());
+        await firestore
+            .collection('users')
+            .doc(user.uid)
+            .set(newUserModel.toJson());
         return newUserModel;
       }
     } on FirebaseAuthException catch (e) {

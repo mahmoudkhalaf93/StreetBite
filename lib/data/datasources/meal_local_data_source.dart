@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/errors/exceptions.dart';
 import '../models/meal_model.dart';
 
@@ -28,8 +30,9 @@ class MealLocalDataSourceImpl implements MealLocalDataSource {
 
   @override
   Future<void> cacheMealsByKey(String key, List<MealModel> mealsToCache) async {
-    final List<Map<String, dynamic>> jsonList =
-        mealsToCache.map((meal) => meal.toJson()).toList();
+    final List<Map<String, dynamic>> jsonList = mealsToCache
+        .map((meal) => meal.toJson())
+        .toList();
     await sharedPreferences.setString(key, json.encode(jsonList));
   }
 
@@ -38,9 +41,7 @@ class MealLocalDataSourceImpl implements MealLocalDataSource {
     final jsonString = sharedPreferences.getString(key);
     if (jsonString != null) {
       final List decodedList = json.decode(jsonString);
-      return decodedList
-          .map((jsonMap) => MealModel.fromJson(jsonMap))
-          .toList();
+      return decodedList.map((jsonMap) => MealModel.fromJson(jsonMap)).toList();
     } else {
       throw CacheException(message: 'No cached meals found for key: $key');
     }

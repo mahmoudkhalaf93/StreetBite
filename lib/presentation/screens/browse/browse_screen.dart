@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import 'category_meals_screen.dart';
@@ -152,7 +153,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
               Container(
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF9FAFB),
+                  color: isDark
+                      ? const Color(0xFF1E1E1E)
+                      : const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
@@ -160,7 +163,10 @@ class _BrowseScreenState extends State<BrowseScreen> {
                     const SizedBox(width: 16),
                     SvgPicture.asset(
                       'assets/icons/search_in_textfield.svg',
-                      colorFilter: const ColorFilter.mode(Color(0xFF9CA3AF), BlendMode.srcIn),
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF9CA3AF),
+                        BlendMode.srcIn,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -241,7 +247,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1F2937) : const Color(0xFFE8F8F0),
+                        color: isDark
+                            ? const Color(0xFF1F2937)
+                            : const Color(0xFFE8F8F0),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -252,7 +260,10 @@ class _BrowseScreenState extends State<BrowseScreen> {
                             cat['icon'],
                             width: 28,
                             height: 28,
-                            colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.primary,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           Text(
                             label,
@@ -260,7 +271,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
                               fontFamily: 'SF Pro',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E1E1E),
                             ),
                           ),
                         ],

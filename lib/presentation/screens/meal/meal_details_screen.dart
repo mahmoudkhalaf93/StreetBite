@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../../domain/entities/meal.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
@@ -22,7 +23,10 @@ class MealDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           meal.strMeal,
-          style: const TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontFamily: 'SF Pro',
+            fontWeight: FontWeight.bold,
+          ),
         ),
         elevation: 0,
         actions: [
@@ -42,13 +46,24 @@ class MealDetailsScreen extends StatelessWidget {
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
                   height: 260,
-                  color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
-                  child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                  color: isDark
+                      ? const Color(0xFF2A2A2A)
+                      : Colors.grey.shade200,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                      strokeWidth: 2,
+                    ),
+                  ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: 260,
                   color: Colors.grey.shade200,
-                  child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  child: const Icon(
+                    Icons.broken_image,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
 
@@ -69,7 +84,9 @@ class MealDetailsScreen extends StatelessWidget {
                             fontFamily: 'SF Pro',
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF1E1E1E),
                           ),
                         ),
                       ),
@@ -92,7 +109,10 @@ class MealDetailsScreen extends StatelessWidget {
                     children: [
                       // Rating Badge
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
@@ -118,7 +138,10 @@ class MealDetailsScreen extends StatelessWidget {
                       // Category Tag
                       if (meal.strCategory != null)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -138,7 +161,10 @@ class MealDetailsScreen extends StatelessWidget {
                       // Area Tag
                       if (meal.strArea != null)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.blue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -172,11 +198,18 @@ class MealDetailsScreen extends StatelessWidget {
                       runSpacing: 8,
                       children: List.generate(meal.ingredients.length, (index) {
                         final ing = meal.ingredients[index];
-                        final measure = index < meal.measures.length ? meal.measures[index] : '';
+                        final measure = index < meal.measures.length
+                            ? meal.measures[index]
+                            : '';
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade100,
+                            color: isDark
+                                ? const Color(0xFF2A2A2A)
+                                : Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -209,7 +242,9 @@ class MealDetailsScreen extends StatelessWidget {
                       fontFamily: 'SF Compact',
                       fontSize: 14,
                       height: 1.5,
-                      color: isDark ? Colors.grey.shade400 : const Color(0xFF4B5563),
+                      color: isDark
+                          ? Colors.grey.shade400
+                          : const Color(0xFF4B5563),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -238,10 +273,22 @@ class MealDetailsScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Price', style: TextStyle(fontFamily: 'SF Compact', color: Colors.grey, fontSize: 12)),
+                  Text(
+                    'Price',
+                    style: TextStyle(
+                      fontFamily: 'SF Compact',
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
                   Text(
                     '\$14.99',
-                    style: TextStyle(fontFamily: 'SF Pro', fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
+                    style: TextStyle(
+                      fontFamily: 'SF Pro',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ],
               ),
@@ -253,12 +300,17 @@ class MealDetailsScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
                     ),
                     icon: const Icon(Icons.add_shopping_cart_rounded, size: 20),
                     label: Text(
                       l10n.addToCart,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     onPressed: () {
                       context.read<CartCubit>().addToCart(meal);

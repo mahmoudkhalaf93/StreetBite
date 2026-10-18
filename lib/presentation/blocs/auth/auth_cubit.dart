@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/usecases/usecase.dart';
 import '../../../domain/usecases/auth_usecases.dart';
 import 'auth_state.dart';
@@ -18,7 +19,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> login(String email, String password) async {
     emit(AuthLoading());
-    final result = await loginUseCase(LoginParams(email: email, password: password));
+    final result = await loginUseCase(
+      LoginParams(email: email, password: password),
+    );
     result.fold(
       (failure) => emit(AuthFailure(failure.props.first as String)),
       (user) => emit(AuthSuccess(user)),
@@ -27,7 +30,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> signUp(String name, String email, String password) async {
     emit(AuthLoading());
-    final result = await signUpUseCase(SignUpParams(name: name, email: email, password: password));
+    final result = await signUpUseCase(
+      SignUpParams(name: name, email: email, password: password),
+    );
     result.fold(
       (failure) => emit(AuthFailure(failure.props.first as String)),
       (user) => emit(AuthSuccess(user)),

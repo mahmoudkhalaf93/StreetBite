@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -59,9 +60,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final prefs = await SharedPreferences.getInstance();
     final lastUid = prefs.getString('LAST_BIOMETRIC_UID');
-    final isBiometricEnabled = lastUid != null && (prefs.getBool('BIOMETRIC_ENABLED_$lastUid') ?? false);
-    final isGoogleUser = lastUid != null && (prefs.getBool('IS_GOOGLE_USER_$lastUid') ?? false);
-    final savedEmail = prefs.getString('LAST_BIOMETRIC_EMAIL') ?? prefs.getString('SAVED_EMAIL');
+    final isBiometricEnabled =
+        lastUid != null &&
+        (prefs.getBool('BIOMETRIC_ENABLED_$lastUid') ?? false);
+    final isGoogleUser =
+        lastUid != null && (prefs.getBool('IS_GOOGLE_USER_$lastUid') ?? false);
+    final savedEmail =
+        prefs.getString('LAST_BIOMETRIC_EMAIL') ??
+        prefs.getString('SAVED_EMAIL');
     final savedPassword = prefs.getString('SAVED_PASSWORD');
 
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -225,7 +231,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16.0,
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -260,7 +269,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: _emailController,
                             hintText: l10n.emailAddress,
                             keyboardType: TextInputType.emailAddress,
-                            prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF9CA3AF)),
+                            prefixIcon: const Icon(
+                              Icons.email_outlined,
+                              color: Color(0xFF9CA3AF),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return l10n.emailRequired;
@@ -279,7 +291,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: _passwordController,
                             hintText: l10n.password,
                             isPassword: true,
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF9CA3AF)),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF9CA3AF),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return l10n.passwordRequired;
@@ -299,7 +314,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const ForgotPasswordScreen(),
+                                  ),
                                 );
                               },
                               style: TextButton.styleFrom(
@@ -330,11 +348,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Biometric Fingerprint Button
                           CustomButton(
-                            text: isArabic ? 'تسجيل الدخول بالبصمة' : 'Sign In with Fingerprint',
+                            text: isArabic
+                                ? 'تسجيل الدخول بالبصمة'
+                                : 'Sign In with Fingerprint',
                             backgroundColor: Colors.white,
                             textColor: AppColors.primary,
                             border: const BorderSide(color: AppColors.primary),
-                            icon: const Icon(Icons.fingerprint_rounded, color: AppColors.primary, size: 24),
+                            icon: const Icon(
+                              Icons.fingerprint_rounded,
+                              color: AppColors.primary,
+                              size: 24,
+                            ),
                             onPressed: () => _onBiometricSignInPressed(context),
                           ),
                           const SizedBox(height: 16),
@@ -342,15 +366,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           // OR Divider
                           Row(
                             children: [
-                              const Expanded(child: Divider(color: Color(0xFFE5E7EB))),
+                              const Expanded(
+                                child: Divider(color: Color(0xFFE5E7EB)),
+                              ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: Text(
                                   l10n.or,
-                                  style: const TextStyle(color: Color(0xFF9CA3AF)),
+                                  style: const TextStyle(
+                                    color: Color(0xFF9CA3AF),
+                                  ),
                                 ),
                               ),
-                              const Expanded(child: Divider(color: Color(0xFFE5E7EB))),
+                              const Expanded(
+                                child: Divider(color: Color(0xFFE5E7EB)),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -379,7 +411,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               'assets/images/Facebook.svg',
                               width: 24,
                               height: 24,
-                              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             onPressed: () => _onFacebookSignInPressed(context),
                           ),
@@ -400,7 +435,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                                    MaterialPageRoute(
+                                      builder: (_) => const SignUpScreen(),
+                                    ),
                                   );
                                 },
                                 child: Text(

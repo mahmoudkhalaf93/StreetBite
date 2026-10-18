@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
@@ -41,10 +42,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             title: Text(
               l10n.resetPasswordTitle,
-              style: const TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontFamily: 'SF Pro',
+                fontWeight: FontWeight.bold,
+              ),
             ),
             content: Text(
               l10n.resetEmailSent,
@@ -52,14 +58,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             actions: [
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                ),
                 onPressed: () {
                   Navigator.pop(ctx);
                   Navigator.pop(context); // Return to login
                 },
                 child: Text(
                   l10n.backToLogin,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -100,7 +111,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black87,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -184,7 +199,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       controller: _emailController,
                       hintText: l10n.emailAddress,
                       keyboardType: TextInputType.emailAddress,
-                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF9CA3AF)),
+                      prefixIcon: const Icon(
+                        Icons.email_outlined,
+                        color: Color(0xFF9CA3AF),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return l10n.emailRequired;

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../l10n/app_localizations.dart';
@@ -38,7 +39,9 @@ class FavouritesScreen extends StatelessWidget {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
                 }
 
                 final docs = snapshot.data?.docs ?? [];
@@ -47,7 +50,11 @@ class FavouritesScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.favorite_border_rounded, size: 80, color: Colors.grey),
+                        const Icon(
+                          Icons.favorite_border_rounded,
+                          size: 80,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'No favourite meals saved yet',
@@ -61,7 +68,10 @@ class FavouritesScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         const Text(
                           'Tap the ❤️ heart icon on any meal to save it here!',
-                          style: TextStyle(fontFamily: 'SF Compact', color: Colors.grey),
+                          style: TextStyle(
+                            fontFamily: 'SF Compact',
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -87,11 +97,15 @@ class FavouritesScreen extends StatelessWidget {
                     return GestureDetector(
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => MealDetailsScreen(meal: meal)),
+                        MaterialPageRoute(
+                          builder: (_) => MealDetailsScreen(meal: meal),
+                        ),
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                          color: isDark
+                              ? const Color(0xFF1A1A1A)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
@@ -109,19 +123,27 @@ class FavouritesScreen extends StatelessWidget {
                                 children: [
                                   Positioned.fill(
                                     child: ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
                                       child: meal.strMealThumb != null
                                           ? CachedNetworkImage(
                                               imageUrl: meal.strMealThumb!,
                                               fit: BoxFit.cover,
+                                              memCacheWidth: 400,
                                             )
-                                          : Container(color: Colors.grey.shade300),
+                                          : Container(
+                                              color: Colors.grey.shade300,
+                                            ),
                                     ),
                                   ),
                                   Positioned(
                                     top: 4,
                                     right: 4,
-                                    child: FavouriteButton(meal: meal, size: 20),
+                                    child: FavouriteButton(
+                                      meal: meal,
+                                      size: 20,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -137,7 +159,9 @@ class FavouritesScreen extends StatelessWidget {
                                       fontFamily: 'SF Pro',
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF1E1E1E),
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -145,7 +169,11 @@ class FavouritesScreen extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     meal.strCategory ?? 'Food',
-                                    style: const TextStyle(fontFamily: 'SF Compact', fontSize: 12, color: Color(0xFF9CA3AF)),
+                                    style: const TextStyle(
+                                      fontFamily: 'SF Compact',
+                                      fontSize: 12,
+                                      color: Color(0xFF9CA3AF),
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -159,22 +187,40 @@ class FavouritesScreen extends StatelessWidget {
                                         foregroundColor: Colors.white,
                                         padding: EdgeInsets.zero,
                                         elevation: 0,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
                                       ),
                                       onPressed: () {
-                                        context.read<CartCubit>().addToCart(meal);
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        context.read<CartCubit>().addToCart(
+                                          meal,
+                                        );
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text(l10n.addedToCart(meal.strMeal)),
+                                            content: Text(
+                                              l10n.addedToCart(meal.strMeal),
+                                            ),
                                             backgroundColor: AppColors.primary,
-                                            duration: const Duration(seconds: 1),
+                                            duration: const Duration(
+                                              seconds: 1,
+                                            ),
                                             behavior: SnackBarBehavior.floating,
                                           ),
                                         );
                                       },
-                                      child: Text(l10n.addToCart, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                                      child: Text(
+                                        l10n.addToCart,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),

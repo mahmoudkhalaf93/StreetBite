@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/user_entity.dart';
@@ -11,7 +12,10 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, UserEntity>> loginWithEmail(String email, String password) async {
+  Future<Either<Failure, UserEntity>> loginWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
       final userModel = await remoteDataSource.loginWithEmail(email, password);
       return Right(userModel);
@@ -23,9 +27,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> signUpWithEmail(String name, String email, String password) async {
+  Future<Either<Failure, UserEntity>> signUpWithEmail(
+    String name,
+    String email,
+    String password,
+  ) async {
     try {
-      final userModel = await remoteDataSource.signUpWithEmail(name, email, password);
+      final userModel = await remoteDataSource.signUpWithEmail(
+        name,
+        email,
+        password,
+      );
       return Right(userModel);
     } on AuthException catch (e) {
       return Left(AuthFailure(message: e.message));

@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -41,7 +43,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
     if (difference.inDays == 0 && now.day == date.day) {
       return 'Today';
-    } else if (difference.inDays == 1 || (difference.inDays == 0 && now.day != date.day)) {
+    } else if (difference.inDays == 1 ||
+        (difference.inDays == 0 && now.day != date.day)) {
       return 'Yesterday';
     } else if (difference.inDays < 7) {
       return '${difference.inDays} days ago';
@@ -70,7 +73,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
                   }
 
                   final docs = snapshot.data?.docs ?? [];
@@ -87,7 +94,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               fontFamily: 'SF Pro',
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E1E1E),
                             ),
                           ),
                           Expanded(
@@ -95,7 +104,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.shade400),
+                                  Icon(
+                                    Icons.receipt_long_outlined,
+                                    size: 80,
+                                    color: Colors.grey.shade400,
+                                  ),
                                   const SizedBox(height: 16),
                                   Text(
                                     'No orders placed yet',
@@ -103,7 +116,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       fontFamily: 'SF Pro',
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : Colors.black87,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black87,
                                     ),
                                   ),
                                 ],
@@ -123,194 +138,288 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
                   for (var doc in docs) {
                     final data = doc.data() as Map<String, dynamic>;
-                    final timestamp = (data['createdAt'] as Timestamp?)?.toDate();
-                    final deliveryMinutes = (data['deliveryMinutes'] as num?)?.toInt() ?? 30;
+                    final timestamp = (data['createdAt'] as Timestamp?)
+                        ?.toDate();
+                    final deliveryMinutes =
+                        (data['deliveryMinutes'] as num?)?.toInt() ?? 30;
 
                     if (timestamp != null) {
-                      final elapsedMinutes = now.difference(timestamp).inMinutes;
+                      final elapsedMinutes = now
+                          .difference(timestamp)
+                          .inMinutes;
 
                       if (elapsedMinutes < deliveryMinutes) {
                         // Order is still actively being prepared / delivered
-                        final remainingMinutes = deliveryMinutes - elapsedMinutes;
+                        final remainingMinutes =
+                            deliveryMinutes - elapsedMinutes;
                         activeOrdersList.add({
                           'data': data,
-                          'remainingMinutes': remainingMinutes > 0 ? remainingMinutes : 1,
+                          'remainingMinutes': remainingMinutes > 0
+                              ? remainingMinutes
+                              : 1,
                         });
                       } else {
                         // Estimated delivery time has passed -> Automatically moved to Past
-                        pastOrdersList.add({'data': data, 'timestamp': timestamp});
+                        pastOrdersList.add({
+                          'data': data,
+                          'timestamp': timestamp,
+                        });
                       }
                     } else {
                       // Fallback if timestamp is resolving
-                      activeOrdersList.add({'data': data, 'remainingMinutes': deliveryMinutes});
+                      activeOrdersList.add({
+                        'data': data,
+                        'remainingMinutes': deliveryMinutes,
+                      });
                     }
                   }
 
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 12),
-                        // 1. "Orders" Header
-                        Text(
-                          l10n.navOrders,
-                          style: TextStyle(
-                            fontFamily: 'SF Pro',
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                  return CustomScrollView(
+                    slivers: [
+                      const SliverPadding(padding: EdgeInsets.only(top: 12)),
+                      // 1. "Orders" Header
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0,
+                            vertical: 8.0,
                           ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // 2. Active Orders Section
-                        if (activeOrdersList.isNotEmpty) ...[
-                          ...activeOrdersList.map((item) {
-                            final data = item['data'] as Map<String, dynamic>;
-                            final remainingMinutes = item['remainingMinutes'] as int;
-                            final items = (data['items'] as List?) ?? [];
-                            final firstItem = items.isNotEmpty ? items.first : {};
-                            final title = firstItem['strMeal'] ?? 'StreetBite Special';
-                            final thumb = firstItem['strMealThumb'];
-
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 24.0),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: thumb != null
-                                        ? CachedNetworkImage(
-                                            imageUrl: thumb,
-                                            width: 90,
-                                            height: 90,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Container(width: 90, height: 90, color: Colors.grey.shade300),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: 8,
-                                              height: 8,
-                                              decoration: const BoxDecoration(
-                                                color: AppColors.primary,
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'Arrives in $remainingMinutes min',
-                                              style: const TextStyle(
-                                                fontFamily: 'SF Pro',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primary,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          title,
-                                          style: TextStyle(
-                                            fontFamily: 'SF Pro',
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ],
-
-                        // 3. Past Orders Section Header
-                        if (pastOrdersList.isNotEmpty) ...[
-                          Text(
-                            'Past',
+                          child: Text(
+                            l10n.navOrders,
                             style: TextStyle(
                               fontFamily: 'SF Pro',
-                              fontSize: 24,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E1E1E),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                        ),
+                      ),
+                      const SliverPadding(padding: EdgeInsets.only(top: 12)),
 
-                          // Past Orders List
-                          ...pastOrdersList.map((item) {
-                            final data = item['data'] as Map<String, dynamic>;
-                            final timestamp = item['timestamp'] as DateTime?;
-                            final items = (data['items'] as List?) ?? [];
-                            final firstItem = items.isNotEmpty ? items.first : {};
-                            final title = firstItem['strMeal'] ?? 'StreetBite Meal';
-                            final thumb = firstItem['strMealThumb'];
-                            final itemCount = (data['itemCount'] as num?)?.toInt() ?? items.length;
-                            final timeAgo = _formatTimeAgo(timestamp);
+                      // 2. Active Orders Section
+                      if (activeOrdersList.isNotEmpty)
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final item = activeOrdersList[index];
+                              final data = item['data'] as Map<String, dynamic>;
+                              final remainingMinutes =
+                                  item['remainingMinutes'] as int;
+                              final items = (data['items'] as List?) ?? [];
+                              final firstItem = items.isNotEmpty
+                                  ? items.first
+                                  : {};
+                              final title =
+                                  firstItem['strMeal'] ?? 'StreetBite Special';
+                              final thumb = firstItem['strMealThumb'];
 
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: thumb != null
-                                        ? CachedNetworkImage(
-                                            imageUrl: thumb,
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Container(width: 80, height: 80, color: Colors.grey.shade300),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          title,
-                                          style: TextStyle(
-                                            fontFamily: 'SF Pro',
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '$itemCount items  •  $timeAgo',
-                                          style: const TextStyle(
-                                            fontFamily: 'SF Compact',
-                                            fontSize: 14,
-                                            color: Color(0xFF9CA3AF),
-                                          ),
-                                        ),
-                                      ],
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 24.0),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: thumb != null
+                                          ? CachedNetworkImage(
+                                              imageUrl: thumb,
+                                              width: 90,
+                                              height: 90,
+                                              fit: BoxFit.cover,
+                                              memCacheWidth: 200,
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                    color: Colors.grey.shade200,
+                                                    child: const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            color: AppColors
+                                                                .primary,
+                                                            strokeWidth: 2,
+                                                          ),
+                                                    ),
+                                                  ),
+                                            )
+                                          : Container(
+                                              width: 90,
+                                              height: 90,
+                                              color: Colors.grey.shade300,
+                                            ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 8,
+                                                height: 8,
+                                                decoration: const BoxDecoration(
+                                                  color: AppColors.primary,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                'Arrives in $remainingMinutes min',
+                                                style: const TextStyle(
+                                                  fontFamily: 'SF Pro',
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.primary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            title,
+                                            style: TextStyle(
+                                              fontFamily: 'SF Pro',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF1E1E1E),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }, childCount: activeOrdersList.length),
+                          ),
+                        ),
+
+                      // 3. Past Orders Section Header
+                      if (pastOrdersList.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 16.0,
+                            ),
+                            child: Text(
+                              'Past',
+                              style: TextStyle(
+                                fontFamily: 'SF Pro',
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF1E1E1E),
                               ),
-                            );
-                          }),
-                        ],
-                      ],
-                    ),
+                            ),
+                          ),
+                        ),
+
+                      // Past Orders List
+                      if (pastOrdersList.isNotEmpty)
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final item = pastOrdersList[index];
+                              final data = item['data'] as Map<String, dynamic>;
+                              final timestamp = item['timestamp'] as DateTime?;
+                              final items = (data['items'] as List?) ?? [];
+                              final firstItem = items.isNotEmpty
+                                  ? items.first
+                                  : {};
+                              final title =
+                                  firstItem['strMeal'] ?? 'StreetBite Meal';
+                              final thumb = firstItem['strMealThumb'];
+                              final itemCount =
+                                  (data['itemCount'] as num?)?.toInt() ??
+                                  items.length;
+                              final timeAgo = _formatTimeAgo(timestamp);
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: thumb != null
+                                          ? CachedNetworkImage(
+                                              imageUrl: thumb,
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                              memCacheWidth: 200,
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                    color: Colors.grey.shade200,
+                                                    child: const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            color: AppColors
+                                                                .primary,
+                                                            strokeWidth: 2,
+                                                          ),
+                                                    ),
+                                                  ),
+                                            )
+                                          : Container(
+                                              width: 80,
+                                              height: 80,
+                                              color: Colors.grey.shade300,
+                                            ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            title,
+                                            style: TextStyle(
+                                              fontFamily: 'SF Pro',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF1E1E1E),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '$itemCount items  •  $timeAgo',
+                                            style: const TextStyle(
+                                              fontFamily: 'SF Compact',
+                                              fontSize: 14,
+                                              color: Color(0xFF9CA3AF),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }, childCount: pastOrdersList.length),
+                          ),
+                        ),
+                    ],
                   );
                 },
               ),

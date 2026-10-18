@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -30,7 +31,9 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
     final snapshot = await cardsRef.get();
     if (snapshot.docs.isEmpty) {
       await cardsRef.add({
-        'holder': user!.displayName?.isNotEmpty == true ? user!.displayName : 'Vlad S.',
+        'holder': user!.displayName?.isNotEmpty == true
+            ? user!.displayName
+            : 'Vlad S.',
         'number': '•••• •••• •••• 4242',
         'expiry': '12/26',
         'type': 'VISA',
@@ -65,7 +68,11 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           l10n.changeDefaultPaymentTitle,
-          style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontFamily: 'SF Pro',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           l10n.changeDefaultPaymentConfirm,
@@ -82,7 +89,10 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
               Navigator.pop(ctx);
               await _setDefaultCard(docId);
             },
-            child: Text(l10n.agree, style: const TextStyle(color: Colors.white)),
+            child: Text(
+              l10n.agree,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -100,7 +110,11 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           AppLocalizations.of(context)!.addNewCard,
-          style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontFamily: 'SF Pro',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -140,9 +154,13 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             onPressed: () async {
-              if (numberController.text.isNotEmpty && holderController.text.isNotEmpty && user != null) {
+              if (numberController.text.isNotEmpty &&
+                  holderController.text.isNotEmpty &&
+                  user != null) {
                 final last4 = numberController.text.length >= 4
-                    ? numberController.text.substring(numberController.text.length - 4)
+                    ? numberController.text.substring(
+                        numberController.text.length - 4,
+                      )
                     : '0000';
 
                 await FirebaseFirestore.instance
@@ -150,18 +168,23 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                     .doc(user!.uid)
                     .collection('cards')
                     .add({
-                  'holder': holderController.text,
-                  'number': '•••• •••• •••• $last4',
-                  'expiry': expiryController.text.isNotEmpty ? expiryController.text : '12/28',
-                  'type': 'Mastercard',
-                  'isDefault': false,
-                  'createdAt': FieldValue.serverTimestamp(),
-                });
+                      'holder': holderController.text,
+                      'number': '•••• •••• •••• $last4',
+                      'expiry': expiryController.text.isNotEmpty
+                          ? expiryController.text
+                          : '12/28',
+                      'type': 'Mastercard',
+                      'isDefault': false,
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
 
                 if (mounted && ctx.mounted) Navigator.pop(ctx);
               }
             },
-            child: const Text('Save Card', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Save Card',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -208,7 +231,7 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: () => Navigator.pop(context),
-                )
+                ),
               ],
             ),
           ),
@@ -225,7 +248,11 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        );
                       }
 
                       final docs = snapshot.data?.docs ?? [];
@@ -240,13 +267,16 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                           final doc = docs[index];
                           final data = doc.data() as Map<String, dynamic>;
                           final holder = data['holder'] ?? 'Vlad S.';
-                          final number = data['number'] ?? '•••• •••• •••• 4242';
+                          final number =
+                              data['number'] ?? '•••• •••• •••• 4242';
                           final expiry = data['expiry'] ?? '12/26';
                           final type = data['type'] ?? 'VISA';
                           final isDefault = data['isDefault'] == true;
 
                           return GestureDetector(
-                            onTap: isDefault ? null : () => _confirmSetDefaultCard(doc.id),
+                            onTap: isDefault
+                                ? null
+                                : () => _confirmSetDefaultCard(doc.id),
                             child: Container(
                               margin: const EdgeInsets.only(bottom: 16),
                               padding: const EdgeInsets.all(20),
@@ -254,12 +284,21 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 border: isDefault
-                                    ? Border.all(color: AppColors.primary, width: 3)
+                                    ? Border.all(
+                                        color: AppColors.primary,
+                                        width: 3,
+                                      )
                                     : null,
                                 gradient: LinearGradient(
                                   colors: index % 2 == 0
-                                      ? [const Color(0xFF1E1E1E), const Color(0xFF3A3A3A)]
-                                      : [AppColors.primary, const Color(0xFF009657)],
+                                      ? [
+                                          const Color(0xFF1E1E1E),
+                                          const Color(0xFF3A3A3A),
+                                        ]
+                                      : [
+                                          AppColors.primary,
+                                          const Color(0xFF009657),
+                                        ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
@@ -273,10 +312,12 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         type,
@@ -289,24 +330,40 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                                       ),
                                       if (isDefault)
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                           child: const Row(
                                             children: [
-                                              Icon(Icons.check_circle, color: Colors.white, size: 14),
+                                              Icon(
+                                                Icons.check_circle,
+                                                color: Colors.white,
+                                                size: 14,
+                                              ),
                                               SizedBox(width: 4),
                                               Text(
                                                 'PRIMARY',
-                                                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         )
                                       else
-                                        const Icon(Icons.credit_card, color: Colors.white70),
+                                        const Icon(
+                                          Icons.credit_card,
+                                          color: Colors.white70,
+                                        ),
                                     ],
                                   ),
                                   Text(
@@ -319,31 +376,48 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                                     ),
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             l10n.cardHolder.toUpperCase(),
-                                            style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                            style: const TextStyle(
+                                              color: Colors.white60,
+                                              fontSize: 10,
+                                            ),
                                           ),
                                           Text(
                                             holder,
-                                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             l10n.expires.toUpperCase(),
-                                            style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                            style: const TextStyle(
+                                              color: Colors.white60,
+                                              fontSize: 10,
+                                            ),
                                           ),
                                           Text(
                                             expiry,
-                                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -367,10 +441,18 @@ class _PaymentInfoSheetState extends State<PaymentInfoSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const Icon(Icons.add_rounded),
-                label: Text(l10n.addNewCard, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                label: Text(
+                  l10n.addNewCard,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 onPressed: _showAddCardDialog,
               ),
             ),

@@ -14,5 +14,10 @@ class Ingredient extends Equatable {
   });
 
   @override
-  List<Object?> get props => [idIngredient, strIngredient, strDescription, strType];
+  List<Object?> get props => [
+    idIngredient,
+    strIngredient,
+    strDescription,
+    strType,
+  ];
 }

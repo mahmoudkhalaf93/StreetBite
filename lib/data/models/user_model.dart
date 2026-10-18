@@ -1,6 +1,7 @@
 import '../../domain/entities/user_entity.dart';
 
-// Applying the Builder Design Pattern as requested in the project requirements
+/// Pattern: Builder Pattern
+/// Why: Provides a flexible and readable way to construct complex UserModel instances step-by-step, separating construction from representation.
 class UserModel extends UserEntity {
   const UserModel({
     required super.uid,

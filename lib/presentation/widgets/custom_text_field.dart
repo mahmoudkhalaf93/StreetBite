@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
@@ -53,12 +54,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         filled: true,
         fillColor: const Color(0xFFF4F5F7),
-        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16), // Reduced internal padding
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 14,
+          horizontal: 16,
+        ), // Reduced internal padding
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
-                  _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  _obscureText
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
                   color: const Color(0xFF9CA3AF),
                 ),
                 onPressed: () {

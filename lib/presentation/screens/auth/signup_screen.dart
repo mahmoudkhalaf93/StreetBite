@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -37,10 +38,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void _onSignUpPressed(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().signUp(
-            _nameController.text.trim(),
-            _emailController.text.trim(),
-            _passwordController.text.trim(),
-          );
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
     }
   }
 
@@ -115,7 +116,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           top: 40,
                           left: 16,
                           child: IconButton(
-                            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -145,7 +149,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16.0,
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -153,7 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         children: [
                           // Title
                           Text(
-                            l10n.signUpTitle, 
+                            l10n.signUpTitle,
                             style: const TextStyle(
                               fontFamily: 'SF Pro',
                               fontSize: 22, // Reduced from 24
@@ -174,20 +181,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16), // Reduced from 24
-
                           // Full Name Field
                           CustomTextField(
                             controller: _nameController,
                             hintText: l10n.fullName, // Added to ARB
                             keyboardType: TextInputType.name,
-                            prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF9CA3AF)),
+                            prefixIcon: const Icon(
+                              Icons.person_outline,
+                              color: Color(0xFF9CA3AF),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return l10n.nameRequired; // Added to ARB
                               }
                               // Requirement: Full name (capital first letter)
                               if (value[0] != value[0].toUpperCase()) {
-                                return l10n.nameMustStartWithCapital; // Added to ARB
+                                return l10n
+                                    .nameMustStartWithCapital; // Added to ARB
                               }
                               return null;
                             },
@@ -199,7 +209,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             controller: _emailController,
                             hintText: l10n.emailAddress,
                             keyboardType: TextInputType.emailAddress,
-                            prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF9CA3AF)),
+                            prefixIcon: const Icon(
+                              Icons.email_outlined,
+                              color: Color(0xFF9CA3AF),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return l10n.emailRequired;
@@ -218,7 +231,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             controller: _passwordController,
                             hintText: l10n.password,
                             isPassword: true,
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF9CA3AF)),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF9CA3AF),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return l10n.passwordRequired;
@@ -236,10 +252,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             controller: _confirmPasswordController,
                             hintText: l10n.confirmPassword, // Added to ARB
                             isPassword: true,
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF9CA3AF)),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF9CA3AF),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return l10n.confirmPasswordRequired; // Added to ARB
+                                return l10n
+                                    .confirmPasswordRequired; // Added to ARB
                               }
                               if (value != _passwordController.text) {
                                 return l10n.passwordsDoNotMatch; // Added to ARB
@@ -260,15 +280,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           // OR Divider
                           Row(
                             children: [
-                              const Expanded(child: Divider(color: Color(0xFFE5E7EB))),
+                              const Expanded(
+                                child: Divider(color: Color(0xFFE5E7EB)),
+                              ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: Text(
                                   l10n.or,
-                                  style: const TextStyle(color: Color(0xFF9CA3AF)),
+                                  style: const TextStyle(
+                                    color: Color(0xFF9CA3AF),
+                                  ),
                                 ),
                               ),
-                              const Expanded(child: Divider(color: Color(0xFFE5E7EB))),
+                              const Expanded(
+                                child: Divider(color: Color(0xFFE5E7EB)),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -297,7 +325,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               'assets/images/Facebook.svg',
                               width: 24,
                               height: 24,
-                              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             onPressed: () => _onFacebookSignInPressed(context),
                           ),

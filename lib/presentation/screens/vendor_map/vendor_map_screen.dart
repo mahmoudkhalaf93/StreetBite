@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+
 import '../../../core/theme/app_colors.dart';
 
 class VendorMapScreen extends StatefulWidget {
@@ -32,7 +33,9 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
         'assets/icons/appicon.png',
       );
     } catch (_) {
-      _customIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+      _customIcon = BitmapDescriptor.defaultMarkerWithHue(
+        BitmapDescriptor.hueGreen,
+      );
     }
 
     await _getUserLocation();
@@ -47,9 +50,12 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
         permission = await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+      if (permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always) {
         Position position = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+          ),
         );
         _userPosition = LatLng(position.latitude, position.longitude);
       }
@@ -113,7 +119,9 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
                           fontFamily: 'SF Pro',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1E1E1E),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -129,7 +137,10 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -160,7 +171,9 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const Icon(Icons.restaurant_menu_rounded),
                 label: const Text(
@@ -226,10 +239,15 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
       },
     ];
 
-    final iconToUse = _customIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+    final iconToUse =
+        _customIcon ??
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
 
     _markers = vendors.map((v) {
-      final pos = LatLng(lat + (v['offsetLat'] as double), lng + (v['offsetLng'] as double));
+      final pos = LatLng(
+        lat + (v['offsetLat'] as double),
+        lng + (v['offsetLng'] as double),
+      );
       return Marker(
         markerId: MarkerId(v['id'] as String),
         position: pos,
@@ -266,7 +284,10 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(target: _userPosition, zoom: 14),
+            initialCameraPosition: CameraPosition(
+              target: _userPosition,
+              zoom: 14,
+            ),
             markers: _markers,
             onMapCreated: (controller) {
               _mapController = controller;

@@ -39,20 +39,63 @@ class _CartScreenState extends State<CartScreen> {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
+
+      // Proximity duplicate check (150 meters = ~85-90% location proximity)
+      final existingDocs = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('addresses')
+          .get();
+
+      bool isDuplicate = false;
+      for (var doc in existingDocs.docs) {
+        final data = doc.data();
+        final existingLat = (data['latitude'] as num?)?.toDouble();
+        final existingLng = (data['longitude'] as num?)?.toDouble();
+
+        if (existingLat != null && existingLng != null) {
+          final distanceInMeters = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            existingLat,
+            existingLng,
+          );
+
+          if (distanceInMeters < 150) {
+            isDuplicate = true;
+            break;
+          }
+        }
+      }
+
+      if (isDuplicate) {
+        if (mounted) {
+          setState(() => _isFetchingLocation = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                Localizations.localeOf(context).languageCode == 'ar'
+                    ? 'هذا العنوان مسجل بالفعل بالقرب منك!'
+                    : 'This address is already registered nearby!',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
 
       final geocodingAr = geo.Geocoding(locale: const Locale('ar'));
       final geocodingEn = geo.Geocoding(locale: const Locale('en'));
 
-      List<geo.Placemark> placemarksAr = await geocodingAr.placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      List<geo.Placemark> placemarksEn = await geocodingEn.placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+      List<geo.Placemark> placemarksAr = await geocodingAr
+          .placemarkFromCoordinates(position.latitude, position.longitude);
+      List<geo.Placemark> placemarksEn = await geocodingEn
+          .placemarkFromCoordinates(position.latitude, position.longitude);
 
       String addressEn = placemarksEn.isNotEmpty
           ? '${placemarksEn.first.street}, ${placemarksEn.first.locality}'
@@ -67,13 +110,13 @@ class _CartScreenState extends State<CartScreen> {
           .doc(user.uid)
           .collection('addresses')
           .add({
-        'addressEn': addressEn,
-        'addressAr': addressAr,
-        'latitude': position.latitude,
-        'longitude': position.longitude,
-        'isDefault': true,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+            'addressEn': addressEn,
+            'addressAr': addressAr,
+            'latitude': position.latitude,
+            'longitude': position.longitude,
+            'isDefault': true,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
 
       if (mounted) {
         setState(() => _isFetchingLocation = false);
@@ -88,7 +131,10 @@ class _CartScreenState extends State<CartScreen> {
       if (mounted) {
         setState(() => _isFetchingLocation = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting location: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Error getting location: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -122,7 +168,8 @@ class _CartScreenState extends State<CartScreen> {
       final timestamp = (data['createdAt'] as Timestamp?)?.toDate();
       final deliveryMinutes = (data['deliveryMinutes'] as num?)?.toInt() ?? 30;
 
-      if (timestamp != null && now.difference(timestamp).inMinutes < deliveryMinutes) {
+      if (timestamp != null &&
+          now.difference(timestamp).inMinutes < deliveryMinutes) {
         hasActiveOrder = true;
         break;
       }
@@ -134,7 +181,9 @@ class _CartScreenState extends State<CartScreen> {
       final shouldProceed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text('Active Order in Progress'),
           content: const Text(
             'You already have an order currently being prepared! Would you like to place an additional order?',
@@ -145,9 +194,14 @@ class _CartScreenState extends State<CartScreen> {
               child: const Text('View Current Order'),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Place Additional Order', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Place Additional Order',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -191,7 +245,9 @@ class _CartScreenState extends State<CartScreen> {
             height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,17 +288,36 @@ class _CartScreenState extends State<CartScreen> {
                               fontFamily: 'SF Pro',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E1E1E),
                             ),
                           ),
                           TextButton.icon(
-                            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
                             icon: _isFetchingLocation
-                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
-                                : const Icon(Icons.add_location_alt_rounded, size: 16, color: AppColors.primary),
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.primary,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.add_location_alt_rounded,
+                                    size: 16,
+                                    color: AppColors.primary,
+                                  ),
                             label: Text(
                               _isFetchingLocation ? 'Fetching...' : '+ Add New',
-                              style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             onPressed: _isFetchingLocation
                                 ? null
@@ -275,12 +350,20 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 child: const Row(
                                   children: [
-                                    Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 20),
+                                    Icon(
+                                      Icons.warning_amber_rounded,
+                                      color: Colors.amber,
+                                      size: 20,
+                                    ),
                                     SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         'No address found. Please add a location above!',
-                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amber),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.amber,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -291,40 +374,63 @@ class _CartScreenState extends State<CartScreen> {
                             // Initialize default selection if not set
                             if (selectedAddress == null) {
                               final defaultMatchingDocs = docs.where(
-                                (d) => (d.data() as Map<String, dynamic>)['isDefault'] == true,
+                                (d) =>
+                                    (d.data()
+                                        as Map<String, dynamic>)['isDefault'] ==
+                                    true,
                               );
                               final defaultDoc = defaultMatchingDocs.isNotEmpty
                                   ? defaultMatchingDocs.first
                                   : docs.first;
 
-                              final data = defaultDoc.data() as Map<String, dynamic>;
-                              selectedAddress = data['addressEn'] ?? data['addressAr'] ?? 'Location';
+                              final data =
+                                  defaultDoc.data() as Map<String, dynamic>;
+                              selectedAddress =
+                                  data['addressEn'] ??
+                                  data['addressAr'] ??
+                                  'Location';
                             }
 
                             return Column(
                               children: docs.map((doc) {
                                 final data = doc.data() as Map<String, dynamic>;
-                                final addrName = data['addressEn'] ?? data['addressAr'] ?? 'Address';
+                                final addrName =
+                                    data['addressEn'] ??
+                                    data['addressAr'] ??
+                                    'Address';
                                 final isSelected = selectedAddress == addrName;
 
                                 return InkWell(
-                                  onTap: () => setSheetState(() => selectedAddress = addrName),
+                                  onTap: () => setSheetState(
+                                    () => selectedAddress = addrName,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                   child: Container(
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: isSelected
-                                          ? AppColors.primary.withValues(alpha: 0.15)
-                                          : (isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade100),
+                                          ? AppColors.primary.withValues(
+                                              alpha: 0.15,
+                                            )
+                                          : (isDark
+                                                ? const Color(0xFF2A2A2A)
+                                                : Colors.grey.shade100),
                                       borderRadius: BorderRadius.circular(12),
-                                      border: isSelected ? Border.all(color: AppColors.primary, width: 1.5) : null,
+                                      border: isSelected
+                                          ? Border.all(
+                                              color: AppColors.primary,
+                                              width: 1.5,
+                                            )
+                                          : null,
                                     ),
                                     child: Row(
                                       children: [
                                         Icon(
                                           Icons.location_on_rounded,
-                                          color: isSelected ? AppColors.primary : Colors.grey,
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : Colors.grey,
                                           size: 20,
                                         ),
                                         const SizedBox(width: 12),
@@ -335,12 +441,18 @@ class _CartScreenState extends State<CartScreen> {
                                               fontFamily: 'SF Compact',
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: isDark ? Colors.white : Colors.black87,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : Colors.black87,
                                             ),
                                           ),
                                         ),
                                         if (isSelected)
-                                          const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20),
+                                          const Icon(
+                                            Icons.check_circle_rounded,
+                                            color: AppColors.primary,
+                                            size: 20,
+                                          ),
                                       ],
                                     ),
                                   ),
@@ -358,7 +470,9 @@ class _CartScreenState extends State<CartScreen> {
                           fontFamily: 'SF Pro',
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1E1E1E),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -373,21 +487,41 @@ class _CartScreenState extends State<CartScreen> {
                           decoration: BoxDecoration(
                             color: isCash
                                 ? AppColors.primary.withValues(alpha: 0.15)
-                                : (isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade100),
+                                : (isDark
+                                      ? const Color(0xFF2A2A2A)
+                                      : Colors.grey.shade100),
                             borderRadius: BorderRadius.circular(12),
-                            border: isCash ? Border.all(color: AppColors.primary, width: 1.5) : null,
+                            border: isCash
+                                ? Border.all(
+                                    color: AppColors.primary,
+                                    width: 1.5,
+                                  )
+                                : null,
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.payments_outlined, color: isCash ? AppColors.primary : Colors.grey, size: 20),
+                              Icon(
+                                Icons.payments_outlined,
+                                color: isCash ? AppColors.primary : Colors.grey,
+                                size: 20,
+                              ),
                               const SizedBox(width: 12),
                               const Expanded(
                                 child: Text(
                                   'Cash on Delivery',
-                                  style: TextStyle(fontFamily: 'SF Compact', fontSize: 14, fontWeight: FontWeight.w600),
+                                  style: TextStyle(
+                                    fontFamily: 'SF Compact',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                              if (isCash) const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20),
+                              if (isCash)
+                                const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: AppColors.primary,
+                                  size: 20,
+                                ),
                             ],
                           ),
                         ),
@@ -408,8 +542,10 @@ class _CartScreenState extends State<CartScreen> {
                             return Column(
                               children: docs.map((doc) {
                                 final data = doc.data() as Map<String, dynamic>;
-                                final cardInfo = '${data['type'] ?? 'Card'} ${data['number'] ?? '•••• 4242'}';
-                                final isSelected = !isCash && selectedCard == cardInfo;
+                                final cardInfo =
+                                    '${data['type'] ?? 'Card'} ${data['number'] ?? '•••• 4242'}';
+                                final isSelected =
+                                    !isCash && selectedCard == cardInfo;
 
                                 return InkWell(
                                   onTap: () => setSheetState(() {
@@ -422,22 +558,46 @@ class _CartScreenState extends State<CartScreen> {
                                     margin: const EdgeInsets.only(bottom: 8),
                                     decoration: BoxDecoration(
                                       color: isSelected
-                                          ? AppColors.primary.withValues(alpha: 0.15)
-                                          : (isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade100),
+                                          ? AppColors.primary.withValues(
+                                              alpha: 0.15,
+                                            )
+                                          : (isDark
+                                                ? const Color(0xFF2A2A2A)
+                                                : Colors.grey.shade100),
                                       borderRadius: BorderRadius.circular(12),
-                                      border: isSelected ? Border.all(color: AppColors.primary, width: 1.5) : null,
+                                      border: isSelected
+                                          ? Border.all(
+                                              color: AppColors.primary,
+                                              width: 1.5,
+                                            )
+                                          : null,
                                     ),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.credit_card_rounded, color: isSelected ? AppColors.primary : Colors.grey, size: 20),
+                                        Icon(
+                                          Icons.credit_card_rounded,
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : Colors.grey,
+                                          size: 20,
+                                        ),
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
                                             cardInfo,
-                                            style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, fontWeight: FontWeight.w600),
+                                            style: const TextStyle(
+                                              fontFamily: 'SF Compact',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
                                         ),
-                                        if (isSelected) const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20),
+                                        if (isSelected)
+                                          const Icon(
+                                            Icons.check_circle_rounded,
+                                            color: AppColors.primary,
+                                            size: 20,
+                                          ),
                                       ],
                                     ),
                                   ),
@@ -457,14 +617,18 @@ class _CartScreenState extends State<CartScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(26),
+                      ),
                       elevation: 0,
                     ),
                     onPressed: () async {
                       if (selectedAddress == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Please add or select a delivery address first!'),
+                            content: Text(
+                              'Please add or select a delivery address first!',
+                            ),
                             backgroundColor: AppColors.error,
                           ),
                         );
@@ -477,11 +641,19 @@ class _CartScreenState extends State<CartScreen> {
                           ? CashPaymentService()
                           : CardPaymentService(cardNumber: selectedCard);
 
-                      await _checkAndProceedCheckout(context, strategy, selectedAddress!);
+                      await _checkAndProceedCheckout(
+                        context,
+                        strategy,
+                        selectedAddress!,
+                      );
                     },
                     child: const Text(
                       'Checkout',
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -501,7 +673,8 @@ class _CartScreenState extends State<CartScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocListener<CartCubit, CartState>(
-          listenWhen: (previous, current) => previous.items.isNotEmpty && current.items.isEmpty,
+          listenWhen: (previous, current) =>
+              previous.items.isNotEmpty && current.items.isEmpty,
           listener: (context, state) {
             if (state.orderSuccessMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -518,11 +691,17 @@ class _CartScreenState extends State<CartScreen> {
                 children: [
                   // 1. Top Bar with Delivery / Pickup Segmented Pill
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12.0,
+                    ),
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 20,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                         Expanded(
@@ -539,11 +718,17 @@ class _CartScreenState extends State<CartScreen> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => context.read<CartCubit>().setOrderType(isDelivery: true),
+                                      onTap: () => context
+                                          .read<CartCubit>()
+                                          .setOrderType(isDelivery: true),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: state.isDelivery ? AppColors.primary : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(20),
+                                          color: state.isDelivery
+                                              ? AppColors.primary
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
@@ -552,7 +737,9 @@ class _CartScreenState extends State<CartScreen> {
                                             fontFamily: 'SF Pro',
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: state.isDelivery ? Colors.white : AppColors.primary,
+                                            color: state.isDelivery
+                                                ? Colors.white
+                                                : AppColors.primary,
                                           ),
                                         ),
                                       ),
@@ -560,11 +747,17 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => context.read<CartCubit>().setOrderType(isDelivery: false),
+                                      onTap: () => context
+                                          .read<CartCubit>()
+                                          .setOrderType(isDelivery: false),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: !state.isDelivery ? AppColors.primary : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(20),
+                                          color: !state.isDelivery
+                                              ? AppColors.primary
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
@@ -573,7 +766,9 @@ class _CartScreenState extends State<CartScreen> {
                                             fontFamily: 'SF Pro',
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: !state.isDelivery ? Colors.white : AppColors.primary,
+                                            color: !state.isDelivery
+                                                ? Colors.white
+                                                : AppColors.primary,
                                           ),
                                         ),
                                       ),
@@ -596,7 +791,11 @@ class _CartScreenState extends State<CartScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.shopping_bag_outlined, size: 80, color: Colors.grey.shade400),
+                                Icon(
+                                  Icons.shopping_bag_outlined,
+                                  size: 80,
+                                  color: Colors.grey.shade400,
+                                ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'Your cart is empty',
@@ -604,19 +803,26 @@ class _CartScreenState extends State<CartScreen> {
                                     fontFamily: 'SF Pro',
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 const Text(
                                   'Add delicious meals to get started!',
-                                  style: TextStyle(fontFamily: 'SF Compact', color: Colors.grey),
+                                  style: TextStyle(
+                                    fontFamily: 'SF Compact',
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             ),
                           )
                         : SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -628,7 +834,9 @@ class _CartScreenState extends State<CartScreen> {
                                     fontFamily: 'SF Pro',
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF1E1E1E),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -642,24 +850,36 @@ class _CartScreenState extends State<CartScreen> {
                                     final item = state.items[index];
 
                                     return Padding(
-                                      padding: const EdgeInsets.only(bottom: 16.0),
+                                      padding: const EdgeInsets.only(
+                                        bottom: 16.0,
+                                      ),
                                       child: Row(
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(16),
-                                            child: item.meal.strMealThumb != null
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            child:
+                                                item.meal.strMealThumb != null
                                                 ? CachedNetworkImage(
-                                                    imageUrl: item.meal.strMealThumb!,
+                                                    imageUrl:
+                                                        item.meal.strMealThumb!,
                                                     width: 72,
                                                     height: 72,
                                                     fit: BoxFit.cover,
+                                                    memCacheWidth: 200,
                                                   )
-                                                : Container(width: 72, height: 72, color: Colors.grey.shade300),
+                                                : Container(
+                                                    width: 72,
+                                                    height: 72,
+                                                    color: Colors.grey.shade300,
+                                                  ),
                                           ),
                                           const SizedBox(width: 14),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   item.meal.strMeal,
@@ -667,10 +887,15 @@ class _CartScreenState extends State<CartScreen> {
                                                     fontFamily: 'SF Pro',
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
-                                                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                                    color: isDark
+                                                        ? Colors.white
+                                                        : const Color(
+                                                            0xFF1E1E1E,
+                                                          ),
                                                   ),
                                                   maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                                 const SizedBox(height: 6),
                                                 Text(
@@ -679,7 +904,11 @@ class _CartScreenState extends State<CartScreen> {
                                                     fontFamily: 'SF Compact',
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w600,
-                                                    color: isDark ? Colors.white70 : const Color(0xFF1E1E1E),
+                                                    color: isDark
+                                                        ? Colors.white70
+                                                        : const Color(
+                                                            0xFF1E1E1E,
+                                                          ),
                                                   ),
                                                 ),
                                               ],
@@ -689,16 +918,27 @@ class _CartScreenState extends State<CartScreen> {
                                           // Quantity Pill Box (+, qty, -)
                                           Container(
                                             height: 38,
-                                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: isDark ? const Color(0xFF1F2937) : const Color(0xFFF9FAFB),
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(color: Colors.grey.shade300),
+                                              color: isDark
+                                                  ? const Color(0xFF1F2937)
+                                                  : const Color(0xFFF9FAFB),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: Colors.grey.shade300,
+                                              ),
                                             ),
                                             child: Row(
                                               children: [
                                                 GestureDetector(
-                                                  onTap: () => context.read<CartCubit>().decrementQuantity(item.meal),
+                                                  onTap: () => context
+                                                      .read<CartCubit>()
+                                                      .decrementQuantity(
+                                                        item.meal,
+                                                      ),
                                                   child: SvgPicture.asset(
                                                     'assets/icons/delete_minus.svg',
                                                     width: 18,
@@ -706,19 +946,29 @@ class _CartScreenState extends State<CartScreen> {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 12.0,
+                                                      ),
                                                   child: Text(
                                                     '${item.quantity}',
                                                     style: TextStyle(
                                                       fontFamily: 'SF Pro',
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: isDark
+                                                          ? Colors.white
+                                                          : const Color(
+                                                              0xFF1E1E1E,
+                                                            ),
                                                     ),
                                                   ),
                                                 ),
                                                 GestureDetector(
-                                                  onTap: () => context.read<CartCubit>().addToCart(item.meal),
+                                                  onTap: () => context
+                                                      .read<CartCubit>()
+                                                      .addToCart(item.meal),
                                                   child: SvgPicture.asset(
                                                     'assets/icons/plus.svg',
                                                     width: 18,
@@ -756,18 +1006,36 @@ class _CartScreenState extends State<CartScreen> {
                                 const SizedBox(height: 16),
 
                                 // Cost Breakdown
-                                _buildCostRow('Order', '\$${state.itemsSubtotal.toStringAsFixed(2)}', isDark),
+                                _buildCostRow(
+                                  'Order',
+                                  '\$${state.itemsSubtotal.toStringAsFixed(2)}',
+                                  isDark,
+                                ),
                                 const SizedBox(height: 10),
-                                _buildCostRow('Delivery fee', '\$${state.deliveryFee.toStringAsFixed(2)}', isDark),
+                                _buildCostRow(
+                                  'Delivery fee',
+                                  '\$${state.deliveryFee.toStringAsFixed(2)}',
+                                  isDark,
+                                ),
                                 const SizedBox(height: 10),
-                                _buildCostRow('Fees & Taxes', '\$${state.taxes.toStringAsFixed(2)}', isDark),
+                                _buildCostRow(
+                                  'Fees & Taxes',
+                                  '\$${state.taxes.toStringAsFixed(2)}',
+                                  isDark,
+                                ),
                                 const SizedBox(height: 10),
-                                _buildCostRow('Discount', '-\$${state.discount.toStringAsFixed(2)}', isDark, isDiscount: true),
+                                _buildCostRow(
+                                  'Discount',
+                                  '-\$${state.discount.toStringAsFixed(2)}',
+                                  isDark,
+                                  isDiscount: true,
+                                ),
                                 const SizedBox(height: 16),
 
                                 // Subtotal / Final Total
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       'Subtotal',
@@ -775,7 +1043,9 @@ class _CartScreenState extends State<CartScreen> {
                                         fontFamily: 'SF Pro',
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1E1E1E),
                                       ),
                                     ),
                                     Text(
@@ -784,7 +1054,9 @@ class _CartScreenState extends State<CartScreen> {
                                         fontFamily: 'SF Pro',
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1E1E1E),
                                       ),
                                     ),
                                   ],
@@ -814,7 +1086,9 @@ class _CartScreenState extends State<CartScreen> {
                               ? null
                               : () => _showCheckoutModal(context),
                           child: state.isPlacingOrder
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
                               : const Text(
                                   'Checkout',
                                   style: TextStyle(
@@ -836,7 +1110,12 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildCostRow(String title, String amount, bool isDark, {bool isDiscount = false}) {
+  Widget _buildCostRow(
+    String title,
+    String amount,
+    bool isDark, {
+    bool isDiscount = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

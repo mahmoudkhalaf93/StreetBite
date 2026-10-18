@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../domain/entities/meal.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/payment_service.dart';
@@ -70,7 +71,8 @@ class CartState extends Equatable {
     this.orderSuccessMessage,
   });
 
-  double get itemsSubtotal => items.fold(0.0, (acc, item) => acc + item.totalPrice);
+  double get itemsSubtotal =>
+      items.fold(0.0, (acc, item) => acc + item.totalPrice);
   double get deliveryFee => (items.isNotEmpty && isDelivery) ? 3.99 : 0.00;
   double get taxes => items.isNotEmpty ? 2.45 : 0.00;
   double get discount => items.isNotEmpty ? 4.56 : 0.00;
@@ -85,7 +87,12 @@ class CartState extends Equatable {
   List<Meal> get cartItems => items.map((i) => i.meal).toList();
 
   @override
-  List<Object?> get props => [items, isDelivery, isPlacingOrder, orderSuccessMessage];
+  List<Object?> get props => [
+    items,
+    isDelivery,
+    isPlacingOrder,
+    orderSuccessMessage,
+  ];
 
   CartState copyWith({
     List<CartItem>? items,
@@ -112,10 +119,15 @@ class CartCubit extends Cubit<CartState> {
     if (user == null) return;
 
     try {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
       if (doc.exists && doc.data()?['cart'] != null) {
         final List rawCart = doc.data()!['cart'];
-        final loadedItems = rawCart.map((item) => CartItem.fromJson(Map<String, dynamic>.from(item))).toList();
+        final loadedItems = rawCart
+            .map((item) => CartItem.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
         emit(state.copyWith(items: loadedItems));
       }
     } catch (_) {}
@@ -138,12 +150,16 @@ class CartCubit extends Cubit<CartState> {
   }
 
   void addToCart(Meal meal) {
-    final existingIndex = state.items.indexWhere((item) => item.meal.idMeal == meal.idMeal);
+    final existingIndex = state.items.indexWhere(
+      (item) => item.meal.idMeal == meal.idMeal,
+    );
     List<CartItem> updatedItems = List.from(state.items);
 
     if (existingIndex >= 0) {
       final existingItem = updatedItems[existingIndex];
-      updatedItems[existingIndex] = existingItem.copyWith(quantity: existingItem.quantity + 1);
+      updatedItems[existingIndex] = existingItem.copyWith(
+        quantity: existingItem.quantity + 1,
+      );
     } else {
       updatedItems.add(CartItem(meal: meal));
     }
@@ -153,14 +169,18 @@ class CartCubit extends Cubit<CartState> {
   }
 
   void decrementQuantity(Meal meal) {
-    final existingIndex = state.items.indexWhere((item) => item.meal.idMeal == meal.idMeal);
+    final existingIndex = state.items.indexWhere(
+      (item) => item.meal.idMeal == meal.idMeal,
+    );
     if (existingIndex < 0) return;
 
     List<CartItem> updatedItems = List.from(state.items);
     final existingItem = updatedItems[existingIndex];
 
     if (existingItem.quantity > 1) {
-      updatedItems[existingIndex] = existingItem.copyWith(quantity: existingItem.quantity - 1);
+      updatedItems[existingIndex] = existingItem.copyWith(
+        quantity: existingItem.quantity - 1,
+      );
     } else {
       updatedItems.removeAt(existingIndex);
     }
@@ -170,7 +190,9 @@ class CartCubit extends Cubit<CartState> {
   }
 
   void removeFromCart(Meal meal) {
-    final updatedItems = state.items.where((item) => item.meal.idMeal != meal.idMeal).toList();
+    final updatedItems = state.items
+        .where((item) => item.meal.idMeal != meal.idMeal)
+        .toList();
     emit(state.copyWith(items: updatedItems, orderSuccessMessage: null));
     _syncCartToFirestore(updatedItems);
   }
@@ -195,14 +217,18 @@ class CartCubit extends Cubit<CartState> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final orderData = {
-          'items': state.items.map((item) => {
-            'idMeal': item.meal.idMeal,
-            'strMeal': item.meal.strMeal,
-            'strMealThumb': item.meal.strMealThumb,
-            'quantity': item.quantity,
-            'pricePerItem': item.pricePerItem,
-            'totalPrice': item.totalPrice,
-          }).toList(),
+          'items': state.items
+              .map(
+                (item) => {
+                  'idMeal': item.meal.idMeal,
+                  'strMeal': item.meal.strMeal,
+                  'strMealThumb': item.meal.strMealThumb,
+                  'quantity': item.quantity,
+                  'pricePerItem': item.pricePerItem,
+                  'totalPrice': item.totalPrice,
+                },
+              )
+              .toList(),
           'subtotal': state.itemsSubtotal,
           'deliveryFee': state.deliveryFee,
           'taxes': state.taxes,
@@ -228,11 +254,13 @@ class CartCubit extends Cubit<CartState> {
         }, SetOptions(merge: true));
       }
 
-      emit(const CartState(
-        items: [],
-        isPlacingOrder: false,
-        orderSuccessMessage: 'Order placed successfully!',
-      ));
+      emit(
+        const CartState(
+          items: [],
+          isPlacingOrder: false,
+          orderSuccessMessage: 'Order placed successfully!',
+        ),
+      );
       return true;
     } catch (e) {
       emit(state.copyWith(isPlacingOrder: false));

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'firebase_options.dart';
 import 'injection.dart' as di;
 import 'core/theme/app_theme.dart';
@@ -15,11 +16,9 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize Dependency Injection
   await di.init();
@@ -57,10 +56,7 @@ class MyApp extends StatelessWidget {
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
                 ],
-                supportedLocales: const [
-                  Locale('en'),
-                  Locale('ar'),
-                ],
+                supportedLocales: const [Locale('en'), Locale('ar')],
                 home: const SplashScreen(),
               );
             },
@@ -70,5 +66,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

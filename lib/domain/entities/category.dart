@@ -15,9 +15,9 @@ class Category extends Equatable {
 
   @override
   List<Object?> get props => [
-        idCategory,
-        strCategory,
-        strCategoryThumb,
-        strCategoryDescription,
-      ];
+    idCategory,
+    strCategory,
+    strCategoryThumb,
+    strCategoryDescription,
+  ];
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../l10n/app_localizations.dart';
 
 class HelpCenterSheet extends StatelessWidget {
@@ -67,7 +68,7 @@ class HelpCenterSheet extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: () => Navigator.pop(context),
-                )
+                ),
               ],
             ),
           ),
@@ -79,7 +80,8 @@ class HelpCenterSheet extends StatelessWidget {
               itemBuilder: (context, index) {
                 final faq = faqs[index];
                 return Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  data: Theme.of(context)
+                      .copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
                     tilePadding: EdgeInsets.zero,
                     title: Text(
@@ -99,7 +101,9 @@ class HelpCenterSheet extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'SF Compact',
                             fontSize: 13,
-                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade700,
                             height: 1.4,
                           ),
                         ),

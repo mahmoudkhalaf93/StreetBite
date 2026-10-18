@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../core/errors/exceptions.dart';
 import '../models/category_model.dart';
 import '../models/meal_model.dart';
@@ -19,13 +20,16 @@ abstract class MealRemoteDataSource {
   Future<List<MealModel>> filterByCategory(String category);
   Future<List<MealModel>> filterByArea(String area);
   Future<List<MealModel>> filterByIngredient(String ingredient);
-  Future<List<MealModel>> filterByMultiIngredient(String ingredients); // Premium API simulation
+  Future<List<MealModel>> filterByMultiIngredient(
+    String ingredients,
+  ); // Premium API simulation
 }
 
 class MealRemoteDataSourceImpl implements MealRemoteDataSource {
   final Dio dio;
   static const String baseUrl = 'https://www.themealdb.com/api/json/v1/1/';
-  static const String premiumBaseUrl = 'https://www.themealdb.com/api/json/v2/1/'; // Using test key '1' for now
+  static const String premiumBaseUrl =
+      'https://www.themealdb.com/api/json/v2/1/'; // Using test key '1' for now
 
   MealRemoteDataSourceImpl({required this.dio});
 
@@ -70,7 +74,9 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['categories'] == null) return [];
-        return (data['categories'] as List).map((json) => CategoryModel.fromJson(json)).toList();
+        return (data['categories'] as List)
+            .map((json) => CategoryModel.fromJson(json))
+            .toList();
       } else {
         throw ServerException(message: 'Failed to fetch categories');
       }
@@ -82,17 +88,24 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
   @override
   Future<List<CategoryModel>> getCategoriesList() async {
     try {
-      final response = await dio.get('${baseUrl}list.php', queryParameters: {'c': 'list'});
+      final response = await dio.get(
+        '${baseUrl}list.php',
+        queryParameters: {'c': 'list'},
+      );
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['meals'] == null) return [];
         // list.php?c=list returns only strCategory, we adapt it to CategoryModel
-        return (data['meals'] as List).map((json) => CategoryModel(
-          idCategory: '', 
-          strCategory: json['strCategory'] ?? '', 
-          strCategoryThumb: '', 
-          strCategoryDescription: ''
-        )).toList();
+        return (data['meals'] as List)
+            .map(
+              (json) => CategoryModel(
+                idCategory: '',
+                strCategory: json['strCategory'] ?? '',
+                strCategoryThumb: '',
+                strCategoryDescription: '',
+              ),
+            )
+            .toList();
       } else {
         throw ServerException(message: 'Failed to fetch category list');
       }
@@ -104,11 +117,16 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
   @override
   Future<List<AreaModel>> getAreasList() async {
     try {
-      final response = await dio.get('${baseUrl}list.php', queryParameters: {'a': 'list'});
+      final response = await dio.get(
+        '${baseUrl}list.php',
+        queryParameters: {'a': 'list'},
+      );
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['meals'] == null) return [];
-        return (data['meals'] as List).map((json) => AreaModel.fromJson(json)).toList();
+        return (data['meals'] as List)
+            .map((json) => AreaModel.fromJson(json))
+            .toList();
       } else {
         throw ServerException(message: 'Failed to fetch area list');
       }
@@ -120,11 +138,16 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
   @override
   Future<List<IngredientModel>> getIngredientsList() async {
     try {
-      final response = await dio.get('${baseUrl}list.php', queryParameters: {'i': 'list'});
+      final response = await dio.get(
+        '${baseUrl}list.php',
+        queryParameters: {'i': 'list'},
+      );
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['meals'] == null) return [];
-        return (data['meals'] as List).map((json) => IngredientModel.fromJson(json)).toList();
+        return (data['meals'] as List)
+            .map((json) => IngredientModel.fromJson(json))
+            .toList();
       } else {
         throw ServerException(message: 'Failed to fetch ingredients list');
       }
@@ -154,13 +177,18 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
   }
 
   // Helper method to reduce code duplication for fetching meal lists
-  Future<List<MealModel>> _fetchMealList(String url, Map<String, dynamic> params) async {
+  Future<List<MealModel>> _fetchMealList(
+    String url,
+    Map<String, dynamic> params,
+  ) async {
     try {
       final response = await dio.get(url, queryParameters: params);
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['meals'] == null) return [];
-        return (data['meals'] as List).map((json) => MealModel.fromJson(json)).toList();
+        return (data['meals'] as List)
+            .map((json) => MealModel.fromJson(json))
+            .toList();
       } else {
         throw ServerException(message: 'Failed to fetch meals from $url');
       }

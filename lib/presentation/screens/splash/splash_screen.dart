@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../auth/login_screen.dart';
 import '../main_navigation/main_navigation_screen.dart';
@@ -12,7 +13,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
@@ -20,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    
+
     // Increased duration to 3.5 seconds to make the animation much longer and smoother
     _animationController = AnimationController(
       vsync: this,
@@ -30,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     // Using Curves.elasticOut for a smoother, softer spring effect
     final curvedAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.elasticOut, 
+      curve: Curves.elasticOut,
     );
 
     // Moving from further down (2.0) to center
@@ -79,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       );
     }
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -91,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     final size = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      backgroundColor: AppColors.primary, 
+      backgroundColor: AppColors.primary,
       body: Center(
         child: SlideTransition(
           position: _slideAnimation,
@@ -108,6 +110,3 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
   }
 }
-
-
-

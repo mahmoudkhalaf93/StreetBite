@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -39,10 +40,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         SystemNavigator.pop();
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: screens,
-        ),
+        body: IndexedStack(index: _currentIndex, children: screens),
         bottomNavigationBar: SafeArea(
           child: Container(
             decoration: BoxDecoration(
@@ -88,7 +86,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(String iconPath, String label, int index) {
+  BottomNavigationBarItem _buildNavItem(
+    String iconPath,
+    String label,
+    int index,
+  ) {
     final isSelected = _currentIndex == index;
     final color = isSelected ? AppColors.primary : const Color(0xFF9CA3AF);
 

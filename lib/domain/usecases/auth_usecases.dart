@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../core/errors/failures.dart';
 import '../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
@@ -26,7 +27,11 @@ class SignUpUseCase implements UseCase<UserEntity, SignUpParams> {
 
   @override
   Future<Either<Failure, UserEntity>> call(SignUpParams params) {
-    return repository.signUpWithEmail(params.name, params.email, params.password);
+    return repository.signUpWithEmail(
+      params.name,
+      params.email,
+      params.password,
+    );
   }
 }
 
@@ -34,7 +39,11 @@ class SignUpParams {
   final String name;
   final String email;
   final String password;
-  SignUpParams({required this.name, required this.email, required this.password});
+  SignUpParams({
+    required this.name,
+    required this.email,
+    required this.password,
+  });
 }
 
 class GoogleSignInUseCase implements UseCase<UserEntity, NoParams> {

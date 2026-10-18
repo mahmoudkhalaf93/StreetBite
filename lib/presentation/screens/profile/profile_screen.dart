@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -64,7 +65,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        _isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED_${user.uid}') ?? false;
+        _isBiometricEnabled =
+            prefs.getBool('BIOMETRIC_ENABLED_${user.uid}') ?? false;
       });
     }
   }
@@ -97,13 +99,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userKey = 'BIOMETRIC_ENABLED_${user.uid}';
 
     if (value) {
-      final authed = await _authenticateForAction('Authenticate to enable biometric login');
+      final authed = await _authenticateForAction(
+        'Authenticate to enable biometric login',
+      );
       if (authed) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(userKey, true);
         await prefs.setString('LAST_BIOMETRIC_UID', user.uid);
 
-        final isGoogleUser = user.providerData.any((p) => p.providerId == 'google.com');
+        final isGoogleUser = user.providerData.any(
+          (p) => p.providerId == 'google.com',
+        );
         await prefs.setBool('IS_GOOGLE_USER_${user.uid}', isGoogleUser);
 
         if (user.email != null) {
@@ -139,14 +145,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final androidInfo = await deviceInfo.androidInfo;
         if (mounted) {
           setState(() {
-            _deviceInfo = '${androidInfo.manufacturer.toUpperCase()} ${androidInfo.model} (Android ${androidInfo.version.release})';
+            _deviceInfo =
+                '${androidInfo.manufacturer.toUpperCase()} ${androidInfo.model} (Android ${androidInfo.version.release})';
           });
         }
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
         if (mounted) {
           setState(() {
-            _deviceInfo = '${iosInfo.name} (${iosInfo.systemName} ${iosInfo.systemVersion})';
+            _deviceInfo =
+                '${iosInfo.name} (${iosInfo.systemName} ${iosInfo.systemVersion})';
           });
         }
       }
@@ -168,14 +176,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .doc(user.uid)
           .snapshots()
           .listen((doc) {
-        if (doc.exists && mounted) {
-          final data = doc.data();
-          setState(() {
-            _userName = data?['name'] ?? user.displayName ?? "Vlad S.";
-            _profilePicUrl = data?['profilePicUrl'] ?? user.photoURL;
+            if (doc.exists && mounted) {
+              final data = doc.data();
+              setState(() {
+                _userName = data?['name'] ?? user.displayName ?? "Vlad S.";
+                _profilePicUrl = data?['profilePicUrl'] ?? user.photoURL;
+              });
+            }
           });
-        }
-      });
     }
   }
 
@@ -225,11 +233,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           l10n.changeDefaultAddressTitle,
-          style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal),
+          style: const TextStyle(
+            fontFamily: 'SF Pro',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.normal,
+          ),
         ),
         content: Text(
           l10n.changeDefaultAddressConfirm,
-          style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, fontStyle: FontStyle.normal),
+          style: const TextStyle(
+            fontFamily: 'SF Compact',
+            fontSize: 14,
+            fontStyle: FontStyle.normal,
+          ),
         ),
         actions: [
           TextButton(
@@ -242,7 +259,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pop(ctx);
               await _setDefaultAddress(docId);
             },
-            child: Text(l10n.agree, style: const TextStyle(color: Colors.white)),
+            child: Text(
+              l10n.agree,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -251,7 +271,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _pickAndUploadImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
 
     if (pickedFile == null) return;
 
@@ -269,10 +292,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await storageRef.putFile(File(pickedFile.path));
       final downloadUrl = await storageRef.getDownloadURL();
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({'profilePicUrl': downloadUrl});
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+        {'profilePicUrl': downloadUrl},
+      );
 
       if (mounted) {
         setState(() {
@@ -290,7 +312,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload failed: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Upload failed: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -310,7 +335,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       final user = FirebaseAuth.instance.currentUser;
@@ -364,19 +391,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final geocodingAr = geo.Geocoding(locale: const Locale('ar'));
       final geocodingEn = geo.Geocoding(locale: const Locale('en'));
 
-      List<geo.Placemark> placemarksAr = await geocodingAr.placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      List<geo.Placemark> placemarksEn = await geocodingEn.placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+      List<geo.Placemark> placemarksAr = await geocodingAr
+          .placemarkFromCoordinates(position.latitude, position.longitude);
+      List<geo.Placemark> placemarksEn = await geocodingEn
+          .placemarkFromCoordinates(position.latitude, position.longitude);
 
       String addressEn = placemarksEn.isNotEmpty
           ? '${placemarksEn.first.street}, ${placemarksEn.first.locality}'
           : 'Current Location (${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)})';
-      
+
       String addressAr = placemarksAr.isNotEmpty
           ? '${placemarksAr.first.street}, ${placemarksAr.first.locality}'
           : addressEn;
@@ -387,13 +410,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .doc(user.uid)
             .collection('addresses')
             .add({
-          'addressEn': addressEn,
-          'addressAr': addressAr,
-          'latitude': position.latitude,
-          'longitude': position.longitude,
-          'isDefault': false,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+              'addressEn': addressEn,
+              'addressAr': addressAr,
+              'latitude': position.latitude,
+              'longitude': position.longitude,
+              'isDefault': false,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
       }
 
       if (mounted) {
@@ -412,7 +435,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         setState(() => _isFetchingLocation = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting location: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Error getting location: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -440,7 +466,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 16.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -456,14 +485,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.primary, width: 2),
+                              border: Border.all(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
                             ),
                             child: CircleAvatar(
                               radius: 42,
-                              backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                              backgroundColor: isDark
+                                  ? const Color(0xFF2A2A2A)
+                                  : Colors.grey.shade200,
                               backgroundImage: _profilePicUrl != null
                                   ? NetworkImage(_profilePicUrl!)
-                                  : const NetworkImage('https://i.pravatar.cc/150?img=11') as ImageProvider,
+                                  : const NetworkImage(
+                                      'https://i.pravatar.cc/150?img=11',
+                                    ) as ImageProvider,
                             ),
                           ),
                           if (_isUploading)
@@ -475,7 +511,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
-                                child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                  strokeWidth: 2,
+                                ),
                               ),
                             )
                           else
@@ -488,7 +527,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: AppColors.primary,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
+                                child: const Icon(
+                                  Icons.camera_alt_rounded,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                         ],
@@ -501,7 +544,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       if (state is AuthSuccess) {
-                        _userName = state.user.name.isNotEmpty ? state.user.name : _userName;
+                        _userName = state.user.name.isNotEmpty
+                            ? state.user.name
+                            : _userName;
                       }
                       return Text(
                         _userName,
@@ -510,7 +555,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.normal,
-                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1E1E1E),
                         ),
                       );
                     },
@@ -523,12 +570,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       // Favourites Menu Option
                       _buildMenuItem(
                         iconData: Icons.favorite_rounded,
-                        title: isArabic ? 'الوجبات المفضلة ❤️' : 'My Favourites ❤️',
+                        title: isArabic
+                            ? 'الوجبات المفضلة ❤️'
+                            : 'My Favourites ❤️',
                         isDark: isDark,
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const FavouritesScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const FavouritesScreen(),
+                            ),
                           );
                         },
                       ),
@@ -536,14 +587,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                       // Settings (Language & Theme)
                       Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
                           tilePadding: EdgeInsets.zero,
                           leading: SvgPicture.asset(
                             'assets/icons/settings.svg',
                             width: 20,
                             height: 20,
-                            colorFilter: ColorFilter.mode(isDark ? Colors.white70 : const Color(0xFF333333), BlendMode.srcIn),
+                            colorFilter: ColorFilter.mode(
+                              isDark ? Colors.white70 : const Color(0xFF333333),
+                              BlendMode.srcIn,
+                            ),
                           ),
                           title: Text(
                             l10n.settings,
@@ -552,34 +607,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               fontStyle: FontStyle.normal,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E1E1E),
                             ),
                           ),
                           children: [
                             ListTile(
-                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                              contentPadding: const EdgeInsets.only(
+                                left: 36,
+                                right: 8,
+                              ),
                               title: Text(
-                                isArabic ? 'تسجيل الدخول بالبصمة' : 'Biometric Login',
-                                style: const TextStyle(fontSize: 13, fontStyle: FontStyle.normal),
+                                isArabic
+                                    ? 'تسجيل الدخول بالبصمة'
+                                    : 'Biometric Login',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal,
+                                ),
                               ),
                               trailing: Switch(
-                                activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+                                activeTrackColor: AppColors.primary.withValues(
+                                  alpha: 0.5,
+                                ),
                                 activeThumbColor: AppColors.primary,
                                 value: _isBiometricEnabled,
                                 onChanged: _toggleBiometricLogin,
                               ),
                             ),
                             ListTile(
-                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
-                              title: Text(l10n.language, style: TextStyle(fontSize: 13, fontStyle: FontStyle.normal, color: isDark ? Colors.white70 : Colors.black87)),
+                              contentPadding: const EdgeInsets.only(
+                                left: 36,
+                                right: 8,
+                              ),
+                              title: Text(
+                                l10n.language,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black87,
+                                ),
+                              ),
                               trailing: DropdownButton<String>(
-                                value: Localizations.localeOf(context).languageCode,
+                                value: Localizations.localeOf(context)
+                                    .languageCode,
                                 underline: const SizedBox(),
-                                dropdownColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                                style: TextStyle(fontSize: 13, fontStyle: FontStyle.normal, color: isDark ? Colors.white : Colors.black),
+                                dropdownColor: isDark
+                                    ? const Color(0xFF1E1E1E)
+                                    : Colors.white,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
                                 items: const [
-                                  DropdownMenuItem(value: 'en', child: Text('English')),
-                                  DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                                  DropdownMenuItem(
+                                    value: 'en',
+                                    child: Text('English'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'ar',
+                                    child: Text('العربية'),
+                                  ),
                                 ],
                                 onChanged: (value) {
                                   if (value != null) {
@@ -589,10 +681,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             ListTile(
-                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
-                              title: Text(l10n.theme, style: TextStyle(fontSize: 13, fontStyle: FontStyle.normal, color: isDark ? Colors.white70 : Colors.black87)),
+                              contentPadding: const EdgeInsets.only(
+                                left: 36,
+                                right: 8,
+                              ),
+                              title: Text(
+                                l10n.theme,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black87,
+                                ),
+                              ),
                               trailing: Switch(
-                                activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+                                activeTrackColor: AppColors.primary.withValues(
+                                  alpha: 0.5,
+                                ),
                                 activeThumbColor: AppColors.primary,
                                 value: isDark,
                                 onChanged: (value) {
@@ -655,13 +761,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                       // Addresses (Expandable with Geolocator Add Address synced with Firestore)
                       Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
                           tilePadding: EdgeInsets.zero,
                           leading: Icon(
                             Icons.location_on_outlined,
                             size: 20,
-                            color: isDark ? Colors.white70 : const Color(0xFF333333),
+                            color: isDark
+                                ? Colors.white70
+                                : const Color(0xFF333333),
                           ),
                           title: Text(
                             l10n.addresses,
@@ -670,7 +779,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               fontStyle: FontStyle.normal,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E1E1E),
                             ),
                           ),
                           children: [
@@ -683,27 +794,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     .orderBy('createdAt', descending: false)
                                     .snapshots(),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
                                     return const Padding(
                                       padding: EdgeInsets.all(12.0),
-                                      child: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: AppColors.primary,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
                                     );
                                   }
 
                                   final docs = snapshot.data?.docs ?? [];
                                   return Column(
                                     children: docs.map((doc) {
-                                      final data = doc.data() as Map<String, dynamic>;
+                                      final data =
+                                          doc.data() as Map<String, dynamic>;
                                       final title = isArabic
-                                          ? (data['addressAr'] ?? data['addressEn'] ?? 'Address')
+                                          ? (data['addressAr'] ??
+                                                data['addressEn'] ??
+                                                'Address')
                                           : (data['addressEn'] ?? 'Address');
-                                      final isDefault = data['isDefault'] == true;
-                                      final lat = (data['latitude'] as num?)?.toStringAsFixed(4) ?? '';
-                                      final lng = (data['longitude'] as num?)?.toStringAsFixed(4) ?? '';
+                                      final isDefault =
+                                          data['isDefault'] == true;
+                                      final lat =
+                                          (data['latitude'] as num?)
+                                              ?.toStringAsFixed(4) ??
+                                          '';
+                                      final lng =
+                                          (data['longitude'] as num?)
+                                              ?.toStringAsFixed(4) ??
+                                          '';
 
                                       return ListTile(
-                                        onTap: isDefault ? null : () => _confirmSetDefaultAddress(doc.id),
-                                        contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                                        onTap: isDefault
+                                            ? null
+                                            : () => _confirmSetDefaultAddress(
+                                                doc.id,
+                                              ),
+                                        contentPadding: const EdgeInsets.only(
+                                          left: 36,
+                                          right: 8,
+                                        ),
                                         title: Text(
                                           title,
                                           style: TextStyle(
@@ -711,31 +845,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
                                             fontStyle: FontStyle.normal,
-                                            color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                                            color: isDark
+                                                ? Colors.white
+                                                : const Color(0xFF1E1E1E),
                                           ),
                                         ),
                                         subtitle: isDefault
-                                            ? Text(l10n.defaultAddress, style: const TextStyle(color: AppColors.primary, fontSize: 11, fontStyle: FontStyle.normal))
-                                            : Text('$lat, $lng', style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11, fontStyle: FontStyle.normal)),
+                                            ? Text(
+                                                l10n.defaultAddress,
+                                                style: const TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontSize: 11,
+                                                  fontStyle: FontStyle.normal,
+                                                ),
+                                              )
+                                            : Text(
+                                                '$lat, $lng',
+                                                style: const TextStyle(
+                                                  color: Color(0xFF9CA3AF),
+                                                  fontSize: 11,
+                                                  fontStyle: FontStyle.normal,
+                                                ),
+                                              ),
                                         trailing: isDefault
-                                            ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
-                                            : const Icon(Icons.circle_outlined, color: Colors.grey, size: 18),
+                                            ? const Icon(
+                                                Icons.check_circle,
+                                                color: AppColors.primary,
+                                                size: 18,
+                                              )
+                                            : const Icon(
+                                                Icons.circle_outlined,
+                                                color: Colors.grey,
+                                                size: 18,
+                                              ),
                                       );
                                     }).toList(),
                                   );
                                 },
                               ),
                             ListTile(
-                              contentPadding: const EdgeInsets.only(left: 36, right: 8),
+                              contentPadding: const EdgeInsets.only(
+                                left: 36,
+                                right: 8,
+                              ),
                               leading: _isFetchingLocation
                                   ? const SizedBox(
                                       width: 16,
                                       height: 16,
-                                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
                                     )
-                                  : const Icon(Icons.my_location_rounded, color: AppColors.primary, size: 18),
+                                  : const Icon(
+                                      Icons.my_location_rounded,
+                                      color: AppColors.primary,
+                                      size: 18,
+                                    ),
                               title: Text(
-                                _isFetchingLocation ? l10n.fetchingLocation : l10n.addAddress,
+                                _isFetchingLocation
+                                    ? l10n.fetchingLocation
+                                    : l10n.addAddress,
                                 style: const TextStyle(
                                   fontFamily: 'SF Compact',
                                   fontSize: 13,
@@ -744,7 +914,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              onTap: _isFetchingLocation ? null : _addNewAddress,
+                              onTap: _isFetchingLocation
+                                  ? null
+                                  : _addNewAddress,
                             ),
                           ],
                         ),
@@ -813,7 +985,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 iconPath,
                 width: 20,
                 height: 20,
-                colorFilter: ColorFilter.mode(isDark ? Colors.white70 : const Color(0xFF333333), BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  isDark ? Colors.white70 : const Color(0xFF333333),
+                  BlendMode.srcIn,
+                ),
               )
             else if (iconData != null)
               Icon(
