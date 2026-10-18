@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -36,32 +35,38 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onLoginPressed(BuildContext context) {
+  Future<void> _onLoginPressed(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      context.read<AuthCubit>().login(
-            _emailController.text.trim(),
-            _passwordController.text.trim(),
-          );
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('SAVED_EMAIL', email);
+      await prefs.setString('SAVED_PASSWORD', password);
+
+      if (context.mounted) {
+        context.read<AuthCubit>().login(email, password);
+      }
     }
   }
 
   Future<void> _onBiometricSignInPressed(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
-    final nav = Navigator.of(context);
     final authCubit = context.read<AuthCubit>();
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     final prefs = await SharedPreferences.getInstance();
     final isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED') ?? false;
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final savedEmail = prefs.getString('SAVED_EMAIL');
+    final savedPassword = prefs.getString('SAVED_PASSWORD');
 
-    if (!isBiometricEnabled && currentUser == null) {
+    if (!isBiometricEnabled || savedEmail == null || savedPassword == null) {
       messenger.showSnackBar(
         SnackBar(
           content: Text(
             isArabic
-                ? 'يرجى تسجيل الدخول أولاً وتفعيل "تسجيل الدخول بالبصمة" من صفحة الإعدادات/البروفايل'
-                : 'Please log in first and enable "Biometric Login" in Settings/Profile',
+                ? 'يرجى تسجيل الدخول أولاً بالبريد وكلمة المرور وتفعيل "تسجيل الدخول بالبصمة" من الإعدادات'
+                : 'Please log in with email/password first and enable "Biometric Login" in Settings',
           ),
           backgroundColor: Colors.orange,
           duration: const Duration(seconds: 3),
@@ -90,8 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final bool didAuth = await _localAuth.authenticate(
         localizedReason: isArabic
-            ? 'يرجى تأكيد البصمة لتسجيل الدخول إلى StreetBite'
-            : 'Please authenticate to sign in to StreetBite',
+            ? 'يرجى تأكيد البصمة لتسجيل الدخول إلى حسابك ($savedEmail)'
+            : 'Please authenticate to sign in to your account ($savedEmail)',
         options: const AuthenticationOptions(
           biometricOnly: false,
           stickyAuth: true,
@@ -100,20 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (didAuth) {
-        if (currentUser != null) {
-          nav.pushReplacement(
-            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-          );
-        } else if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-          authCubit.login(
-            _emailController.text.trim(),
-            _passwordController.text.trim(),
-          );
-        } else {
-          nav.pushReplacement(
-            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-          );
-        }
+        authCubit.login(savedEmail, savedPassword);
       }
     } catch (e) {
       messenger.showSnackBar(
