@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -418,12 +419,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               child: meal.strMealThumb != null
-                  ? Image.network(
-                      meal.strMealThumb!, 
-                      height: 110, 
-                      width: double.infinity, 
+                  ? CachedNetworkImage(
+                      imageUrl: meal.strMealThumb!,
+                      height: 110,
+                      width: double.infinity,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(height: 110, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
+                      placeholder: (context, url) => Container(
+                        height: 110,
+                        color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                        child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        height: 110,
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.fastfood, color: Colors.grey),
+                      ),
                     )
                   : Container(height: 110, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
             ),
@@ -460,12 +470,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: meal.strMealThumb != null
-                  ? Image.network(
-                      meal.strMealThumb!, 
-                      height: 160, 
-                      width: double.infinity, 
+                  ? CachedNetworkImage(
+                      imageUrl: meal.strMealThumb!,
+                      height: 160,
+                      width: double.infinity,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(height: 160, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, size: 48, color: Colors.grey)),
+                      placeholder: (context, url) => Container(
+                        height: 160,
+                        color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                        child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        height: 160,
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.fastfood, size: 48, color: Colors.grey),
+                      ),
                     )
                   : Container(height: 160, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, size: 48, color: Colors.grey)),
             ),
@@ -546,10 +565,17 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: meal.strMealThumb != null
-                    ? Image.network(
-                        meal.strMealThumb!, 
+                    ? CachedNetworkImage(
+                        imageUrl: meal.strMealThumb!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
+                        placeholder: (context, url) => Container(
+                          color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                          child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey.shade300,
+                          child: const Icon(Icons.fastfood, color: Colors.grey),
+                        ),
                       )
                     : Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
               ),

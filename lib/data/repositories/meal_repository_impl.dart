@@ -39,30 +39,54 @@ class MealRepositoryImpl implements MealRepository {
         );
 
   @override
+  Future<Either<Failure, List<Meal>>> searchMealsByFirstLetter(String letter) async {
+    // 1. Try returning cached meals first for INSTANT zero-wait loading!
+    try {
+      final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
+      if (localMeals.isNotEmpty) {
+        // Refresh cache asynchronously in background
+        dataSourceFactory.getRemote().searchMealsByFirstLetter(letter).then((remoteMeals) {
+          if (remoteMeals.isNotEmpty) {
+            dataSourceFactory.getLocal().cacheMeals(remoteMeals);
+          }
+        }).catchError((_) {});
+
+        return Right(localMeals);
+      }
+    } catch (_) {
+      // If no local cache exists, fall through to fetch from remote
+    }
+
+    try {
+      final remoteMeals = await dataSourceFactory.getRemote().searchMealsByFirstLetter(letter);
+      await dataSourceFactory.getLocal().cacheMeals(remoteMeals);
+      return Right(remoteMeals);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<Meal>>> searchMealsByName(String query) async {
+    try {
+      final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
+      if (localMeals.isNotEmpty && query.isEmpty) {
+        dataSourceFactory.getRemote().searchMealsByName(query).then((remoteMeals) {
+          if (remoteMeals.isNotEmpty) {
+            dataSourceFactory.getLocal().cacheMeals(remoteMeals);
+          }
+        }).catchError((_) {});
+
+        return Right(localMeals);
+      }
+    } catch (_) {}
+
     try {
       final remoteMeals = await dataSourceFactory.getRemote().searchMealsByName(query);
       await dataSourceFactory.getLocal().cacheMeals(remoteMeals);
       return Right(remoteMeals);
     } on ServerException catch (e) {
       try {
-        final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
-        return Right(localMeals);
-      } on CacheException {
-        return Left(ServerFailure(message: e.message));
-      }
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<Meal>>> searchMealsByFirstLetter(String letter) async {
-    try {
-      final remoteMeals = await dataSourceFactory.getRemote().searchMealsByFirstLetter(letter);
-      await dataSourceFactory.getLocal().cacheMeals(remoteMeals); // Cache successfully fetched items
-      return Right(remoteMeals);
-    } on ServerException catch (e) {
-      try {
-        // Factory fallback to local cache
         final localMeals = await dataSourceFactory.getLocal().getLastCachedMeals();
         return Right(localMeals);
       } on CacheException {

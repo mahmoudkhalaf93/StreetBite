@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../domain/entities/meal.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -18,11 +19,16 @@ class MealDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (meal.strMealThumb != null)
-              Image.network(
-                meal.strMealThumb!,
+              CachedNetworkImage(
+                imageUrl: meal.strMealThumb!,
                 height: 250,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+                placeholder: (context, url) => Container(
+                  height: 250,
+                  color: Colors.grey.shade200,
+                  child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                ),
+                errorWidget: (context, url, error) => Container(
                   height: 250,
                   color: Colors.grey.shade200,
                   child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
