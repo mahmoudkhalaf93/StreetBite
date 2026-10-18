@@ -72,24 +72,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _authenticateBiometrics() async {
+  Future<bool> _authenticateForAction(String reason) async {
     try {
       final bool canCheck = await _localAuth.canCheckBiometrics;
       final bool isSupported = canCheck || await _localAuth.isDeviceSupported();
 
       if (isSupported) {
-        final bool didAuth = await _localAuth.authenticate(
-          localizedReason: 'Please authenticate to access your profile',
-          options: const AuthenticationOptions(biometricOnly: false, stickyAuth: true),
+        return await _localAuth.authenticate(
+          localizedReason: reason,
+          options: const AuthenticationOptions(
+            biometricOnly: false,
+            stickyAuth: true,
+            useErrorDialogs: true,
+          ),
         );
-        if (mounted) {
-          setState(() => _isAuthenticated = didAuth);
-        }
-      } else {
-        if (mounted) setState(() => _isAuthenticated = true);
       }
-    } catch (_) {
-      if (mounted) setState(() => _isAuthenticated = true);
+      return false;
+    } catch (e) {
+      debugPrint('Biometrics Error: $e');
+      return false;
+    }
+  }
+
+  Future<void> _authenticateBiometrics() async {
+    final didAuth = await _authenticateForAction('Please authenticate to access your profile');
+    if (mounted) {
+      setState(() => _isAuthenticated = didAuth);
     }
   }
 
@@ -604,18 +612,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 8),
 
-                      // Payment Information
+                      // Payment Information (Guarded with Biometrics)
                       _buildMenuItem(
                         iconData: Icons.credit_card_rounded,
                         title: l10n.paymentInfo,
                         isDark: isDark,
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (_) => const PaymentInfoSheet(),
-                          );
+                        onTap: () async {
+                          final authed = await _authenticateForAction('Authenticate to view payment information');
+                          if (!mounted || !context.mounted) return;
+                          if (authed) {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => const PaymentInfoSheet(),
+                            );
+                          }
                         },
                       ),
                       const SizedBox(height: 8),
@@ -711,7 +723,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              onTap: _isFetchingLocation ? null : _addNewAddress,
+                              onTap: _isFetchingLocation
+                                  ? null
+                                  : () async {
+                                      final authed = await _authenticateForAction('Authenticate to add a new address');
+                                      if (authed && mounted) {
+                                        _addNewAddress();
+                                      }
+                                    },
                             ),
                           ],
                         ),
