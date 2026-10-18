@@ -24,6 +24,24 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController;
 
+  String _extractRegionName(String fullAddress) {
+    final parts = fullAddress
+        .split(RegExp(r'[,،]'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    if (parts.isEmpty) return fullAddress;
+
+    if (parts.length >= 3) {
+      return parts[1]; // District/Region name
+    } else if (parts.length == 2) {
+      return parts[1];
+    }
+
+    return parts.first;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -98,9 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               String addressTitle = l10n.parkWay;
                               if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
                                 final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
-                                addressTitle = isArabic
+                                final rawAddress = isArabic
                                     ? (data['addressAr'] ?? data['addressEn'] ?? l10n.parkWay)
                                     : (data['addressEn'] ?? l10n.parkWay);
+                                addressTitle = _extractRegionName(rawAddress);
                               }
 
                               return Text(
