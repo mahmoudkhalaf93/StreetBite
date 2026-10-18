@@ -227,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               if (user == null) {
                                 return Text(
-                                  l10n.parkWay,
+                                  isArabic ? 'حدد عنوانك' : 'Set Your Location',
                                   style: const TextStyle(
                                     fontFamily: 'SF Pro',
                                     fontSize: 16,
@@ -249,13 +249,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .limit(1)
                                     .snapshots(),
                                 builder: (context, snapshot) {
-                                  String addressTitle = l10n.parkWay;
+                                  String addressTitle = isArabic ? 'حدد عنوانك' : 'Set Your Location';
                                   if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
                                     final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
                                     final rawAddress = isArabic
-                                        ? (data['addressAr'] ?? data['addressEn'] ?? l10n.parkWay)
-                                        : (data['addressEn'] ?? l10n.parkWay);
-                                    addressTitle = _extractRegionName(rawAddress);
+                                        ? (data['addressAr'] ?? data['addressEn'])
+                                        : (data['addressEn'] ?? data['addressAr']);
+                                    if (rawAddress != null && rawAddress.toString().isNotEmpty) {
+                                      addressTitle = _extractRegionName(rawAddress.toString());
+                                    }
                                   }
 
                                   return Text(
