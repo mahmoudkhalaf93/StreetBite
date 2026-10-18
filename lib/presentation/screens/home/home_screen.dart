@@ -33,105 +33,21 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentBannerIndex = 0;
 
   // Exact 14 API Categories matching https://www.themealdb.com/api/json/v1/1/categories.php
-  final List<Map<String, dynamic>> _homeCategories = [
-    {
-      'labelEn': 'Beef',
-      'labelAr': 'لحوم بقر',
-      'icon': 'assets/icons/meat.svg',
-      'query': 'Beef',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Chicken',
-      'labelAr': 'دجاج',
-      'icon': 'assets/icons/fast_food.svg',
-      'query': 'Chicken',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Dessert',
-      'labelAr': 'حلويات',
-      'icon': 'assets/icons/icecream.svg',
-      'query': 'Dessert',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Lamb',
-      'labelAr': 'لحم ضأن',
-      'icon': 'assets/icons/meat.svg',
-      'query': 'Lamb',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Miscellaneous',
-      'labelAr': 'أطباق متنوعة',
-      'icon': 'assets/icons/acclaimed.svg',
-      'query': 'Miscellaneous',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Pasta',
-      'labelAr': 'باستا',
-      'icon': 'assets/icons/ramen.svg',
-      'query': 'Pasta',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Pork',
-      'labelAr': 'لحم خنزير',
-      'icon': 'assets/icons/meat.svg',
-      'query': 'Pork',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Seafood',
-      'labelAr': 'مأكولات بحرية',
-      'icon': 'assets/icons/asian.svg',
-      'query': 'Seafood',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Side',
-      'labelAr': 'أطباق جانبية',
-      'icon': 'assets/icons/salads.svg',
-      'query': 'Side',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Starter',
-      'labelAr': 'مقبلات',
-      'icon': 'assets/icons/pizza.svg',
-      'query': 'Starter',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Vegan',
-      'labelAr': 'نباتي صرف',
-      'icon': 'assets/icons/healthy.svg',
-      'query': 'Vegan',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Vegetarian',
-      'labelAr': 'نباتي',
-      'icon': 'assets/icons/healthy.svg',
-      'query': 'Vegetarian',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Breakfast',
-      'labelAr': 'إفطار',
-      'icon': 'assets/icons/bakery.svg',
-      'query': 'Breakfast',
-      'isArea': false,
-    },
-    {
-      'labelEn': 'Goat',
-      'labelAr': 'لحم ماعز',
-      'icon': 'assets/icons/meat.svg',
-      'query': 'Goat',
-      'isArea': false,
-    },
+  final List<Map<String, dynamic>> _homeCategories = const [
+    {'labelEn': 'Beef', 'labelAr': 'لحوم بقر', 'icon': 'assets/icons/meat.svg', 'query': 'Beef', 'isArea': false},
+    {'labelEn': 'Chicken', 'labelAr': 'دجاج', 'icon': 'assets/icons/fast_food.svg', 'query': 'Chicken', 'isArea': false},
+    {'labelEn': 'Dessert', 'labelAr': 'حلويات', 'icon': 'assets/icons/icecream.svg', 'query': 'Dessert', 'isArea': false},
+    {'labelEn': 'Lamb', 'labelAr': 'لحم ضأن', 'icon': 'assets/icons/meat.svg', 'query': 'Lamb', 'isArea': false},
+    {'labelEn': 'Miscellaneous', 'labelAr': 'أطباق متنوعة', 'icon': 'assets/icons/acclaimed.svg', 'query': 'Miscellaneous', 'isArea': false},
+    {'labelEn': 'Pasta', 'labelAr': 'باستا', 'icon': 'assets/icons/ramen.svg', 'query': 'Pasta', 'isArea': false},
+    {'labelEn': 'Pork', 'labelAr': 'لحم خنزير', 'icon': 'assets/icons/meat.svg', 'query': 'Pork', 'isArea': false},
+    {'labelEn': 'Seafood', 'labelAr': 'مأكولات بحرية', 'icon': 'assets/icons/asian.svg', 'query': 'Seafood', 'isArea': false},
+    {'labelEn': 'Side', 'labelAr': 'أطباق جانبية', 'icon': 'assets/icons/salads.svg', 'query': 'Side', 'isArea': false},
+    {'labelEn': 'Starter', 'labelAr': 'مقبلات', 'icon': 'assets/icons/pizza.svg', 'query': 'Starter', 'isArea': false},
+    {'labelEn': 'Vegan', 'labelAr': 'نباتي صرف', 'icon': 'assets/icons/healthy.svg', 'query': 'Vegan', 'isArea': false},
+    {'labelEn': 'Vegetarian', 'labelAr': 'نباتي', 'icon': 'assets/icons/healthy.svg', 'query': 'Vegetarian', 'isArea': false},
+    {'labelEn': 'Breakfast', 'labelAr': 'إفطار', 'icon': 'assets/icons/bakery.svg', 'query': 'Breakfast', 'isArea': false},
+    {'labelEn': 'Goat', 'labelAr': 'لحم ماعز', 'icon': 'assets/icons/meat.svg', 'query': 'Goat', 'isArea': false},
   ];
 
   String _extractRegionName(String fullAddress) {
@@ -140,15 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
         .toList();
-
     if (parts.isEmpty) return fullAddress;
-
-    if (parts.length >= 3) {
-      return parts[1]; // District/Region name
-    } else if (parts.length == 2) {
-      return parts[1];
-    }
-
+    if (parts.length >= 3) return parts[1];
+    if (parts.length == 2) return parts[1];
     return parts.first;
   }
 
@@ -157,10 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _fastestController = PageController(viewportFraction: 0.78);
     _hotOffersController = PageController(viewportFraction: 0.92);
-
     _startAutoBannerScroll();
-
-    // Fetch meals when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MealCubit>().fetchMeals();
     });
@@ -196,429 +103,283 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Top Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const VendorMapScreen()),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Row(
+        child: BlocBuilder<MealCubit, MealState>(
+          builder: (context, state) {
+            final List<Meal> meals = state is MealLoaded ? state.meals : [];
+            final hotOffersMeals = meals.isNotEmpty ? meals.take(5).toList() : <Meal>[];
+            final fastestMeals = meals.isNotEmpty ? meals.skip(5).take(5).toList() : <Meal>[];
+            final recommendedMeals = meals;
+
+            return CustomScrollView(
+              slivers: [
+                // Top Bar
+                SliverToBoxAdapter(child: _buildTopBar(context, l10n, isDark)),
+                // Search Bar
+                SliverToBoxAdapter(child: _buildSearchBar(context, l10n, isDark)),
+                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                // Categories
+                SliverToBoxAdapter(child: _buildCategories(context, isDark)),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+                // Handle State (Loading/Error)
+                if (state is MealLoading || state is MealInitial)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                  )
+                else if (state is MealError)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(
-                            'assets/icons/location_in_bar.svg',
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(width: 8),
-                          Builder(
-                            builder: (context) {
-                              final user = FirebaseAuth.instance.currentUser;
-                              final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-
-                              if (user == null) {
-                                return Text(
-                                  isArabic ? 'حدد عنوانك' : 'Set Your Location',
-                                  style: const TextStyle(
-                                    fontFamily: 'SF Pro',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    fontStyle: FontStyle.normal,
-                                    color: AppColors.primary,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                );
-                              }
-
-                              return StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(user.uid)
-                                    .collection('addresses')
-                                    .where('isDefault', isEqualTo: true)
-                                    .limit(1)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  String addressTitle = isArabic ? 'حدد عنوانك' : 'Set Your Location';
-                                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                                    final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
-                                    final rawAddress = isArabic
-                                        ? (data['addressAr'] ?? data['addressEn'])
-                                        : (data['addressEn'] ?? data['addressAr']);
-                                    if (rawAddress != null && rawAddress.toString().isNotEmpty) {
-                                      addressTitle = _extractRegionName(rawAddress.toString());
-                                    }
-                                  }
-
-                                  return Text(
-                                    addressTitle,
-                                    style: const TextStyle(
-                                      fontFamily: 'SF Pro',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      fontStyle: FontStyle.normal,
-                                      color: AppColors.primary,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                          Text(state.message, style: const TextStyle(color: AppColors.error)),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                            onPressed: () => context.read<MealCubit>().fetchMeals(),
+                            child: Text(l10n.retry, style: const TextStyle(color: Colors.white)),
+                          )
                         ],
                       ),
                     ),
-                    const Spacer(),
-                    // Language Toggle
-                    AnimatedClickButton(
-                      onPressed: () => context.read<LocaleCubit>().toggleLocale(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                        child: Text(
-                          Localizations.localeOf(context).languageCode.toUpperCase(),
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 16),
-                        ),
+                  )
+                else if (state is MealLoaded && meals.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: Text("No meals found.")),
+                  )
+                else if (state is MealLoaded) ...[
+                  // Hot Offers
+                  SliverToBoxAdapter(child: _buildSectionHeader(l10n.hotOffers, isDark)),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 150,
+                      child: PageView.builder(
+                        controller: _hotOffersController,
+                        onPageChanged: (index) => setState(() => _currentBannerIndex = index),
+                        itemCount: hotOffersMeals.length,
+                        itemBuilder: (context, index) => _buildHotOfferBannerCard(context, hotOffersMeals[index], l10n, isDark, index),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    // Theme Toggle
-                    AnimatedClickButton(
-                      onPressed: () => context.read<ThemeCubit>().toggleTheme(),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) => ScaleTransition(
-                          scale: animation,
-                          child: child,
-                        ),
-                        child: Icon(
-                          isDark ? Icons.light_mode : Icons.dark_mode,
-                          key: ValueKey(isDark ? 'light' : 'dark'),
-                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: SvgPicture.asset(
-                        'assets/icons/Bell_notification.svg',
-                        colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
-                      ),
-                      onPressed: () {},
-                    ),
-                    // Cart Icon with Badge
-                    BlocBuilder<CartCubit, CartState>(
-                      builder: (context, cartState) {
-                        return Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            IconButton(
-                              icon: SvgPicture.asset(
-                                'assets/icons/cart.svg',
-                                colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
-                              ),
-                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen())),
-                            ),
-                            if (cartState.cartItems.isNotEmpty)
-                              Positioned(
-                                right: 6,
-                                top: 6,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.error,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    '${cartState.cartItems.length}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              // 2. Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF9FAFB),
-                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      SvgPicture.asset(
-                        'assets/icons/search_in_textfield.svg',
-                        colorFilter: const ColorFilter.mode(Color(0xFF9CA3AF), BlendMode.srcIn),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          onSubmitted: (query) {
-                            if (query.trim().isNotEmpty) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CategoryMealsScreen(
-                                    categoryName: 'Search: ${query.trim()}',
-                                    apiQuery: query.trim(),
-                                    isSearchMode: true,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                          decoration: InputDecoration(
-                            hintText: l10n.searchHint,
-                            hintStyle: const TextStyle(
-                              fontFamily: 'SF Compact',
-                              color: Color(0xFF9CA3AF),
-                              fontSize: 14,
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          hotOffersMeals.length,
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            width: _currentBannerIndex == index ? 20 : 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: _currentBannerIndex == index ? AppColors.primary : Colors.grey.shade400,
+                              borderRadius: BorderRadius.circular(3),
                             ),
-                            border: InputBorder.none,
-                            isDense: true,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // 3. Categories (Horizontal Scroll matching categories.php API)
-              SizedBox(
-                height: 95,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  itemCount: _homeCategories.length,
-                  itemBuilder: (context, index) {
-                    final cat = _homeCategories[index];
-                    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-                    final label = isArabic ? cat['labelAr'] : cat['labelEn'];
-
-                    return _buildCategoryItem(
-                      icon: cat['icon'],
-                      label: label,
-                      isDark: isDark,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryMealsScreen(
-                              categoryName: label,
-                              apiQuery: cat['query'],
-                              isAreaFilter: cat['isArea'],
-                              iconPath: cat['icon'],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Content based on MealCubit State
-              BlocBuilder<MealCubit, MealState>(
-                builder: (context, state) {
-                  if (state is MealLoading || state is MealInitial) {
-                    return const Padding(
-                      padding: EdgeInsets.only(top: 40.0),
-                      child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                    );
-                  } else if (state is MealError) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 40.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Text(state.message, style: const TextStyle(color: AppColors.error)),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                              onPressed: () => context.read<MealCubit>().fetchMeals(),
-                              child: Text(l10n.retry, style: const TextStyle(color: Colors.white)),
-                            )
-                          ],
-                        ),
+                  
+                  // Fastest Near You
+                  SliverToBoxAdapter(child: _buildSectionHeader(l10n.fastest, isDark)),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 240,
+                      child: PageView.builder(
+                        controller: _fastestController,
+                        padEnds: false,
+                        itemCount: fastestMeals.isNotEmpty ? fastestMeals.length : meals.length,
+                        itemBuilder: (context, index) => _buildFastestCard(context, fastestMeals.isNotEmpty ? fastestMeals[index] : meals[index], l10n, isDark),
                       ),
-                    );
-                  } else if (state is MealLoaded) {
-                    final meals = state.meals;
-                    if (meals.isEmpty) {
-                      return const Center(child: Text("No meals found."));
-                    }
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
-                    final hotOffersMeals = meals.take(5).toList();
-                    final fastestMeals = meals.skip(5).take(5).toList();
-                    final recommendedMeals = meals;
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 4. Hot Offers Section (Auto-Sliding Banners)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text(
-                            l10n.hotOffers,
-                            style: TextStyle(
-                              fontFamily: 'SF Pro',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 150,
-                          child: PageView.builder(
-                            controller: _hotOffersController,
-                            onPageChanged: (index) {
-                              setState(() => _currentBannerIndex = index);
-                            },
-                            itemCount: hotOffersMeals.length,
-                            itemBuilder: (context, index) {
-                              return _buildHotOfferBannerCard(
-                                context,
-                                hotOffersMeals[index],
-                                l10n,
-                                isDark,
-                                index,
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        // Page Indicator Dots for Banners
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            hotOffersMeals.length,
-                            (index) => AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 3),
-                              width: _currentBannerIndex == index ? 20 : 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: _currentBannerIndex == index
-                                    ? AppColors.primary
-                                    : Colors.grey.shade400,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // 5. Fastest Section (PageView Banner)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text(
-                            l10n.fastest,
-                            style: TextStyle(
-                              fontFamily: 'SF Pro',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 240,
-                          child: PageView.builder(
-                            controller: _fastestController,
-                            padEnds: false,
-                            itemCount: fastestMeals.isNotEmpty ? fastestMeals.length : meals.length,
-                            itemBuilder: (context, index) {
-                              return _buildFastestCard(
-                                context,
-                                fastestMeals.isNotEmpty ? fastestMeals[index] : meals[index],
-                                l10n,
-                                isDark,
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // 6. Recommended Section (Two-column GridView)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text(
-                            l10n.recommended,
-                            style: TextStyle(
-                              fontFamily: 'SF Pro',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.60,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                          ),
-                          itemCount: recommendedMeals.length,
-                          itemBuilder: (context, index) {
-                            return _buildGridMealCard(context, recommendedMeals[index], l10n, isDark);
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    );
-                  }
-                  return const SizedBox();
-                },
-              ),
-            ],
-          ),
+                  // Recommended
+                  SliverToBoxAdapter(child: _buildSectionHeader(l10n.recommended, isDark)),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    sliver: SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.60,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => _buildGridMealCard(context, recommendedMeals[index], l10n, isDark),
+                        childCount: recommendedMeals.length,
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildCategoryItem({
-    required String icon,
-    required String label,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildTopBar(BuildContext context, AppLocalizations l10n, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Row(
+        children: [
+          InkWell(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VendorMapScreen())),
+            borderRadius: BorderRadius.circular(12),
+            child: Row(
+              children: [
+                SvgPicture.asset('assets/icons/location_in_bar.svg', width: 24, height: 24),
+                const SizedBox(width: 8),
+                Builder(
+                  builder: (context) {
+                    final user = FirebaseAuth.instance.currentUser;
+                    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+                    final defaultLocationText = isArabic ? 'حدد عنوانك' : 'Set Your Location';
+
+                    if (user == null) {
+                      return Text(
+                        defaultLocationText,
+                        style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    }
+                    return StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance.collection('users').doc(user.uid).collection('addresses').where('isDefault', isEqualTo: true).limit(1).snapshots(),
+                      builder: (context, snapshot) {
+                        String addressTitle = defaultLocationText;
+                        if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                          final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
+                          final rawAddress = isArabic ? (data['addressAr'] ?? data['addressEn']) : (data['addressEn'] ?? data['addressAr']);
+                          if (rawAddress != null && rawAddress.toString().isNotEmpty) {
+                            addressTitle = _extractRegionName(rawAddress.toString());
+                          }
+                        }
+                        return Text(addressTitle, style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primary), maxLines: 1, overflow: TextOverflow.ellipsis);
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          AnimatedClickButton(
+            onPressed: () => context.read<LocaleCubit>().toggleLocale(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Text(Localizations.localeOf(context).languageCode.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 16)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          AnimatedClickButton(
+            onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+              child: Icon(isDark ? Icons.light_mode : Icons.dark_mode, key: ValueKey(isDark ? 'light' : 'dark'), color: isDark ? Colors.white : const Color(0xFF1E1E1E), size: 24),
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: SvgPicture.asset('assets/icons/Bell_notification.svg', colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn)),
+            onPressed: () {},
+          ),
+          BlocBuilder<CartCubit, CartState>(
+            builder: (context, cartState) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: SvgPicture.asset('assets/icons/cart.svg', colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn)),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen())),
+                  ),
+                  if (cartState.cartItems.isNotEmpty)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
+                        child: Text('${cartState.cartItems.length}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context, AppLocalizations l10n, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF9FAFB), borderRadius: BorderRadius.circular(16)),
+        child: Row(
+          children: [
+            const SizedBox(width: 16),
+            SvgPicture.asset('assets/icons/search_in_textfield.svg', colorFilter: const ColorFilter.mode(Color(0xFF9CA3AF), BlendMode.srcIn)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                onSubmitted: (query) {
+                  if (query.trim().isNotEmpty) {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => CategoryMealsScreen(categoryName: 'Search: ${query.trim()}', apiQuery: query.trim(), isSearchMode: true)));
+                  }
+                },
+                decoration: InputDecoration(hintText: l10n.searchHint, hintStyle: const TextStyle(fontFamily: 'SF Compact', color: Color(0xFF9CA3AF), fontSize: 14), border: InputBorder.none, isDense: true),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategories(BuildContext context, bool isDark) {
+    return SizedBox(
+      height: 95,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        itemCount: _homeCategories.length,
+        itemBuilder: (context, index) {
+          final cat = _homeCategories[index];
+          final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+          final label = isArabic ? cat['labelAr'] : cat['labelEn'];
+          return _buildCategoryItem(
+            icon: cat['icon'],
+            label: label,
+            isDark: isDark,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CategoryMealsScreen(categoryName: label, apiQuery: cat['query'], isAreaFilter: cat['isArea'], iconPath: cat['icon']))),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Text(title, style: TextStyle(fontFamily: 'SF Pro', fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E))),
+    );
+  }
+
+  Widget _buildCategoryItem({required String icon, required String label, required bool isDark, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -628,39 +389,21 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               width: 60,
               height: 60,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE8F8F0),
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE8F8F0), shape: BoxShape.circle),
               child: Center(
-                child: SvgPicture.asset(
-                  icon.startsWith('assets/') ? icon : 'assets/icons/$icon',
-                  width: 24,
-                  height: 24,
-                  colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
-                ),
+                child: SvgPicture.asset(icon.startsWith('assets/') ? icon : 'assets/icons/$icon', width: 24, height: 24, colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn)),
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'SF Compact',
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-              ),
-            ),
+            Text(label, style: TextStyle(fontFamily: 'SF Compact', fontSize: 12, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1E1E1E))),
           ],
         ),
       ),
     );
   }
 
-  // Rectangular Auto-Sliding Banner for Hot Offers
-  Widget _buildHotOfferBannerCard(
-      BuildContext context, Meal meal, AppLocalizations l10n, bool isDark, int index) {
-    final discounts = ['20% OFF', '30% OFF', 'SPECIAL DEAL', 'BUY 1 GET 1', '25% OFF'];
+  Widget _buildHotOfferBannerCard(BuildContext context, Meal meal, AppLocalizations l10n, bool isDark, int index) {
+    final discounts = const ['20% OFF', '30% OFF', 'SPECIAL DEAL', 'BUY 1 GET 1', '25% OFF'];
     final discountText = discounts[index % discounts.length];
 
     return GestureDetector(
@@ -670,106 +413,54 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF1F2937), const Color(0xFF111827)]
-                : [AppColors.primary, const Color(0xFF009B5A)],
+            colors: isDark ? const [Color(0xFF1F2937), Color(0xFF111827)] : const [AppColors.primary, Color(0xFF009B5A)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.25),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
+          boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 4))],
         ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  // Text & Info Column
-                  Expanded(
-                    flex: 6,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            discountText,
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          meal.strMeal,
-                          style: const TextStyle(
-                            fontFamily: 'SF Pro',
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        const Row(
-                          children: [
-                            Text(
-                              'Order Now',
-                              style: TextStyle(
-                                fontFamily: 'SF Compact',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white70,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white70),
-                          ],
-                        ),
-                      ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 6,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                      child: Text(discountText, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 11)),
                     ),
-                  ),
-
-                  // Image Container
-                  Expanded(
-                    flex: 4,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: meal.strMealThumb != null
-                          ? CachedNetworkImage(
-                              imageUrl: meal.strMealThumb!,
-                              height: 110,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                color: Colors.black12,
-                                child: const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.black12,
-                                child: const Icon(Icons.fastfood, color: Colors.white),
-                              ),
-                            )
-                          : Container(color: Colors.black12, child: const Icon(Icons.fastfood, color: Colors.white)),
-                    ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(meal.strMeal, style: const TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 6),
+                    const Row(children: [Text('Order Now', style: TextStyle(fontFamily: 'SF Compact', fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white70)), SizedBox(width: 4), Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white70)]),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 4,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: meal.strMealThumb != null
+                      ? CachedNetworkImage(
+                          imageUrl: meal.strMealThumb!,
+                          height: 110,
+                          fit: BoxFit.cover,
+                          memCacheWidth: 400,
+                          maxWidthDiskCache: 400,
+                          fadeInDuration: const Duration(milliseconds: 150),
+                          placeholder: (context, url) => Container(color: Colors.black12, child: const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))),
+                          errorWidget: (context, url, error) => Container(color: Colors.black12, child: const Icon(Icons.fastfood, color: Colors.white)),
+                        )
+                      : Container(color: Colors.black12, child: const Icon(Icons.fastfood, color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -791,66 +482,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        height: 160,
-                        color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
-                        child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 160,
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.fastfood, size: 48, color: Colors.grey),
-                      ),
+                      memCacheWidth: 400,
+                      maxWidthDiskCache: 400,
+                      fadeInDuration: const Duration(milliseconds: 150),
+                      placeholder: (context, url) => Container(height: 160, color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200, child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))),
+                      errorWidget: (context, url, error) => Container(height: 160, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, size: 48, color: Colors.grey)),
                     )
                   : Container(height: 160, color: Colors.grey.shade300, child: const Icon(Icons.fastfood, size: 48, color: Colors.grey)),
             ),
             const SizedBox(height: 12),
-            Text(
-              meal.strMeal,
-              style: TextStyle(
-                fontFamily: 'SF Pro',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            Text(meal.strMeal, style: TextStyle(fontFamily: 'SF Pro', fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)), maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 4),
             Row(
               children: [
-                Text(
-                  '4.8',
-                  style: TextStyle(
-                    fontFamily: 'SF Compact',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                  ),
-                ),
+                Text('4.8', style: TextStyle(fontFamily: 'SF Compact', fontSize: 14, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1E1E1E))),
                 const SizedBox(width: 4),
                 SvgPicture.asset('assets/icons/Star.svg', width: 14, height: 14),
                 const SizedBox(width: 4),
-                const Text(
-                  '(120)',
-                  style: TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
-                ),
-                Text(
-                  '2.4 ${l10n.km}',
-                  style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
-                ),
-                Text(
-                  '20-25 ${l10n.min}',
-                  style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF)),
-                ),
+                const Text('(120)', style: TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF))),
+                const Padding(padding: EdgeInsets.symmetric(horizontal: 4.0), child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF)))),
+                Text('2.4 ${l10n.km}', style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF))),
+                const Padding(padding: EdgeInsets.symmetric(horizontal: 4.0), child: Text('•', style: TextStyle(color: Color(0xFF9CA3AF)))),
+                Text('20-25 ${l10n.min}', style: const TextStyle(fontFamily: 'SF Compact', fontSize: 14, color: Color(0xFF9CA3AF))),
               ],
             ),
           ],
@@ -866,13 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -887,23 +534,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? CachedNetworkImage(
                               imageUrl: meal.strMealThumb!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
-                                child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.grey.shade300,
-                                child: const Icon(Icons.fastfood, color: Colors.grey),
-                              ),
+                              memCacheWidth: 400,
+                              maxWidthDiskCache: 400,
+                              fadeInDuration: const Duration(milliseconds: 150),
+                              placeholder: (context, url) => Container(color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200, child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))),
+                              errorWidget: (context, url, error) => Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
                             )
                           : Container(color: Colors.grey.shade300, child: const Icon(Icons.fastfood, color: Colors.grey)),
                     ),
                   ),
-                  Positioned(
-                    top: 2,
-                    right: 2,
-                    child: FavouriteButton(meal: meal, size: 20),
-                  ),
+                  Positioned(top: 2, right: 2, child: FavouriteButton(meal: meal, size: 20)),
                 ],
               ),
             ),
@@ -912,19 +552,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    meal.strMeal,
-                    style: TextStyle(fontFamily: 'SF Pro', fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(meal.strMeal, style: TextStyle(fontFamily: 'SF Pro', fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)), maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
-                  Text(
-                    meal.strCategory ?? 'Food',
-                    style: const TextStyle(fontFamily: 'SF Compact', fontSize: 12, color: Color(0xFF9CA3AF)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(meal.strCategory ?? 'Food', style: const TextStyle(fontFamily: 'SF Compact', fontSize: 12, color: Color(0xFF9CA3AF)), maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -940,23 +570,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: double.infinity,
                     height: 36,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.zero,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: EdgeInsets.zero, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                       onPressed: () {
                         context.read<CartCubit>().addToCart(meal);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.addedToCart(meal.strMeal)),
-                            backgroundColor: AppColors.primary,
-                            duration: const Duration(seconds: 1),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.addedToCart(meal.strMeal)), backgroundColor: AppColors.primary, duration: const Duration(seconds: 1), behavior: SnackBarBehavior.floating));
                       },
                       child: Text(l10n.addToCart, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                     ),
@@ -993,11 +610,7 @@ class _AnimatedClickButtonState extends State<AnimatedClickButton> {
         widget.onPressed();
       },
       onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedScale(
-        scale: _isPressed ? 0.85 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        child: widget.child,
-      ),
+      child: AnimatedScale(scale: _isPressed ? 0.85 : 1.0, duration: const Duration(milliseconds: 100), child: widget.child),
     );
   }
 }
