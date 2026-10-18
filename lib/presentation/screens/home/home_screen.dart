@@ -76,18 +76,36 @@ class _HomeScreenState extends State<HomeScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    // Language Toggle stays in the Top Bar for UX
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
+                    // Language Toggle
+                    AnimatedClickButton(
                       onPressed: () => context.read<LocaleCubit>().toggleLocale(),
-                      child: Text(
-                        Localizations.localeOf(context).languageCode.toUpperCase(),
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        child: Text(
+                          Localizations.localeOf(context).languageCode.toUpperCase(),
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 16),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    // Theme Toggle
+                    AnimatedClickButton(
+                      onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) => ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        ),
+                        child: Icon(
+                          isDark ? Icons.light_mode : Icons.dark_mode,
+                          key: ValueKey(isDark ? 'light' : 'dark'),
+                          color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     IconButton(
                       icon: SvgPicture.asset(
                         'assets/icons/Bell_notification.svg',
@@ -229,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 4. Hot Offers Section + THEME TOGGLE
+                        // 4. Hot Offers Section
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Row(
@@ -243,15 +261,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                                 ),
-                              ),
-                              // Theme Toggle is placed here as per project guidelines
-                              IconButton(
-                                icon: Icon(
-                                  isDark ? Icons.light_mode : Icons.dark_mode,
-                                  color: isDark ? Colors.white : const Color(0xFF1E1E1E),
-                                  size: 24,
-                                ),
-                                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
                               ),
                             ],
                           ),
@@ -604,6 +613,37 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class AnimatedClickButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onPressed;
+
+  const AnimatedClickButton({super.key, required this.child, required this.onPressed});
+
+  @override
+  State<AnimatedClickButton> createState() => _AnimatedClickButtonState();
+}
+
+class _AnimatedClickButtonState extends State<AnimatedClickButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.85 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: widget.child,
       ),
     );
   }
