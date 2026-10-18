@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../domain/entities/meal.dart';
+import '../../../data/models/meal_model.dart';
 import '../../../data/services/payment_service.dart';
 
 class CartItem extends Equatable {
@@ -23,6 +24,32 @@ class CartItem extends Equatable {
       meal: meal,
       quantity: quantity ?? this.quantity,
       pricePerItem: pricePerItem,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'idMeal': meal.idMeal,
+      'strMeal': meal.strMeal,
+      'strMealThumb': meal.strMealThumb,
+      'strCategory': meal.strCategory,
+      'strArea': meal.strArea,
+      'quantity': quantity,
+      'pricePerItem': pricePerItem,
+    };
+  }
+
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      meal: MealModel(
+        idMeal: json['idMeal'] ?? '',
+        strMeal: json['strMeal'] ?? '',
+        strMealThumb: json['strMealThumb'],
+        strCategory: json['strCategory'],
+        strArea: json['strArea'],
+      ),
+      quantity: json['quantity'] ?? 1,
+      pricePerItem: (json['pricePerItem'] as num?)?.toDouble() ?? 15.0,
     );
   }
 
@@ -62,7 +89,37 @@ class CartState extends Equatable {
 }
 
 class CartCubit extends Cubit<CartState> {
-  CartCubit() : super(const CartState());
+  CartCubit() : super(const CartState()) {
+    loadCartFromFirestore();
+  }
+
+  Future<void> loadCartFromFirestore() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (doc.exists && doc.data()?['cart'] != null) {
+        final List rawCart = doc.data()!['cart'];
+        final loadedItems = rawCart.map((item) => CartItem.fromJson(Map<String, dynamic>.from(item))).toList();
+        emit(state.copyWith(items: loadedLoadedItems(loadedItems)));
+      }
+    } catch (_) {}
+  }
+
+  List<CartItem> loadedLoadedItems(List<CartItem> items) => items;
+
+  Future<void> _syncCartToFirestore(List<CartItem> items) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      final cartJson = items.map((i) => i.toJson()).toList();
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'cart': cartJson,
+      }, SetOptions(merge: true));
+    } catch (_) {}
+  }
 
   void addToCart(Meal meal) {
     final existingIndex = state.items.indexWhere((item) => item.meal.idMeal == meal.idMeal);
@@ -76,6 +133,7 @@ class CartCubit extends Cubit<CartState> {
     }
 
     emit(state.copyWith(items: updatedItems, orderSuccessMessage: null));
+    _syncCartToFirestore(updatedItems);
   }
 
   void decrementQuantity(Meal meal) {
@@ -92,15 +150,18 @@ class CartCubit extends Cubit<CartState> {
     }
 
     emit(state.copyWith(items: updatedItems, orderSuccessMessage: null));
+    _syncCartToFirestore(updatedItems);
   }
 
   void removeFromCart(Meal meal) {
     final updatedItems = state.items.where((item) => item.meal.idMeal != meal.idMeal).toList();
     emit(state.copyWith(items: updatedItems, orderSuccessMessage: null));
+    _syncCartToFirestore(updatedItems);
   }
 
   void clearCart() {
     emit(const CartState());
+    _syncCartToFirestore([]);
   }
 
   Future<bool> placeOrder(PaymentStrategy paymentStrategy) async {
@@ -133,11 +194,17 @@ class CartCubit extends Cubit<CartState> {
           'createdAt': FieldValue.serverTimestamp(),
         };
 
+        // 1. Save order to user's orders collection
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .collection('orders')
             .add(orderData);
+
+        // 2. Clear cart in Firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'cart': [],
+        }, SetOptions(merge: true));
       }
 
       emit(const CartState(
