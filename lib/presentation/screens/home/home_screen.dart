@@ -31,6 +31,79 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _bannerTimer;
   int _currentBannerIndex = 0;
 
+  final List<Map<String, dynamic>> _homeCategories = [
+    {
+      'labelEn': 'Ramen',
+      'labelAr': 'رامن',
+      'icon': 'assets/icons/ramen.svg',
+      'query': 'Seafood',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Pizza',
+      'labelAr': 'بيتزا',
+      'icon': 'assets/icons/pizza.svg',
+      'query': 'Miscellaneous',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Fast Food',
+      'labelAr': 'وجبات سريعة',
+      'icon': 'assets/icons/fast_food.svg',
+      'query': 'Beef',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Healthy',
+      'labelAr': 'أكل صحي',
+      'icon': 'assets/icons/healthy.svg',
+      'query': 'Vegetarian',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Salads',
+      'labelAr': 'سلاطات',
+      'icon': 'assets/icons/salads.svg',
+      'query': 'Side',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Desserts',
+      'labelAr': 'حلويات',
+      'icon': 'assets/icons/icecream.svg',
+      'query': 'Dessert',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Meat',
+      'labelAr': 'لحوم',
+      'icon': 'assets/icons/meat.svg',
+      'query': 'Lamb',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Asian',
+      'labelAr': 'آسيوي',
+      'icon': 'assets/icons/asian.svg',
+      'query': 'Japanese',
+      'isArea': true,
+    },
+    {
+      'labelEn': 'Bakery',
+      'labelAr': 'مخبوزات',
+      'icon': 'assets/icons/bakery.svg',
+      'query': 'Breakfast',
+      'isArea': false,
+    },
+    {
+      'labelEn': 'Italian',
+      'labelAr': 'إيطالي',
+      'icon': 'assets/icons/italian.svg',
+      'query': 'Italian',
+      'isArea': true,
+    },
+  ];
+
   String _extractRegionName(String fullAddress) {
     final parts = fullAddress
         .split(RegExp(r'[,،]'))
@@ -305,19 +378,37 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 3. Categories (Horizontal Scroll)
+              // 3. Categories (Horizontal Scroll matching Browse categories)
               SizedBox(
-                height: 100,
-                child: ListView(
+                height: 95,
+                child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  children: [
-                    _buildCategoryItem(icon: 'acclaimed.svg', label: l10n.acclaimed, isDark: isDark),
-                    _buildCategoryItem(icon: 'healthy.svg', label: l10n.healthy, isDark: isDark),
-                    _buildCategoryItem(icon: 'pizza.svg', label: l10n.pizza, isDark: isDark),
-                    _buildCategoryItem(icon: 'ramen.svg', label: l10n.ramen, isDark: isDark),
-                    _buildCategoryItem(icon: 'burger.svg', label: l10n.burger, isDark: isDark),
-                  ],
+                  itemCount: _homeCategories.length,
+                  itemBuilder: (context, index) {
+                    final cat = _homeCategories[index];
+                    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+                    final label = isArabic ? cat['labelAr'] : cat['labelEn'];
+
+                    return _buildCategoryItem(
+                      icon: cat['icon'],
+                      label: label,
+                      isDark: isDark,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CategoryMealsScreen(
+                              categoryName: label,
+                              apiQuery: cat['query'],
+                              isAreaFilter: cat['isArea'],
+                              iconPath: cat['icon'],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 16),
@@ -490,38 +581,46 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryItem({required String icon, required String label, required bool isDark}) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE8F8F0),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                'assets/icons/$icon',
-                width: 24,
-                height: 24,
-                colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+  Widget _buildCategoryItem({
+    required String icon,
+    required String label,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16.0),
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE8F8F0),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  icon.startsWith('assets/') ? icon : 'assets/icons/$icon',
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'SF Compact',
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'SF Compact',
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
