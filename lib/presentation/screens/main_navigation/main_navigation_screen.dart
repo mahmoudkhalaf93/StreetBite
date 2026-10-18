@@ -5,6 +5,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../home/home_screen.dart';
 import '../profile/profile_screen.dart';
+import '../orders/orders_screen.dart';
+import '../vendor_map/vendor_map_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -24,8 +26,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Screens are dynamically generated here so they can access context for l10n
     final List<Widget> screens = [
       const HomeScreen(),
-      Center(child: Text(l10n.navBrowse)),
-      Center(child: Text(l10n.navOrders)),
+      const VendorMapScreen(),
+      const OrdersScreen(),
       const ProfileScreen(),
     ];
 

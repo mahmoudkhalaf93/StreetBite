@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/app_colors.dart';
 import '../auth/login_screen.dart';
-import '../home/home_screen.dart';
+import '../main_navigation/main_navigation_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,27 +12,52 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  double _opacity = 0.0;
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+    
+    // Increased duration to 3.5 seconds to make the animation much longer and smoother
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3500),
+    );
+
+    // Using Curves.elasticOut for a smoother, softer spring effect
+    final curvedAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut, 
+    );
+
+    // Moving from further down (2.0) to center
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 2.0),
+      end: Offset.zero,
+    ).animate(curvedAnimation);
+
+    // Scaling from very small to full size
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(curvedAnimation);
+
     _startSplashSequence();
   }
 
   void _startSplashSequence() {
-    // Start fade-in animation slightly later so the engine is fully ready to render it
+    // Start animation
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
-        setState(() {
-          _opacity = 1.0;
-        });
+        _animationController.forward();
       }
     });
 
-    // Wait for animation to finish, then navigate based on Auth State
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    // Wait 4.5 seconds before navigating to allow the smooth animation to fully settle
+    Future.delayed(const Duration(milliseconds: 4500), () {
       _checkAuthAndNavigate();
     });
   }
@@ -43,40 +68,46 @@ class _SplashScreenState extends State<SplashScreen> {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // User is logged in, navigate to Home
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
       );
     } else {
-      // User is not logged in, navigate to Login / Onboarding
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
   }
+  
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Use MediaQuery for responsiveness (adapts to mobile and tablets)
     final size = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      backgroundColor: AppColors.primary, // Using centralized AppColors instead of hardcoded hex
+      backgroundColor: AppColors.primary, 
       body: Center(
-        child: AnimatedOpacity(
-          duration: const Duration(seconds: 2), // 2 seconds fade-in animation
-          curve: Curves.easeIn,
-          opacity: _opacity,
-          child: SvgPicture.asset(
-            'assets/images/app logo.svg',
-            width: size.width * 0.5, // 50% of the screen width for responsive sizing
-            fit: BoxFit.contain,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: SvgPicture.asset(
+              'assets/images/applogo.svg',
+              width: size.width * 0.5,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+
 

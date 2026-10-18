@@ -35,24 +35,25 @@ class _CustomTextFieldState extends State<CustomTextField> {
       validator: widget.validator,
       style: const TextStyle(
         fontFamily: 'SF Pro Display',
-        fontSize: 16,
+        fontSize: 14, // Reduced from 16
         color: AppColors.textPrimaryLight,
       ),
       decoration: InputDecoration(
         labelText: widget.hintText,
         labelStyle: const TextStyle(
           fontFamily: 'SF Pro Display',
-          fontSize: 16,
+          fontSize: 14, // Reduced from 16
           color: Color(0xFF9CA3AF),
         ),
         floatingLabelStyle: const TextStyle(
           fontFamily: 'SF Pro Display',
-          fontSize: 16,
+          fontSize: 14, // Reduced from 16
           color: AppColors.primary,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         filled: true,
         fillColor: const Color(0xFFF4F5F7),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16), // Reduced internal padding
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.isPassword
             ? IconButton(

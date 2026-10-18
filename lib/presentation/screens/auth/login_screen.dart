@@ -9,7 +9,8 @@ import '../../blocs/auth/auth_cubit.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
-import '../home/home_screen.dart';
+import '../main_navigation/main_navigation_screen.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state is AuthSuccess) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
               );
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -142,24 +143,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             l10n.foodAndGroceries,
                             style: const TextStyle(
                               fontFamily: 'SF Pro',
-                              fontSize: 24,
+                              fontSize: 22, // Reduced from 24
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1E1E1E),
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 4), // Reduced from 6
                           // Subtitle
                           Text(
                             l10n.signInToGetMeal,
                             style: const TextStyle(
                               fontFamily: 'SF Compact',
-                              fontSize: 16,
+                              fontSize: 14, // Reduced from 16
                               color: Color(0xFF6B7280),
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 24), // Reduced from 32
+                          const SizedBox(height: 20), // Reduced from 24
 
                           // Email Field
                           CustomTextField(
@@ -288,7 +289,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  // Navigate to SignUpScreen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                                  );
                                 },
                                 child: Text(
                                   l10n.signUp,

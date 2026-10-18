@@ -13,6 +13,7 @@ import '../../blocs/locale/locale_cubit.dart';
 import '../../blocs/meal/meal_cubit.dart';
 import '../../blocs/theme/theme_cubit.dart';
 import '../meal/meal_details_screen.dart';
+import '../cart/cart_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -187,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 'assets/icons/cart.svg',
                                 colorFilter: ColorFilter.mode(isDark ? Colors.white : const Color(0xFF1E1E1E), BlendMode.srcIn),
                               ),
-                              onPressed: () {},
+                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen())),
                             ),
                             if (cartState.cartItems.isNotEmpty)
                               Positioned(
