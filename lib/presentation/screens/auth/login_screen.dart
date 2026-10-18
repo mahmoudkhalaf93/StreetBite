@@ -56,8 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     final prefs = await SharedPreferences.getInstance();
-    final isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED') ?? false;
-    final savedEmail = prefs.getString('SAVED_EMAIL');
+    final lastUid = prefs.getString('LAST_BIOMETRIC_UID');
+    final isBiometricEnabled = lastUid != null && (prefs.getBool('BIOMETRIC_ENABLED_$lastUid') ?? false);
+    final savedEmail = prefs.getString('LAST_BIOMETRIC_EMAIL') ?? prefs.getString('SAVED_EMAIL');
     final savedPassword = prefs.getString('SAVED_PASSWORD');
 
     if (!isBiometricEnabled || savedEmail == null || savedPassword == null) {
@@ -65,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'يرجى تسجيل الدخول أولاً بالبريد وكلمة المرور وتفعيل "تسجيل الدخول بالبصمة" من الإعدادات'
+                ? 'يرجى تسجيل الدخول بالبريد وكلمة المرور أولاً وتفعيل "تسجيل الدخول بالبصمة" من الإعدادات'
                 : 'Please log in with email/password first and enable "Biometric Login" in Settings',
           ),
           backgroundColor: Colors.orange,
@@ -143,9 +144,10 @@ class _LoginScreenState extends State<LoginScreen> {
         body: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthSuccess) {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+                (route) => false,
               );
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(

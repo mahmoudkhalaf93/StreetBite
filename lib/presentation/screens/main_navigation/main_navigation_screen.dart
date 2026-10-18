@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -23,7 +24,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Screens are dynamically generated here so they can access context for l10n
     final List<Widget> screens = [
       const HomeScreen(),
       const BrowseScreen(),
@@ -31,50 +31,57 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const ProfileScreen(),
     ];
 
-    return Scaffold(
-      // Using IndexedStack to preserve state of all screens (e.g. scroll position in Home)
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            border: Border(
-              top: BorderSide(
-                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200, 
-                width: 1,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        // Exit application directly when pressing back on root screen
+        SystemNavigator.pop();
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: screens,
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              border: Border(
+                top: BorderSide(
+                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                  width: 1,
+                ),
               ),
             ),
-          ),
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: const Color(0xFF9CA3AF),
-            selectedLabelStyle: const TextStyle(
-              fontFamily: 'SF Compact Display',
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              selectedItemColor: AppColors.primary,
+              unselectedItemColor: const Color(0xFF9CA3AF),
+              selectedLabelStyle: const TextStyle(
+                fontFamily: 'SF Compact Display',
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontFamily: 'SF Compact Display',
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+              items: [
+                _buildNavItem('assets/icons/home.svg', l10n.navHome, 0),
+                _buildNavItem('assets/icons/browse.svg', l10n.navBrowse, 1),
+                _buildNavItem('assets/icons/orders.svg', l10n.navOrders, 2),
+                _buildNavItem('assets/icons/profile.svg', l10n.navProfile, 3),
+              ],
             ),
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: 'SF Compact Display',
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            items: [
-              _buildNavItem('assets/icons/home.svg', l10n.navHome, 0),
-              _buildNavItem('assets/icons/browse.svg', l10n.navBrowse, 1),
-              _buildNavItem('assets/icons/orders.svg', l10n.navOrders, 2),
-              _buildNavItem('assets/icons/profile.svg', l10n.navProfile, 3),
-            ],
           ),
         ),
       ),
@@ -91,7 +98,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // The animated indicator dot instead of the broken SVG
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOut,
@@ -116,4 +122,3 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 }
-

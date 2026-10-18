@@ -49,10 +49,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadBiometricPreference() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        _isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED') ?? false;
+        _isBiometricEnabled = prefs.getBool('BIOMETRIC_ENABLED_${user.uid}') ?? false;
       });
     }
   }
@@ -82,13 +85,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
+    final userKey = 'BIOMETRIC_ENABLED_${user.uid}';
+
     if (value) {
       final authed = await _authenticateForAction('Authenticate to enable biometric login');
       if (authed) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('BIOMETRIC_ENABLED', true);
+        await prefs.setBool(userKey, true);
+        await prefs.setString('LAST_BIOMETRIC_UID', user.uid);
         if (user.email != null) {
-          await prefs.setString('SAVED_BIOMETRIC_EMAIL', user.email!);
+          await prefs.setString('LAST_BIOMETRIC_EMAIL', user.email!);
         }
         if (mounted) {
           setState(() => _isBiometricEnabled = true);
@@ -96,8 +102,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SnackBar(
               content: Text(
                 Localizations.localeOf(context).languageCode == 'ar'
-                    ? 'تم تفعيل تسجيل الدخول بالبصمة بنجاح! 🔒'
-                    : 'Biometric login enabled successfully! 🔒',
+                    ? 'تم تفعيل تسجيل الدخول بالبصمة لهذا الحساب! 🔒'
+                    : 'Biometric login enabled for this account! 🔒',
               ),
               backgroundColor: AppColors.primary,
             ),
@@ -106,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } else {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('BIOMETRIC_ENABLED', false);
+      await prefs.setBool(userKey, false);
       if (mounted) {
         setState(() => _isBiometricEnabled = false);
       }
