@@ -485,56 +485,77 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/Bell_notification.svg',
-              colorFilter: ColorFilter.mode(
-                isDark ? Colors.white : const Color(0xFF1E1E1E),
-                BlendMode.srcIn,
+          const SizedBox(width: 4),
+          Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.hardEdge,
+            child: InkWell(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SvgPicture.asset(
+                  'assets/icons/Bell_notification.svg',
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    isDark ? Colors.white : const Color(0xFF1E1E1E),
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
             ),
-            onPressed: () {},
           ),
           BlocBuilder<CartCubit, CartState>(
             builder: (context, cartState) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/cart.svg',
-                      colorFilter: ColorFilter.mode(
-                        isDark ? Colors.white : const Color(0xFF1E1E1E),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CartScreen()),
-                    ),
+              return Material(
+                color: Colors.transparent,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.hardEdge,
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CartScreen()),
                   ),
-                  if (cartState.cartItems.isNotEmpty)
-                    Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.error,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '${cartState.cartItems.length}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/cart.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            isDark ? Colors.white : const Color(0xFF1E1E1E),
+                            BlendMode.srcIn,
                           ),
                         ),
-                      ),
+                        if (cartState.cartItems.isNotEmpty)
+                          Positioned(
+                            right: -6,
+                            top: -6,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: AppColors.error,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                '${cartState.cartItems.length}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                ],
+                  ),
+                ),
               );
             },
           ),
