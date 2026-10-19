@@ -191,51 +191,55 @@ class _ContactUsSheetState extends State<ContactUsSheet> {
           ),
 
           // Message Input Field
-          Padding(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-              top: 8,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        hintText: l10n.typeMessage,
-                        hintStyle: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF9CA3AF),
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom > 0 
+                        ? MediaQuery.of(context).viewInsets.bottom + 8 
+                        : 16,
+                top: 8,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF2A2A2A)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: l10n.typeMessage,
+                          hintStyle: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF9CA3AF),
+                          ),
+                          border: InputBorder.none,
                         ),
-                        border: InputBorder.none,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                CircleAvatar(
-                  backgroundColor: AppColors.primary,
-                  radius: 20,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.send_rounded,
-                      size: 18,
-                      color: Colors.white,
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    backgroundColor: AppColors.primary,
+                    radius: 20,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.send_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      onPressed: _sendMessage,
                     ),
-                    onPressed: _sendMessage,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
