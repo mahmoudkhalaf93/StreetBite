@@ -5,78 +5,208 @@
 [![Clean Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20BLoC-00C874?style=for-the-badge)](https://bloclibrary.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-**StreetBite V1.0** is a full-featured, bilingual (English & Arabic) food discovery and ordering mobile application built with **Flutter**, **Clean Architecture**, **TheMealDB REST API**, and **Firebase Cloud Services**. Designed with responsive Material 3 principles, zero-lag lazy loading, and hardware integrations.
+**StreetBite V1.0** is a full-featured, bilingual (English & Arabic) food discovery and ordering mobile application built with **Flutter**, **Clean Architecture**, **TheMealDB REST API**, and **Firebase Cloud Services**.
 
 ---
 
-## 📱 Visual Showcase & App Screenshots
+## 📱 Complete App Showcase (Side-by-Side Screen Triplets)
 
-### 1. Home Screen & Food Feeds (EN, AR & Dark Mode)
+Every screen is presented in three synchronized variations: **Light Mode (English)**, **Light Mode (Arabic RTL)**, and **Dark Mode (English)**.
+
+### 1. 🚀 Splash & Authentication Flow
+
+#### Splash & Login Options
+> Extended elastic logo animation, Email/Password, Google Sign-In, and Password Reset.
+<div align="center">
+
+| Splash Screen | Login Screen (English) | Sign Up / Create Account | Password Reset |
+| :---: | :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/splash_screen.jpg" width="220"/> | <img src="docs/final_submission/evidence/app_screenshots/login.jpg" width="220"/> | <img src="docs/final_submission/evidence/app_screenshots/create_account.jpg" width="220"/> | <img src="docs/final_submission/evidence/app_screenshots/reset_password.jpg" width="220"/> |
+
+</div>
+
+#### Biometric Fingerprint Login (`local_auth`)
+> Native fingerprint prompt securely mapped to the specific user's UID for instant biometric login.
+<div align="center">
+
+| Fingerprint Prompt | Biometric Authenticated Session |
+| :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/login_with_fingerprint.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/sign_in_to_your_account_with_fingerprint.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 2. 🏠 Home Screen (Feeds & Offers)
 > Dynamic header with geolocated address, auto-sliding banner offers with localized discount badges, categories carousel, fastest near you, and recommended meals grid with lazy loading.
 
 <div align="center">
 
-| Home Screen (Light) | Home Screen (Arabic RTL) | Home Screen (Dark Mode) |
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/home_light.jpg" width="260" alt="Home Light"/> | <img src="docs/final_submission/evidence/app_screenshots/home_light_arabic_(2).jpg" width="260" alt="Home Arabic"/> | <img src="docs/final_submission/evidence/app_screenshots/home_screen_dark_.jpg" width="260" alt="Home Dark"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/home_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/home_light_arabic.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/home_dark.jpg" width="260"/> |
 
 </div>
 
 ---
 
-### 2. Food Discovery, Search & Category Filtering
-> Real-time search by dish or ingredient name, 14 live categories matching TheMealDB API, and country/area filtering (Italian, Egyptian, Asian, etc.).
+### 3. 🔍 Browse & Search Categories
+> 14 live food categories matching TheMealDB API with real-time instant search bar.
 
 <div align="center">
 
-| Categories Grid | Meal Search (Pizza) | Category Filter (Beef Dark) |
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/categories_light_a.jpg" width="260" alt="Categories"/> | <img src="docs/final_submission/evidence/app_screenshots/search_pizza_light.jpg" width="260" alt="Search"/> | <img src="docs/final_submission/evidence/app_screenshots/beef_cat_dark.jpg" width="260" alt="Beef Category"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/browse_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/browse_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/browse_screen_dark.jpg" width="260"/> |
 
 </div>
 
 ---
 
-### 3. Meal Details & Interactive Cart
-> Full-resolution food imagery, rating badges, localized ingredients & instructions lists, quantity selectors, and instant cart additions.
+### 4. 🍕 Category Meals Filter
+> Category-specific meal feeds filtered by food type (Beef, Chicken, Pasta, Dessert, etc.).
 
 <div align="center">
 
-| Meal Details (English) | Meal Details (Arabic) | Interactive Cart |
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/add_to_cart_page_details_dark.jpg" width="260" alt="Details English"/> | <img src="docs/final_submission/evidence/app_screenshots/details_page_arabic_light.jpg" width="260" alt="Details Arabic"/> | <img src="docs/final_submission/evidence/app_screenshots/cart_pickup_light.jpg" width="260" alt="Cart"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/categories_light_a.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/category_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/beef_cat_dark.jpg" width="260"/> |
 
 </div>
 
 ---
 
-### 4. Geolocated Checkout & Orders Countdown
-> Checkout modal with 150m proximity duplicate address prevention, Cash/Card payment strategy, active 30-min live countdown timer, and automatic transition to past orders.
+### 5. 🔍 Live Dish Search (Pizza, Burger)
+> Live search query results with instant API response filtering.
 
 <div align="center">
 
-| Checkout Modal (Arabic) | Active Orders (Countdown) | Past Orders History |
+| Search Light (Pizza) | Search Arabic (Burger) | Search Dark (Pizza) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/check_out_arabic_light.jpg" width="260" alt="Checkout"/> | <img src="docs/final_submission/evidence/app_screenshots/orders_arabic_light.jpg" width="260" alt="Active Orders"/> | <img src="docs/final_submission/evidence/app_screenshots/orders_dark.jpg" width="260" alt="Past Orders"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/search_pizza_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/search_burger_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/search_pizza_dark.jpg" width="260"/> |
 
 </div>
 
 ---
 
-### 5. Profile, Biometric Security & Vendor Discovery Map
-> User profile management, photo gallery upload to Firebase Storage, UID-bound fingerprint login toggle, device info display, and Google Maps vendor pins with custom InfoWindows.
+### 6. 🍲 Meal Details Page
+> High-resolution cover photo, ratings, price, localized ingredients wrap list, and preparation instructions.
 
 <div align="center">
 
-| Profile & Settings (Arabic) | Biometric Login Security | Google Maps Nearby Vendors |
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/profile_arabic_light.jpg" width="260" alt="Profile"/> | <img src="docs/final_submission/evidence/app_screenshots/profile_enabled_biometric_to_login_dark.jpg" width="260" alt="Biometrics"/> | <img src="docs/final_submission/evidence/app_screenshots/nearby_vendors.jpg" width="260" alt="Google Maps"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/all_page_details_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/details_page_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/add_to_cart_page_details_dark.jpg" width="260"/> |
 
 </div>
 
 ---
 
-## ⚡ Complete Feature Matrix & Architectural Capabilities
+### 7. 🛒 Cart Screen & Delivery Selector
+> Interactive quantity pill box, Delivery vs. Pickup segmented selector, and cost breakdown (Subtotal, Delivery Fee, Taxes, Discount).
+
+<div align="center">
+
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/cart_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/cart_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/cart_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 8. 💳 Checkout Sheet Modal
+> Delivery address selector with GPS location fetch, 150-meter duplicate address guard, and Cash on Delivery / Card payment strategy options.
+
+<div align="center">
+
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/checkout_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/check_out_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/check_out_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 9. ⏱️ Orders Screen & Live Countdown Timer
+> Active 30-minute delivery countdown timer calculated from exact `placedAtMillis` timestamp, automatically transitioning to Past Orders history once time elapses.
+
+<div align="center">
+
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/orders_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/orders_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/orders_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 10. ❤️ Favourites Screen
+> Synchronized live with `users/{uid}/favourites` in Cloud Firestore with instant remove and add-to-cart actions.
+
+<div align="center">
+
+| Favourites Screen (Dark Mode) | Favourites Toggle Action |
+| :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/my_favourites_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/goat_add_to_favourites_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 11. 👤 Profile & Settings Screen
+> User avatar upload to Firebase Storage, device model & OS details via `device_info_plus`, Biometric toggle, language dropdown, and theme switch.
+
+<div align="center">
+
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/profile_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/profile_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/profile_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 12. 💬 Support, FAQ & Payment Information Sheets
+> Support hotline chat interface, FAQ accordion, and saved credit card manager.
+
+<div align="center">
+
+| Contact Support Chat (Arabic) | Contact Support Chat (Dark) | FAQ Help Center Sheet |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/connect_us_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/contact_us_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/faq_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 13. 🗺️ Google Maps Vendor Discovery
+> Interactive Google Maps with 5 nearby food vendor pins and custom InfoWindow bottom sheets showing ratings and cuisines.
+
+<div align="center">
+
+| Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode Vendor Sheet |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/nearby_vendors.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/nearby_vendor_light_arabic.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/nearby_vendors_pop_up_dialog_dark.jpg" width="260"/> |
+
+</div>
+
+---
+
+### 14. 🧪 Beta Testing & Firebase App Distribution
+> Release APK distributed and tested via Firebase App Distribution Console & App Tester mobile app.
+
+<div align="center">
+
+| App Tester Mobile App | Firebase Console Distribution Dashboard |
+| :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/test_app.jpg" width="280" alt="App Tester"/> | <img src="docs/final_submission/evidence/firebase_distribution/firebase_dashboard.png" width="460" alt="Firebase Dashboard"/> |
+
+</div>
+
+---
+
+## ⚡ Complete Feature Matrix & Capabilities
 
 ### 🔐 1. Authentication & Session Security
 - **Multi-Factor Auth Flow:** Email/Password Authentication, Google Sign-In, Sign-Up with name validation, and Password Reset email link dispatch.
@@ -89,7 +219,7 @@
 
 ### 🚀 3. True Lazy Loading & Memory Optimization
 - **Sliver Grid Architecture:** `HomeScreen`, `CategoryMealsScreen`, and `OrdersScreen` use `CustomScrollView` and `Slivers` (`SliverGrid`, `SliverList`) for 100% lazy loading.
-- **Image RAM Boundaries:** All remote network images use `CachedNetworkImage` with `memCacheWidth: 400` / `200` to prevent memory leaks or frame drops during fast scrolling.
+- **RAM Image Optimization:** All remote network images use `CachedNetworkImage` with `memCacheWidth: 400` / `200` to prevent memory leaks or frame drops during fast scrolling.
 - **Zero-Flicker Live Timers:** Order countdown timers update without rebuilding the main screen scaffold.
 
 ### 🛒 4. Reactive Cart & Geolocated Checkout
@@ -110,6 +240,10 @@
 ### 🌐 8. Localization & Dynamic Themes
 - **Full EN/AR Localization:** Complete English and Arabic translations using ARB files with automatic RTL (Right-To-Left) layout mirroring.
 - **Light/Dark Mode Engine:** Dynamic theme switching maintained globally across screens.
+
+### 📱 9. Profile & Hardware Integration
+- **Device Info (`device_info_plus`):** Displays user's specific device model and OS version.
+- **Avatar Upload (`image_picker`):** Profile picture update from phone gallery uploaded to Firebase Storage.
 
 ---
 
