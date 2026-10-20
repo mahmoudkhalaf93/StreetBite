@@ -18,7 +18,7 @@
 
 | Home Screen (Light) | Home Screen (Arabic RTL) | Home Screen (Dark Mode) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/home_light.jpg" width="260" alt="Home Light"/> | <img src="docs/final_submission/evidence/app_screenshots/home_light_arabic.jpg" width="260" alt="Home Arabic"/> | <img src="docs/final_submission/evidence/app_screenshots/home_dark.jpg" width="260" alt="Home Dark"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/home_light.jpg" width="260" alt="Home Light"/> | <img src="docs/final_submission/evidence/app_screenshots/home_light_arabic_(2).jpg" width="260" alt="Home Arabic"/> | <img src="docs/final_submission/evidence/app_screenshots/home_screen_dark_.jpg" width="260" alt="Home Dark"/> |
 
 </div>
 
