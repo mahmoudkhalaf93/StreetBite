@@ -238,6 +238,8 @@ class CartCubit extends Cubit<CartState> {
           'orderType': state.isDelivery ? 'Delivery' : 'Pickup',
           'paymentMethod': paymentStrategy.paymentMethodName,
           'status': 'Preparing',
+          'deliveryMinutes': 30,
+          'placedAtMillis': DateTime.now().millisecondsSinceEpoch,
           'createdAt': FieldValue.serverTimestamp(),
         };
 

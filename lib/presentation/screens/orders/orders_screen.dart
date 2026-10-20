@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,23 +15,20 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  Timer? _countdownTimer;
+  Stream<QuerySnapshot>? _ordersStream;
 
   @override
   void initState() {
     super.initState();
-    // Re-render every 10 seconds to update remaining delivery minutes live on screen
-    _countdownTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _countdownTimer?.cancel();
-    super.dispose();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _ordersStream = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('orders')
+          .orderBy('createdAt', descending: true)
+          .snapshots();
+    }
   }
 
   String _formatTimeAgo(DateTime? date) {
@@ -65,12 +60,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         child: user == null
             ? const Center(child: Text("Please sign in to view your orders."))
             : StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(user.uid)
-                    .collection('orders')
-                    .orderBy('createdAt', descending: true)
-                    .snapshots(),
+                stream: _ordersStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -138,8 +128,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
                   for (var doc in docs) {
                     final data = doc.data() as Map<String, dynamic>;
-                    final timestamp = (data['createdAt'] as Timestamp?)
-                        ?.toDate();
+                    final millis = data['placedAtMillis'] as int?;
+                    final timestamp = millis != null
+                        ? DateTime.fromMillisecondsSinceEpoch(millis)
+                        : (data['createdAt'] as Timestamp?)?.toDate();
                     final deliveryMinutes =
                         (data['deliveryMinutes'] as num?)?.toInt() ?? 30;
 
@@ -148,7 +140,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           .difference(timestamp)
                           .inMinutes;
 
-                      if (elapsedMinutes < deliveryMinutes) {
+                      if (elapsedMinutes < deliveryMinutes && elapsedMinutes >= 0) {
                         // Order is still actively being prepared / delivered
                         final remainingMinutes =
                             deliveryMinutes - elapsedMinutes;
@@ -236,14 +228,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                               placeholder: (context, url) =>
                                                   Container(
                                                     color: Colors.grey.shade200,
-                                                    child: const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            color: AppColors
-                                                                .primary,
-                                                            strokeWidth: 2,
-                                                          ),
-                                                    ),
                                                   ),
                                             )
                                           : Container(
@@ -366,14 +350,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                               placeholder: (context, url) =>
                                                   Container(
                                                     color: Colors.grey.shade200,
-                                                    child: const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            color: AppColors
-                                                                .primary,
-                                                            strokeWidth: 2,
-                                                          ),
-                                                    ),
                                                   ),
                                             )
                                           : Container(

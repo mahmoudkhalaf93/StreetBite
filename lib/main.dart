@@ -17,11 +17,19 @@ import 'l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Initialize Firebase safely
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    debugPrint('Firebase initialization error: $e');
+  }
 
-  // Initialize Dependency Injection
-  await di.init();
+  // Initialize Dependency Injection safely
+  try {
+    await di.init();
+  } catch (e) {
+    debugPrint('DI initialization error: $e');
+  }
 
   runApp(const MyApp());
 }
