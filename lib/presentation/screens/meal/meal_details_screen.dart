@@ -184,9 +184,9 @@ class MealDetailsScreen extends StatelessWidget {
 
                   // Ingredients Section
                   if (meal.ingredients.isNotEmpty) ...[
-                    const Text(
-                      'Ingredients',
-                      style: TextStyle(
+                    Text(
+                      l10n.ingredients,
+                      style: const TextStyle(
                         fontFamily: 'SF Pro',
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -227,9 +227,9 @@ class MealDetailsScreen extends StatelessWidget {
                   ],
 
                   // Instructions Section
-                  const Text(
-                    'Instructions',
-                    style: TextStyle(
+                  Text(
+                    l10n.instructions,
+                    style: const TextStyle(
                       fontFamily: 'SF Pro',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -237,7 +237,7 @@ class MealDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    meal.strInstructions ?? 'No instructions provided.',
+                    meal.strInstructions ?? l10n.noInstructions,
                     style: TextStyle(
                       fontFamily: 'SF Compact',
                       fontSize: 14,
@@ -269,13 +269,13 @@ class MealDetailsScreen extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Column(
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Price',
-                    style: TextStyle(
+                    l10n.price,
+                    style: const TextStyle(
                       fontFamily: 'SF Compact',
                       color: Colors.grey,
                       fontSize: 12,

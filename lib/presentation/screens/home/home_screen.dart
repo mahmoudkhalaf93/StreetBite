@@ -725,14 +725,24 @@ class _HomeScreenState extends State<HomeScreen> {
     bool isDark,
     int index,
   ) {
-    final discounts = const [
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final discountsEn = const [
       '20% OFF',
       '30% OFF',
       'SPECIAL DEAL',
       'BUY 1 GET 1',
       '25% OFF',
     ];
-    final discountText = discounts[index % discounts.length];
+    final discountsAr = const [
+      'خصم 20%',
+      'خصم 30%',
+      'عرض خاص',
+      'عرض 1 + 1 هدية',
+      'خصم 25%',
+    ];
+    final discountText = isArabic
+        ? discountsAr[index % discountsAr.length]
+        : discountsEn[index % discountsEn.length];
 
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -799,22 +809,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    const Row(
+                    Row(
                       children: [
                         Text(
-                          'Order Now',
-                          style: TextStyle(
+                          isArabic ? 'اطلب الآن' : 'Order Now',
+                          style: const TextStyle(
                             fontFamily: 'SF Compact',
                             fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Icon(
-                          Icons.arrow_forward_rounded,
+                          isArabic
+                              ? Icons.arrow_back_rounded
+                              : Icons.arrow_forward_rounded,
                           size: 14,
-                          color: Colors.white70,
+                          color: Colors.white,
                         ),
                       ],
                     ),

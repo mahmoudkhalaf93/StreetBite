@@ -20,16 +20,24 @@ class FavouritesScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final user = FirebaseAuth.instance.currentUser;
 
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'My Favourites ❤️',
-          style: TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
+        title: Text(
+          isArabic ? 'الوجبات المفضلة ❤️' : 'My Favourites ❤️',
+          style: const TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
         ),
         elevation: 0,
       ),
       body: user == null
-          ? const Center(child: Text("Please sign in to view your favourites."))
+          ? Center(
+              child: Text(
+                isArabic
+                    ? 'يرجى تسجيل الدخول لمشاهدة المفضلات'
+                    : 'Please sign in to view your favourites.',
+              ),
+            )
           : StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
@@ -57,7 +65,7 @@ class FavouritesScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No favourite meals saved yet',
+                          isArabic ? 'لا توجد وجبات مفضلة محفوظة بعد' : 'No favourite meals saved yet',
                           style: TextStyle(
                             fontFamily: 'SF Pro',
                             fontSize: 18,
@@ -66,9 +74,11 @@ class FavouritesScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Tap the ❤️ heart icon on any meal to save it here!',
-                          style: TextStyle(
+                        Text(
+                          isArabic
+                              ? 'انقر على أيقونة ❤️ القلب لحفظ الوجبة هنا!'
+                              : 'Tap the ❤️ heart icon on any meal to save it here!',
+                          style: const TextStyle(
                             fontFamily: 'SF Compact',
                             color: Colors.grey,
                           ),

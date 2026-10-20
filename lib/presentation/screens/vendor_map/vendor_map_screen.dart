@@ -75,6 +75,7 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
 
   void _showVendorDetailsSheet(Map<String, dynamic> vendor) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     showModalBottomSheet(
       context: context,
@@ -176,9 +177,9 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
                   ),
                 ),
                 icon: const Icon(Icons.restaurant_menu_rounded),
-                label: const Text(
-                  'Explore Menu',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                label: Text(
+                  isArabic ? 'تصفح قائمة الطعام' : 'Explore Menu',
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
                   Navigator.pop(ctx);
@@ -265,11 +266,13 @@ class _VendorMapScreenState extends State<VendorMapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Nearby Vendors',
-          style: TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
+        title: Text(
+          isArabic ? 'المطاعم والقريبة 📍' : 'Nearby Vendors 📍',
+          style: const TextStyle(fontFamily: 'SF Pro', fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

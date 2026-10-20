@@ -177,6 +177,7 @@ class _CartScreenState extends State<CartScreen> {
 
     if (!mounted || !context.mounted) return;
 
+    final l10n = AppLocalizations.of(context)!;
     if (hasActiveOrder) {
       final shouldProceed = await showDialog<bool>(
         context: context,
@@ -184,23 +185,21 @@ class _CartScreenState extends State<CartScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Active Order in Progress'),
-          content: const Text(
-            'You already have an order currently being prepared! Would you like to place an additional order?',
-          ),
+          title: Text(l10n.activeOrderInProgressTitle),
+          content: Text(l10n.activeOrderInProgressBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('View Current Order'),
+              child: Text(l10n.viewCurrentOrder),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
               ),
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text(
-                'Place Additional Order',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                l10n.placeAdditionalOrder,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
@@ -239,6 +238,7 @@ class _CartScreenState extends State<CartScreen> {
       builder: (sheetContext) => StatefulBuilder(
         builder: (ctx, setSheetState) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
+          final l10n = AppLocalizations.of(context)!;
 
           return Container(
             padding: const EdgeInsets.all(24),
@@ -264,7 +264,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Checkout Summary',
+                  l10n.checkoutSummary,
                   style: TextStyle(
                     fontFamily: 'SF Pro',
                     fontSize: 20,
@@ -283,7 +283,7 @@ class _CartScreenState extends State<CartScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Delivery Address',
+                            l10n.deliveryAddress,
                             style: TextStyle(
                               fontFamily: 'SF Pro',
                               fontSize: 15,
@@ -312,7 +312,7 @@ class _CartScreenState extends State<CartScreen> {
                                     color: AppColors.primary,
                                   ),
                             label: Text(
-                              _isFetchingLocation ? 'Fetching...' : '+ Add New',
+                              _isFetchingLocation ? l10n.fetchingLocation : l10n.addNew,
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.primary,
@@ -348,7 +348,7 @@ class _CartScreenState extends State<CartScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(color: Colors.amber),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   children: [
                                     Icon(
                                       Icons.warning_amber_rounded,
@@ -358,8 +358,8 @@ class _CartScreenState extends State<CartScreen> {
                                     SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        'No address found. Please add a location above!',
-                                        style: TextStyle(
+                                        l10n.noAddressFound,
+                                        style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.amber,
@@ -465,7 +465,7 @@ class _CartScreenState extends State<CartScreen> {
 
                       // 2. Select Payment Method
                       Text(
-                        'Payment Method',
+                        l10n.paymentMethod,
                         style: TextStyle(
                           fontFamily: 'SF Pro',
                           fontSize: 15,
@@ -506,10 +506,10 @@ class _CartScreenState extends State<CartScreen> {
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
-                                  'Cash on Delivery',
-                                  style: TextStyle(
+                                  l10n.cashOnDelivery,
+                                  style: const TextStyle(
                                     fontFamily: 'SF Compact',
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -625,9 +625,9 @@ class _CartScreenState extends State<CartScreen> {
                     onPressed: () async {
                       if (selectedAddress == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
-                              'Please add or select a delivery address first!',
+                              l10n.selectAddressPrompt,
                             ),
                             backgroundColor: AppColors.error,
                           ),
@@ -647,9 +647,9 @@ class _CartScreenState extends State<CartScreen> {
                         selectedAddress!,
                       );
                     },
-                    child: const Text(
-                      'Checkout',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.checkout,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -668,6 +668,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -679,7 +680,9 @@ class _CartScreenState extends State<CartScreen> {
             if (state.orderSuccessMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.orderSuccessMessage!),
+                  content: Text(
+                    l10n.orderPlacedSuccessfully,
+                  ),
                   backgroundColor: AppColors.primary,
                 ),
               );
@@ -732,7 +735,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Delivery',
+                                          l10n.delivery,
                                           style: TextStyle(
                                             fontFamily: 'SF Pro',
                                             fontSize: 14,
@@ -761,7 +764,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Pickup',
+                                          l10n.pickup,
                                           style: TextStyle(
                                             fontFamily: 'SF Pro',
                                             fontSize: 14,
@@ -798,7 +801,7 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'Your cart is empty',
+                                  l10n.yourCartIsEmpty,
                                   style: TextStyle(
                                     fontFamily: 'SF Pro',
                                     fontSize: 18,
@@ -809,9 +812,9 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  'Add delicious meals to get started!',
-                                  style: TextStyle(
+                                Text(
+                                  l10n.addDeliciousMeals,
+                                  style: const TextStyle(
                                     fontFamily: 'SF Compact',
                                     color: Colors.grey,
                                   ),
@@ -829,7 +832,7 @@ class _CartScreenState extends State<CartScreen> {
                                 const SizedBox(height: 12),
                                 // "Order" Header
                                 Text(
-                                  'Order',
+                                  l10n.order,
                                   style: TextStyle(
                                     fontFamily: 'SF Pro',
                                     fontSize: 24,
@@ -991,9 +994,9 @@ class _CartScreenState extends State<CartScreen> {
                                     alignment: Alignment.centerLeft,
                                   ),
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text(
-                                    'See menu',
-                                    style: TextStyle(
+                                  child: Text(
+                                    l10n.seeMenu,
+                                    style: const TextStyle(
                                       fontFamily: 'SF Pro',
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -1007,25 +1010,25 @@ class _CartScreenState extends State<CartScreen> {
 
                                 // Cost Breakdown
                                 _buildCostRow(
-                                  'Order',
+                                  l10n.order,
                                   '\$${state.itemsSubtotal.toStringAsFixed(2)}',
                                   isDark,
                                 ),
                                 const SizedBox(height: 10),
                                 _buildCostRow(
-                                  'Delivery fee',
+                                  l10n.deliveryFee,
                                   '\$${state.deliveryFee.toStringAsFixed(2)}',
                                   isDark,
                                 ),
                                 const SizedBox(height: 10),
                                 _buildCostRow(
-                                  'Fees & Taxes',
+                                  l10n.feesAndTaxes,
                                   '\$${state.taxes.toStringAsFixed(2)}',
                                   isDark,
                                 ),
                                 const SizedBox(height: 10),
                                 _buildCostRow(
-                                  'Discount',
+                                  l10n.discount,
                                   '-\$${state.discount.toStringAsFixed(2)}',
                                   isDark,
                                   isDiscount: true,
@@ -1038,7 +1041,7 @@ class _CartScreenState extends State<CartScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Subtotal',
+                                      l10n.subtotal,
                                       style: TextStyle(
                                         fontFamily: 'SF Pro',
                                         fontSize: 22,
@@ -1089,9 +1092,9 @@ class _CartScreenState extends State<CartScreen> {
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
-                              : const Text(
-                                  'Checkout',
-                                  style: TextStyle(
+                              : Text(
+                                  l10n.checkout,
+                                  style: const TextStyle(
                                     fontFamily: 'SF Pro',
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

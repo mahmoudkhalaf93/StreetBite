@@ -92,6 +92,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get parkWay => 'بارك واي 145';
 
   @override
+  String get searchTitle => 'البحث';
+
+  @override
+  String get categoriesTitle => 'التصنيفات';
+
+  @override
   String get searchHint => 'طعام، بقالة، إلخ...';
 
   @override
@@ -154,6 +160,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hotOffers => 'عروض مميزة';
+
+  @override
+  String get pastOrders => 'الطلبات السابقة';
+
+  @override
+  String arrivesInMin(int min) {
+    return 'يصل خلال $min دقيقة';
+  }
+
+  @override
+  String itemsCount(int count) {
+    return '$count وجبات';
+  }
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get yesterday => 'أمس';
+
+  @override
+  String daysAgo(int count) {
+    return 'منذ $count أيام';
+  }
+
+  @override
+  String get recent => 'حديثاً';
+
+  @override
+  String get noOrdersYet => 'لا توجد طلبات سابقة بعد';
+
+  @override
+  String get pleaseSignInToViewOrders => 'يرجى تسجيل الدخول لمشاهدة طلباتك.';
 
   @override
   String get settings => 'الإعدادات';
@@ -253,7 +292,90 @@ class AppLocalizationsAr extends AppLocalizations {
       'هل توافق على تعيين هذه البطاقة كطريقة الدفع الأساسية؟';
 
   @override
+  String get ingredients => 'المكونات';
+
+  @override
+  String get instructions => 'طريقة التحضير';
+
+  @override
+  String get noInstructions => 'لا توجد طريقة تحضير متوفرة.';
+
+  @override
+  String get price => 'السعر';
+
+  @override
   String get agree => 'موافق';
+
+  @override
+  String get delivery => 'توصيل';
+
+  @override
+  String get pickup => 'استلام من الفرع';
+
+  @override
+  String get yourCartIsEmpty => 'سلة المشتريات فارغة';
+
+  @override
+  String get addDeliciousMeals => 'أضف وجبات شهية للبدء!';
+
+  @override
+  String get order => 'الطلب';
+
+  @override
+  String get seeMenu => 'تصفح القائمة';
+
+  @override
+  String get deliveryFee => 'رسوم التوصيل';
+
+  @override
+  String get feesAndTaxes => 'الرسوم والضرائب';
+
+  @override
+  String get discount => 'الخصم';
+
+  @override
+  String get subtotal => 'المجموع الكلي';
+
+  @override
+  String get checkout => 'الدفع والتأكيد';
+
+  @override
+  String get checkoutSummary => 'ملخص الطلب والدفع';
+
+  @override
+  String get deliveryAddress => 'عنوان التوصيل';
+
+  @override
+  String get addNew => '+ إضافة جديد';
+
+  @override
+  String get noAddressFound =>
+      'لم يتم العثور على عنوان! يرجى إضافة عنوان أعلاه.';
+
+  @override
+  String get paymentMethod => 'طريقة الدفع';
+
+  @override
+  String get cashOnDelivery => 'الدفع عند الاستلام';
+
+  @override
+  String get selectAddressPrompt => 'يرجى اختيار أو إضافة عنوان توصيل أولاً!';
+
+  @override
+  String get activeOrderInProgressTitle => 'يوجد طلب جاري تنفيذه';
+
+  @override
+  String get activeOrderInProgressBody =>
+      'لديك طلب جاري تحضيره حالياً! هل ترغب في عمل طلب إضافي آخر؟';
+
+  @override
+  String get viewCurrentOrder => 'عرض الطلب الحالي';
+
+  @override
+  String get placeAdditionalOrder => 'عمل طلب إضافي';
+
+  @override
+  String get orderPlacedSuccessfully => 'تم تقديم طلبك بنجاح! 🍕';
 
   @override
   String get cancel => 'إلغاء';

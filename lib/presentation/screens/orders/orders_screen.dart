@@ -31,18 +31,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
-  String _formatTimeAgo(DateTime? date) {
-    if (date == null) return 'Recent';
+  String _formatTimeAgo(DateTime? date, AppLocalizations l10n) {
+    if (date == null) return l10n.recent;
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inDays == 0 && now.day == date.day) {
-      return 'Today';
+      return l10n.today;
     } else if (difference.inDays == 1 ||
         (difference.inDays == 0 && now.day != date.day)) {
-      return 'Yesterday';
+      return l10n.yesterday;
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return l10n.daysAgo(difference.inDays);
     } else {
       return DateFormat('dd MMM').format(date);
     }
@@ -58,7 +58,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: user == null
-            ? const Center(child: Text("Please sign in to view your orders."))
+            ? Center(child: Text(l10n.pleaseSignInToViewOrders))
             : StreamBuilder<QuerySnapshot>(
                 stream: _ordersStream,
                 builder: (context, snapshot) {
@@ -101,7 +101,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'No orders placed yet',
+                                    l10n.noOrdersYet,
                                     style: TextStyle(
                                       fontFamily: 'SF Pro',
                                       fontSize: 18,
@@ -254,7 +254,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                               ),
                                               const SizedBox(width: 6),
                                               Text(
-                                                'Arrives in $remainingMinutes min',
+                                                l10n.arrivesInMin(remainingMinutes),
                                                 style: const TextStyle(
                                                   fontFamily: 'SF Pro',
                                                   fontSize: 16,
@@ -297,7 +297,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               vertical: 16.0,
                             ),
                             child: Text(
-                              'Past',
+                              l10n.pastOrders,
                               style: TextStyle(
                                 fontFamily: 'SF Pro',
                                 fontSize: 24,
@@ -332,7 +332,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               final itemCount =
                                   (data['itemCount'] as num?)?.toInt() ??
                                   items.length;
-                              final timeAgo = _formatTimeAgo(timestamp);
+                              final timeAgo = _formatTimeAgo(timestamp, l10n);
+                              final itemsText = l10n.itemsCount(itemCount);
 
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 20.0),
@@ -379,7 +380,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            '$itemCount items  •  $timeAgo',
+                                            '$itemsText  •  $timeAgo',
                                             style: const TextStyle(
                                               fontFamily: 'SF Compact',
                                               fontSize: 14,

@@ -93,6 +93,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parkWay => 'Park Way 145';
 
   @override
+  String get searchTitle => 'Search';
+
+  @override
+  String get categoriesTitle => 'Categories';
+
+  @override
   String get searchHint => 'Food, groceries, etc.';
 
   @override
@@ -155,6 +161,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hotOffers => 'Hot Offers';
+
+  @override
+  String get pastOrders => 'Past';
+
+  @override
+  String arrivesInMin(int min) {
+    return 'Arrives in $min min';
+  }
+
+  @override
+  String itemsCount(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String daysAgo(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String get recent => 'Recent';
+
+  @override
+  String get noOrdersYet => 'No orders placed yet';
+
+  @override
+  String get pleaseSignInToViewOrders => 'Please sign in to view your orders.';
 
   @override
   String get settings => 'Settings';
@@ -254,7 +293,90 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to set this as your primary payment card?';
 
   @override
+  String get ingredients => 'Ingredients';
+
+  @override
+  String get instructions => 'Instructions';
+
+  @override
+  String get noInstructions => 'No instructions provided.';
+
+  @override
+  String get price => 'Price';
+
+  @override
   String get agree => 'Agree';
+
+  @override
+  String get delivery => 'Delivery';
+
+  @override
+  String get pickup => 'Pickup';
+
+  @override
+  String get yourCartIsEmpty => 'Your cart is empty';
+
+  @override
+  String get addDeliciousMeals => 'Add delicious meals to get started!';
+
+  @override
+  String get order => 'Order';
+
+  @override
+  String get seeMenu => 'See menu';
+
+  @override
+  String get deliveryFee => 'Delivery fee';
+
+  @override
+  String get feesAndTaxes => 'Fees & Taxes';
+
+  @override
+  String get discount => 'Discount';
+
+  @override
+  String get subtotal => 'Subtotal';
+
+  @override
+  String get checkout => 'Checkout';
+
+  @override
+  String get checkoutSummary => 'Checkout Summary';
+
+  @override
+  String get deliveryAddress => 'Delivery Address';
+
+  @override
+  String get addNew => '+ Add New';
+
+  @override
+  String get noAddressFound => 'No address found. Please add a location above!';
+
+  @override
+  String get paymentMethod => 'Payment Method';
+
+  @override
+  String get cashOnDelivery => 'Cash on Delivery';
+
+  @override
+  String get selectAddressPrompt =>
+      'Please add or select a delivery address first!';
+
+  @override
+  String get activeOrderInProgressTitle => 'Active Order in Progress';
+
+  @override
+  String get activeOrderInProgressBody =>
+      'You already have an order currently being prepared! Would you like to place an additional order?';
+
+  @override
+  String get viewCurrentOrder => 'View Current Order';
+
+  @override
+  String get placeAdditionalOrder => 'Place Additional Order';
+
+  @override
+  String get orderPlacedSuccessfully => 'Order placed successfully! 🍕';
 
   @override
   String get cancel => 'Cancel';

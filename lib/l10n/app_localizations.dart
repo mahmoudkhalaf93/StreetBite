@@ -260,6 +260,18 @@ abstract class AppLocalizations {
   /// **'Park Way 145'**
   String get parkWay;
 
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchTitle;
+
+  /// No description provided for @categoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categoriesTitle;
+
   /// No description provided for @searchHint.
   ///
   /// In en, this message translates to:
@@ -379,6 +391,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hot Offers'**
   String get hotOffers;
+
+  /// No description provided for @pastOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get pastOrders;
+
+  /// No description provided for @arrivesInMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrives in {min} min'**
+  String arrivesInMin(int min);
+
+  /// No description provided for @itemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String itemsCount(int count);
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String daysAgo(int count);
+
+  /// No description provided for @recent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get recent;
+
+  /// No description provided for @noOrdersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders placed yet'**
+  String get noOrdersYet;
+
+  /// No description provided for @pleaseSignInToViewOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to view your orders.'**
+  String get pleaseSignInToViewOrders;
 
   /// No description provided for @settings.
   ///
@@ -566,11 +632,173 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to set this as your primary payment card?'**
   String get changeDefaultPaymentConfirm;
 
+  /// No description provided for @ingredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get ingredients;
+
+  /// No description provided for @instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get instructions;
+
+  /// No description provided for @noInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'No instructions provided.'**
+  String get noInstructions;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
   /// No description provided for @agree.
   ///
   /// In en, this message translates to:
   /// **'Agree'**
   String get agree;
+
+  /// No description provided for @delivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery'**
+  String get delivery;
+
+  /// No description provided for @pickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup'**
+  String get pickup;
+
+  /// No description provided for @yourCartIsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get yourCartIsEmpty;
+
+  /// No description provided for @addDeliciousMeals.
+  ///
+  /// In en, this message translates to:
+  /// **'Add delicious meals to get started!'**
+  String get addDeliciousMeals;
+
+  /// No description provided for @order.
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get order;
+
+  /// No description provided for @seeMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'See menu'**
+  String get seeMenu;
+
+  /// No description provided for @deliveryFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery fee'**
+  String get deliveryFee;
+
+  /// No description provided for @feesAndTaxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Fees & Taxes'**
+  String get feesAndTaxes;
+
+  /// No description provided for @discount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get discount;
+
+  /// No description provided for @subtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get subtotal;
+
+  /// No description provided for @checkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout'**
+  String get checkout;
+
+  /// No description provided for @checkoutSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout Summary'**
+  String get checkoutSummary;
+
+  /// No description provided for @deliveryAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery Address'**
+  String get deliveryAddress;
+
+  /// No description provided for @addNew.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add New'**
+  String get addNew;
+
+  /// No description provided for @noAddressFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No address found. Please add a location above!'**
+  String get noAddressFound;
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Method'**
+  String get paymentMethod;
+
+  /// No description provided for @cashOnDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash on Delivery'**
+  String get cashOnDelivery;
+
+  /// No description provided for @selectAddressPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add or select a delivery address first!'**
+  String get selectAddressPrompt;
+
+  /// No description provided for @activeOrderInProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Order in Progress'**
+  String get activeOrderInProgressTitle;
+
+  /// No description provided for @activeOrderInProgressBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have an order currently being prepared! Would you like to place an additional order?'**
+  String get activeOrderInProgressBody;
+
+  /// No description provided for @viewCurrentOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'View Current Order'**
+  String get viewCurrentOrder;
+
+  /// No description provided for @placeAdditionalOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Place Additional Order'**
+  String get placeAdditionalOrder;
+
+  /// No description provided for @orderPlacedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Order placed successfully! 🍕'**
+  String get orderPlacedSuccessfully;
 
   /// No description provided for @cancel.
   ///

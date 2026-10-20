@@ -27,6 +27,8 @@
   "passwordsDoNotMatch": "Passwords do not match",
   "underConstruction": "This feature is currently in the development phase",
   "parkWay": "Park Way 145",
+  "searchTitle": "Search",
+  "categoriesTitle": "Categories",
   "searchHint": "Food, groceries, etc.",
   "acclaimed": "Acclaimed",
   "healthy": "Healthy",
@@ -54,6 +56,36 @@
     }
   },
   "hotOffers": "Hot Offers",
+  "pastOrders": "Past",
+  "arrivesInMin": "Arrives in {min} min",
+  "@arrivesInMin": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "itemsCount": "{count} items",
+  "@itemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recent": "Recent",
+  "noOrdersYet": "No orders placed yet",
+  "pleaseSignInToViewOrders": "Please sign in to view your orders.",
   "settings": "Settings",
   "contactUs": "Contact us",
   "helpCenter": "Help center",
@@ -85,6 +117,33 @@
   "changeDefaultAddressConfirm": "Are you sure you want to set this as your default delivery address?",
   "changeDefaultPaymentTitle": "Change Primary Payment Method",
   "changeDefaultPaymentConfirm": "Are you sure you want to set this as your primary payment card?",
+  "ingredients": "Ingredients",
+  "instructions": "Instructions",
+  "noInstructions": "No instructions provided.",
+  "price": "Price",
   "agree": "Agree",
+  "delivery": "Delivery",
+  "pickup": "Pickup",
+  "yourCartIsEmpty": "Your cart is empty",
+  "addDeliciousMeals": "Add delicious meals to get started!",
+  "order": "Order",
+  "seeMenu": "See menu",
+  "deliveryFee": "Delivery fee",
+  "feesAndTaxes": "Fees & Taxes",
+  "discount": "Discount",
+  "subtotal": "Subtotal",
+  "checkout": "Checkout",
+  "checkoutSummary": "Checkout Summary",
+  "deliveryAddress": "Delivery Address",
+  "addNew": "+ Add New",
+  "noAddressFound": "No address found. Please add a location above!",
+  "paymentMethod": "Payment Method",
+  "cashOnDelivery": "Cash on Delivery",
+  "selectAddressPrompt": "Please add or select a delivery address first!",
+  "activeOrderInProgressTitle": "Active Order in Progress",
+  "activeOrderInProgressBody": "You already have an order currently being prepared! Would you like to place an additional order?",
+  "viewCurrentOrder": "View Current Order",
+  "placeAdditionalOrder": "Place Additional Order",
+  "orderPlacedSuccessfully": "Order placed successfully! 🍕",
   "cancel": "Cancel"
 }

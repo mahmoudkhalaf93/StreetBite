@@ -139,7 +139,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
             children: [
               // 1. Header Title
               Text(
-                'Search',
+                l10n.searchTitle,
                 style: TextStyle(
                   fontFamily: 'SF Pro',
                   fontSize: 28,
@@ -205,7 +205,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
               // 3. Categories Header
               Text(
-                'Categories',
+                l10n.categoriesTitle,
                 style: TextStyle(
                   fontFamily: 'SF Pro',
                   fontSize: 22,
