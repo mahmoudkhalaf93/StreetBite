@@ -7,8 +7,8 @@
 ### Slide 1: Title Slide
 - **Title:** StreetBite V1.0
 - **Subtitle:** Flutter Food Discovery & Ordering App - Graduation Capstone
-- **Visual:** StreetBite App Logo (Use `assets/icons/appicon.png` or `assets/images/applogofastfood.png`)
-- **Footer:** Your Name / Team Name
+- **Visual:** StreetBite App Logo (`assets/icons/appicon.png` or `assets/images/applogofastfood.png`)
+- **Footer:** Mahmoud Khalaf — Senior Flutter Engineer
 
 ---
 
@@ -19,7 +19,7 @@
   - Implement Clean Architecture (Data, Domain, Presentation).
   - Integrate live APIs (TheMealDB) and Cloud Firestore for seamless data persistence.
   - Deliver a production-ready APK via Firebase App Distribution.
-- **Visual:** Split-screen showing the Light Mode and Dark Mode of the Home Screen side-by-side.
+- **Visual:** Split-screen showing `home_light.jpg` and `home_dark.jpg` side-by-side.
 
 ---
 
@@ -29,7 +29,7 @@
   - **Version Control:** GitHub for branching and commits.
   - **QA & Automation:** Jira for bug tracking, Appium + Java for UI automation.
   - **Beta Delivery:** Firebase App Distribution for tester feedback.
-- **Visual:** Flowchart arrows: `Code (Flutter)` ➔ `Test (Appium/QA)` ➔ `Deploy (Firebase)`.
+- **Visual:** Flowchart arrows: `Code (Flutter)` ➔ `Test (Appium/QA)` ➔ `Deploy (Firebase)` + Screenshot: `test_app.jpg`.
 
 ---
 
@@ -51,7 +51,7 @@
   - Fetches 14 real food categories and live meals from TheMealDB.
   - Implements True Lazy Loading using `CustomScrollView` and `Slivers`.
   - Zero-lag image caching with `CachedNetworkImage` and `memCacheWidth`.
-- **Visual:** Screenshot: `home_screen_en.png`.
+- **Visual:** Screenshots: `home_light_arabic.jpg` and `categories_light_a.jpg`.
 
 ---
 
@@ -59,10 +59,10 @@
 - **Title:** Live Cart & Orders Persistence
 - **Content:**
   - Calculates subtotal, delivery fees, taxes, and final total dynamically.
-  - Prevents checkout without a Geo-located Address.
+  - Geolocator address picker with 150m proximity duplicate prevention.
   - Synchronizes active Cart and Orders live with Cloud Firestore.
   - 30-minute Live Countdown Timer for active deliveries.
-- **Visual:** Screenshot: `cart_screen.png` and `orders_screen.png`.
+- **Visual:** Screenshots: `cart_pickup_light.jpg` and `orders_arabic_light.jpg`.
 
 ---
 
@@ -70,9 +70,9 @@
 - **Title:** High Security & Biometric Login
 - **Content:**
   - Fingerprint / FaceID integration via `local_auth`.
-  - Securely binds biometrics to the specific user's UID and email in SharedPreferences.
-  - Protects sensitive Profile actions (Payment Info, Addresses) behind biometric guards.
-- **Visual:** Screenshot: `biometric_prompt.png`.
+  - Securely binds biometrics to the specific user's UID in SharedPreferences.
+  - Protects sensitive Profile actions behind biometric guards.
+- **Visual:** Screenshots: `profile_enabled_biometric_to_login_dark.jpg` and `login_with_fingerprint.jpg`.
 
 ---
 
@@ -80,19 +80,19 @@
 - **Title:** Nearby Vendors Map
 - **Content:**
   - Integrated `google_maps_flutter`.
-  - Displays 5 hardcoded local vendor pins.
+  - Displays 5 nearby local vendor pins.
   - Custom InfoWindows showing Vendor Name, Cuisine, and Rating.
-- **Visual:** Screenshot: `vendor_map.png`.
+- **Visual:** Screenshots: `nearby_vendors.jpg` and `nearby_vendors_pop_up_dialog_dark.jpg`.
 
 ---
 
 ### Slide 9: Testing Strategy
 - **Title:** QA & Appium Automation
 - **Content:**
-  - Detailed Manual Test Plan and Traceability Matrix.
+  - Detailed Manual Test Plan and Traceability Matrix in `docs/qa/`.
   - 100% Passing Rate on Critical UI flows.
-  - **Appium Java Automation:** Scripts written for Login validation, Home scrolling (W3C Actions), and Cart SnackBar assertions.
-- **Visual:** Screenshot of the IDE running Appium Java tests or TestNG console output.
+  - **Appium Java Automation:** Scripts written for Login validation and Home scrolling (W3C Actions).
+- **Visual:** Screenshot of IDE running Appium Java tests or TestNG console output.
 
 ---
 
