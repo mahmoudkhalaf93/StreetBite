@@ -131,9 +131,25 @@ class FavouritesScreen extends StatelessWidget {
                                               imageUrl: meal.strMealThumb!,
                                               fit: BoxFit.cover,
                                               memCacheWidth: 400,
+                                              maxWidthDiskCache: 400,
+                                              fadeInDuration: const Duration(milliseconds: 150),
+                                              placeholder: (context, url) => Container(
+                                                color: isDark ? const Color(0xFF2A2A2A) : Colors.grey.shade200,
+                                                child: const Center(
+                                                  child: CircularProgressIndicator(
+                                                    color: AppColors.primary,
+                                                    strokeWidth: 2,
+                                                  ),
+                                                ),
+                                              ),
+                                              errorWidget: (context, url, error) => Container(
+                                                color: Colors.grey.shade300,
+                                                child: const Icon(Icons.fastfood, color: Colors.grey),
+                                              ),
                                             )
                                           : Container(
                                               color: Colors.grey.shade300,
+                                              child: const Icon(Icons.fastfood, color: Colors.grey),
                                             ),
                                     ),
                                   ),

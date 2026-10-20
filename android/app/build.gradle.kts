@@ -20,7 +20,7 @@ plugins {
 
 android {
     namespace = "com.example.streetbite"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
