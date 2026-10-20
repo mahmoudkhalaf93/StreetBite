@@ -44,7 +44,7 @@ Every screen is presented in three synchronized variations: **Light Mode (Englis
 
 | Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/home_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/home_light_arabic.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/home_dark.jpg" width="260"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/home_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/home_light_arabic_(2).jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/home_screen_dark_.jpg" width="260"/> |
 
 </div>
 
@@ -64,26 +64,26 @@ Every screen is presented in three synchronized variations: **Light Mode (Englis
 ---
 
 ### 4. 🍕 Category Meals Filter
-> Category-specific meal feeds filtered by food type (Beef, Chicken, Pasta, Dessert, etc.).
+> Category-specific meal feeds filtered by food type (Miscellaneous, Beef, Vegetarian, Dessert, etc.).
 
 <div align="center">
 
 | Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/categories_light_a.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/category_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/beef_cat_dark.jpg" width="260"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/cat_miscellaneous_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/category_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/dessert_cat_dark.jpg" width="260"/> |
 
 </div>
 
 ---
 
-### 5. 🔍 Live Dish Search (Pizza, Burger)
+### 5. 🔍 Live Dish Search (Pizza, Vegetarian)
 > Live search query results with instant API response filtering.
 
 <div align="center">
 
-| Search Light (Pizza) | Search Arabic (Burger) | Search Dark (Pizza) |
+| Search Light (Pizza) | Search Arabic (Vegetarian) | Search Dark (Pizza) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/search_pizza_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/search_burger_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/search_pizza_dark.jpg" width="260"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/search_pizza_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/veg_cat_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/search_pizza_dark.jpg" width="260"/> |
 
 </div>
 
@@ -96,7 +96,7 @@ Every screen is presented in three synchronized variations: **Light Mode (Englis
 
 | Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/all_page_details_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/details_page_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/add_to_cart_page_details_dark.jpg" width="260"/> |
+| <img src="docs/final_submission/evidence/app_screenshots/details_page_english_light1.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/details_page_arabic_light1.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/details_page_english_dark1.jpg" width="260"/> |
 
 </div>
 
