@@ -96,13 +96,14 @@
 
 ---
 
-### Slide 10: Features — Profile & Biometric Security
-- **Title:** Profile Management & Biometric Guard
+### Slide 10: Features — Profile, Location & Biometric Security
+- **Title:** Profile Management, Geolocation & Biometric Guard
 - **Content:**
   - User avatar upload from phone gallery directly to Firebase Storage.
   - Device info display (`device_info_plus`) showing device model and Android OS version.
-  - Biometric fingerprint login (`local_auth`) securely mapped per User `UID`.
-- **Visual:** Screenshots: `profile_arabic_light.jpg`, `profile_enabled_biometric_to_login_dark.jpg`, and `login_with_fingerprint.jpg`.
+  - GPS Geolocation address fetch (`get_location_from_profile_dark.jpg`, `fetching_location.jpg`).
+  - Biometric fingerprint login (`local_auth`) securely enabled per User `UID` (`enable_biometric_to_login.jpg`).
+- **Visual:** Screenshots: `profile_arabic_light.jpg`, `profile_enabled_biometric_to_login_dark.jpg`, `get_location_from_profile_dark.jpg`, and `login_with_fingerprint.jpg`.
 
 ---
 

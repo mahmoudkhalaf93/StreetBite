@@ -29,9 +29,9 @@ Every screen is presented in three synchronized variations: **Light Mode (Englis
 > Native fingerprint prompt securely mapped to the specific user's UID for instant biometric login.
 <div align="center">
 
-| Fingerprint Prompt | Biometric Authenticated Session |
-| :---: | :---: |
-| <img src="docs/final_submission/evidence/app_screenshots/login_with_fingerprint.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/sign_in_to_your_account_with_fingerprint.jpg" width="260"/> |
+| Fingerprint Prompt | Enable Biometric Setting | Biometric Enabled Profile |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/login_with_fingerprint.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/enable_biometric_to_login.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/profile_enabled_biometric_to_login_dark.jpg" width="260"/> |
 
 </div>
 
@@ -162,6 +162,16 @@ Every screen is presented in three synchronized variations: **Light Mode (Englis
 | Light Mode (English) | Light Mode (Arabic RTL) | Dark Mode (English) |
 | :---: | :---: | :---: |
 | <img src="docs/final_submission/evidence/app_screenshots/profile_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/profile_arabic_light.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/profile_dark.jpg" width="260"/> |
+
+</div>
+
+#### GPS Location Fetching & Permission Prompt
+> GPS geolocation fetching from profile for address creation with permission dialogs and loading indicators.
+<div align="center">
+
+| Get Location from Profile | Turn On Location Prompt | Fetching Location State |
+| :---: | :---: | :---: |
+| <img src="docs/final_submission/evidence/app_screenshots/get_location_from_profile_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/turn_on_location_dark.jpg" width="260"/> | <img src="docs/final_submission/evidence/app_screenshots/fetching_location.jpg" width="260"/> |
 
 </div>
 
