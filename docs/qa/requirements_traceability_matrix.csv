@@ -1,8 +1,8 @@
 Requirement ID,Requirement Description,Screen/Feature,Test Case IDs,Execution Status,Defect IDs,Evidence
-REQ-001,User Login via Email/Password,Login Screen,TC_LOGIN_001; TC_LOGIN_002; TC_LOGIN_003,PASS,None,login_success.png
-REQ-002,Biometric Authentication,Login & Profile,TC_LOGIN_004,PASS,None,biometric_prompt.png
-REQ-003,Live API Meal Loading,Home Screen,TC_HOME_001,PASS,None,home_screen_en.png
-REQ-004,Add to Cart & SnackBar,Home & Details,TC_HOME_002,PASS,None,cart_snackbar.png
-REQ-005,Offline Caching,Data Layer,TC_HOME_003,PASS,None,home_offline.png
-REQ-006,EN/AR Localization,App-wide,TC_HOME_005,PASS,None,home_screen_ar.png
-REQ-007,Light/Dark Theme,App-wide,TC_HOME_004,PASS,None,home_dark_mode.png
+REQ-001,User Login via Email/Password,Login Screen,TC_LOGIN_001; TC_LOGIN_002; TC_LOGIN_003,PASS,None,login.jpg
+REQ-002,Biometric Authentication,Login & Profile,TC_LOGIN_004,PASS,None,login_with_fingerprint.jpg
+REQ-003,Live API Meal Loading,Home Screen,TC_HOME_001,PASS,None,home_light.jpg
+REQ-004,Add to Cart & SnackBar,Home & Details,TC_HOME_002,PASS,None,home_add_to_cart_light.jpg
+REQ-005,Offline Caching,Data Layer,TC_HOME_003,PASS,None,N/A
+REQ-006,EN/AR Localization,App-wide,TC_HOME_005,PASS,None,home_light_arabic_(2).jpg
+REQ-007,Light/Dark Theme,App-wide,TC_HOME_004,PASS,None,home_screen_dark_.jpg
